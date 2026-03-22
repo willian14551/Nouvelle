@@ -1,0 +1,54 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body{
+    background-color: black;
+}
+
+.menu {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end;
+    background-color: rgb(150, 28, 28);
+    padding: 10px 40px;
+    gap: 100px;
+}
+
+.menu-links {
+    list-style: none; /* remove as bolinhas da lista */
+    display: flex;
+    gap: 30px;
+}
+
+.menu-links a {
+    color: #F0AD12;
+    text-decoration: none; /* para limpar a letra*/
+    font-size: 30px;
+    font-weight: 500;
+    padding: 8px 12px;
+    transition: all 0.3s ease; /* só pra melhorar o efeito do hover */
+}
+
+.menu-links a:hover, .menu-login a:hover{
+    color: #4da6ff;
+}
+
+.menu-login {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+    margin-left: auto;
+}
+
+.menu-login a {
+    color: #F0AD12;
+    text-decoration: none;
+    font-size: 30px;
+    font-weight: 500;
+    padding: 8px 12px;
+    transition: all 0.3s ease;
+}
