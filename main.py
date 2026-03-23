@@ -24,8 +24,9 @@ url = f"https://api.themoviedb.org/3/movie/now_playing?api_key={API_KEY}&languag
 async def home(request: Request):
 
     # Gerenciador de contexto que instancia um objeto AsyncClient
-    async with httpx.AsyncClient() as client:
-        
+    # !!!! Para funcionar no servidor da puc deve ter o "verify=False" sempre que tiver a linha abaixo !!!!
+    async with httpx.AsyncClient(verify=False) as client:
+
         # Chamada de método, o await pede pra esperar, salvando o objeto da resposta na variável
         resposta = await client.get(url)
         # Chamada de Método que transforma a resposta de uma forma que o python consiga ler, salvando na variável dados
@@ -45,7 +46,7 @@ async def home(request: Request):
 @app.get("/filmesCartaz.html")
 async def filmesCartaz(request: Request):
 
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(verify=False) as client:
         resposta = await client.get(url)
         dados = resposta.json()
         filmesCartaz = dados.get("results", [])[:5]
@@ -64,7 +65,7 @@ async def pegar_detalhes(filme_id: int):
 @app.get("/emBreve.html")
 async def filmesCartaz(request: Request):
 
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(verify=False) as client:
         resposta = await client.get(url)
         dados = resposta.json()
         filmesCartaz = dados.get("results", [])[:5]
