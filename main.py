@@ -17,12 +17,11 @@ app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 # Variável que instância um objeto da classe Jinja2Templates que determina o local onde procurar um HTML
 templates = Jinja2Templates(directory="templates")
 API_KEY = "2ba00226f0008ae80f498510e6d1882a"
+url = f"https://api.themoviedb.org/3/movie/now_playing?api_key={API_KEY}&language=pt-BR&page=1"
 
 @app.get("/")
-
 # Função Assincrona (endpoint) que recebe o parâmetro do tipo Request chamado request
 async def home(request: Request):
-    url = f"https://api.themoviedb.org/3/movie/now_playing?api_key={API_KEY}&language=pt-BR&page=1"
 
     # Gerenciador de contexto que instancia um objeto AsyncClient
     async with httpx.AsyncClient() as client:
@@ -42,4 +41,36 @@ async def home(request: Request):
         context={"request": request, "filmes": filmes_recentes}
     )
 
+# Mostra o caminho de outra página para o python
+@app.get("/filmesCartaz.html")
+async def filmesCartaz(request: Request):
 
+    async with httpx.AsyncClient() as client:
+        resposta = await client.get(url)
+        dados = resposta.json()
+        filmesCartaz = dados.get("results", [])[:5]
+
+    return templates.TemplateResponse(
+        request=request,
+        name="filmesCartaz.html",
+        context={"request": request, "filmes": filmesCartaz}
+    )
+
+@app.get("/api/detalhes/{filme_id}")
+async def pegar_detalhes(filme_id: int):
+    # Imagine que você busca os detalhes de um filme específico aqui
+    return {"id": filme_id, "status": "Disponível", "assentos": [1, 5, 8]}
+
+@app.get("/emBreve.html")
+async def filmesCartaz(request: Request):
+
+    async with httpx.AsyncClient() as client:
+        resposta = await client.get(url)
+        dados = resposta.json()
+        filmesCartaz = dados.get("results", [])[:5]
+
+    return templates.TemplateResponse(
+        request=request,
+        name="filmesCartaz.html",
+        context={"request": request, "filmes": filmesCartaz}
+    )

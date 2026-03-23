@@ -1,6 +1,6 @@
-console.log("Executando o js ...");
+console.log("Executando o js ..."); // Teste no console
 
-const busca = "Batman";
+const busca = "Harry Potter";
 
 async function carregarFilmes() {
     // Link da API
@@ -11,40 +11,50 @@ async function carregarFilmes() {
     const dados = await resposta.json();
 
     const corpoTabela = document.getElementById("corpoTabela");
-    const linhaImg = document.createElement("tr");
-
-    // Procura o filme na API
+    // Procura o poster do filme na API
     if (dados.Search) {
+        const linha = document.createElement("tr");
         dados.Search.forEach(filme => {
-            console.log(filme.Title);
-
-            const linha = document.createElement("tr");
+            console.log(filme.Poster); // Teste no console
             
-            const imgColuna = document.createElement("td");
+            const imgTd = document.createElement("td");
             const img = document.createElement("img");
             img.src = filme.Poster;
-            img.width = 100;
-            imgColuna.appendChild(img);
-            
-            const tituloColuna = document.createElement("td");
-            const titulo = document.createElement("th");
-            titulo.innerText = filme.Title;
-            tituloColuna.appendChild(titulo);
+            img.width = 250;
+            imgTd.appendChild(img);
 
-            const descColuna = document.createElement("td");
-            const desc = document.createElement("td");
-            desc.innerText = filme.Plot;
-            descColuna.appendChild(desc);
-
-            linha.appendChild(imgColuna);
-            linha.appendChild(tituloColuna);
-            linha.appendChild(descColuna);
-
+            linha.appendChild(imgTd);
             corpoTabela.appendChild(linha);
         });
-    } else {
-        console.log("NENHUM FILME ENCONTRADO!");
+
+    } if (dados.Search){
+        const linha = document.createElement("tr");
+        dados.Search.forEach(filme => {
+            console.log(filme.Title); // Teste no console
+
+            const titulo = document.createElement("th");
+            titulo.innerText = filme.Title;
+
+            linha.appendChild(titulo);
+            corpoTabela.appendChild(linha);
+       });
+
+    } if (dados.Search){
+        const linha = document.createElement("tr");
+        dados.Search.forEach(filme => {
+            console.log(filme.Title); // Teste no console
+            
+            const desc = document.createElement("td");
+            desc.innerText = filme.Overview;
+
+            linha.appendChild(desc);
+            corpoTabela.appendChild(linha);
+        });
+        
+    }  else {
+        console.log("NENHUM FILME CHAMADO '"+busca+"' FOI ENCONTRADO!");
     }
+
 }
 
 carregarFilmes();
