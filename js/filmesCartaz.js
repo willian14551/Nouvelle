@@ -1,3 +1,5 @@
+// Falta filtrar a busca e pesquisar com o Enter além do botão da tela
+
 const btnBuscar = document.getElementById("btnBuscar");
 btnBuscar.addEventListener("click", async () => {
     carregarFilmes();
