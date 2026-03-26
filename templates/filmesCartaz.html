@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/main.css"> 
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/filmesCartaz.css"> 
     <title>Filmes em Cartaz</title>
 </head>
 <body>
@@ -22,14 +23,22 @@
   </nav>
 
   <center>
-    {% for filme in filmes %}
-    <div class="divFilmes">
-      <table class="tabelaFilmes">
-          <tbody id="corpoTabela">
-          </tbody>
-        </table>
+    <!-- Caixa de Pesquisa -->
+    <div class="search-box">
+      <input type="text" id="inputBuscar" placeholder="Buscar..">
+      <button id="btnBuscar">🔍︎</button>
+      <!-- LUPA EM TXT => "https://www.emojiall.com/pt/code/1F50D-FE0E" -->
+    </div>
+
+    <div class="gradeFilmes" id="corpoTabela">
+      {% for filme in filmes %}
+      <div class="cardFilme">
+        <img class="posterFilme" src="https://image.tmdb.org/t/p/w500{{ filme.poster_path }}" alt="{{ filme.title }}">
+        <strong class="tituloFilme">{{ filme.title }}</strong>
       </div>
-    {% endfor %}
+      {% endfor %}
+    </div>
+    
   </center>
   
   <script src="/js/filmesCartaz.js"></script>

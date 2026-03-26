@@ -49,7 +49,7 @@ async def filmesCartaz(request: Request):
     async with httpx.AsyncClient(verify=False) as client:
         resposta = await client.get(url)
         dados = resposta.json()
-        filmesCartaz = dados.get("results", [])[:5]
+        filmesCartaz = dados.get("results", [])[:10]
 
     return templates.TemplateResponse(
         request=request,

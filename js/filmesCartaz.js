@@ -1,60 +1,47 @@
-console.log("Executando o js ..."); // Teste no console
+const btnBuscar = document.getElementById("btnBuscar");
+btnBuscar.addEventListener("click", async () => {
+    carregarFilmes();
+});
 
-const busca = "Harry Potter";
+const inputBuscar = document.getElementById("inputBuscar");
 
 async function carregarFilmes() {
     // Link da API
-    const url = "https://www.omdbapi.com/?s="+busca+"&apikey=9d5bacaa";
-
-    // Faz a requisição dos dados e salva
-    const resposta = await fetch(url);
-    const dados = await resposta.json();
+    const url = "https://www.omdbapi.com/?s="+inputBuscar.value+"&apikey=9d5bacaa";
 
     const corpoTabela = document.getElementById("corpoTabela");
-    // Procura o poster do filme na API
-    if (dados.Search) {
-        const linha = document.createElement("tr");
-        dados.Search.forEach(filme => {
-            console.log(filme.Poster); // Teste no console
+    // Limpa a tela antes de mostrar o resultado de busca
+    corpoTabela.innerHTML = "";
+
+    try {
+        // Faz a requisição dos dados e salva
+        const resposta = await fetch(url);
+        const dados = await resposta.json();
+
+        // Procura o filme na API
+        if (dados.Search) {
             
-            const imgTd = document.createElement("td");
-            const img = document.createElement("img");
-            img.src = filme.Poster;
-            img.width = 250;
-            imgTd.appendChild(img);
 
-            linha.appendChild(imgTd);
-            corpoTabela.appendChild(linha);
-        });
+            dados.Search.forEach(filme => {
+                console.log(filme.Poster); // Teste no console
 
-    } if (dados.Search){
-        const linha = document.createElement("tr");
-        dados.Search.forEach(filme => {
-            console.log(filme.Title); // Teste no console
-
-            const titulo = document.createElement("th");
-            titulo.innerText = filme.Title;
-
-            linha.appendChild(titulo);
-            corpoTabela.appendChild(linha);
-       });
-
-    } if (dados.Search){
-        const linha = document.createElement("tr");
-        dados.Search.forEach(filme => {
-            console.log(filme.Title); // Teste no console
-            
-            const desc = document.createElement("td");
-            desc.innerText = filme.Overview;
-
-            linha.appendChild(desc);
-            corpoTabela.appendChild(linha);
-        });
-        
-    }  else {
-        console.log("NENHUM FILME CHAMADO '"+busca+"' FOI ENCONTRADO!");
+                const divCard = document.createElement("div");
+                divCard.className = "cardFilme";
+                divCard.innerHTML = `
+                    <img class="posterFilme" src="${filme.Poster}">
+                    <strong class="tituloFilme">${filme.Title}</strong>
+                `;
+                corpoTabela.appendChild(divCard);
+            });
+ 
+        }  else {
+            console.log("NENHUM FILME CHAMADO '"+inputBuscar+"' FOI ENCONTRADO!");
+            alert("NENHUM FILME CHAMADO '"+inputBuscar+"' FOI ENCONTRADO!");
+        }
+    } catch (error) {
+        console.log("Erro ao buscar os dados: ", error);
     }
-
+    
 }
 
-carregarFilmes();
+console.log("filmesCartaz.js foi executado!"); // Teste no console
