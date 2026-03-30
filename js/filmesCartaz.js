@@ -1,49 +1,53 @@
-// Falta filtrar a busca e pesquisar com o Enter além do botão da tela
+// Variável global para guardar os filmes que o Python enviou
+let filmesDaPagina = [];
+
+// Assim que a página carregar, buscamos a lista do Python
+window.onload = async () => {
+    const resposta = await fetch("/api/filmes-lista");
+    filmesDaPagina = await resposta.json();
+    console.log("Filmes carregados para busca local:", filmesDaPagina);
+};
 
 const btnBuscar = document.getElementById("btnBuscar");
-btnBuscar.addEventListener("click", async () => {
-    carregarFilmes();
+btnBuscar.addEventListener("click", () => {
+    filtrarFilmes(); // Mudamos o nome para refletir que é um filtro
+});
+
+window.addEventListener("keydown", function(event){
+    if (event.key == "Enter"){
+        filtrarFilmes();
+    }
 });
 
 const inputBuscar = document.getElementById("inputBuscar");
 
-async function carregarFilmes() {
-    // Link da API
-    const url = "https://www.omdbapi.com/?s="+inputBuscar.value+"&apikey=9d5bacaa";
-
+function filtrarFilmes() {
+    const termo = inputBuscar.value.toLowerCase();
     const corpoTabela = document.getElementById("corpoTabela");
-    // Limpa a tela antes de mostrar o resultado de busca
     corpoTabela.innerHTML = "";
 
-    try {
-        // Faz a requisição dos dados e salva
-        const resposta = await fetch(url);
-        const dados = await resposta.json();
+    // FILTRAGEM LOCAL: Olhamos apenas para os filmes que já temos
+    const resultados = filmesDaPagina.filter(filme => 
+        filme.title.toLowerCase().includes(termo)
+    );
 
-        // Procura o filme na API
-        if (dados.Search) {
+    if (resultados.length > 0) {
+        resultados.forEach(filme => {
+            const divCard = document.createElement("div");
+            divCard.className = "cardFilme";
             
+            // Montando a URL da imagem do TMDb
+            const posterUrl = filme.poster_path 
+                ? "https://image.tmdb.org/t/p/w500" + filme.poster_path 
+                : "caminho/para/imagem-padrao.jpg";
 
-            dados.Search.forEach(filme => {
-                console.log(filme.Poster); // Teste no console
-
-                const divCard = document.createElement("div");
-                divCard.className = "cardFilme";
-                divCard.innerHTML = `
-                    <img class="posterFilme" src="${filme.Poster}">
-                    <strong class="tituloFilme">${filme.Title}</strong>
-                `;
-                corpoTabela.appendChild(divCard);
-            });
- 
-        }  else {
-            console.log("NENHUM FILME CHAMADO '"+inputBuscar+"' FOI ENCONTRADO!");
-            alert("NENHUM FILME CHAMADO '"+inputBuscar+"' FOI ENCONTRADO!");
-        }
-    } catch (error) {
-        console.log("Erro ao buscar os dados: ", error);
+            divCard.innerHTML = `
+                <img class="posterFilme" src="${posterUrl}">
+                <strong class="tituloFilme">${filme.title}</strong>
+            `;
+            corpoTabela.appendChild(divCard);
+        });
+    } else {
+        alert("Nenhum dos filmes em cartaz corresponde a: " + inputBuscar.value);
     }
-    
 }
-
-console.log("filmesCartaz.js foi executado!"); // Teste no console
