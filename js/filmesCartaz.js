@@ -1,60 +1,53 @@
-console.log("Executando o js ..."); // Teste no console
+// Variável global para guardar os filmes que o Python enviou
+let filmesDaPagina = [];
 
-const busca = "Harry Potter";
+// Assim que a página carregar, buscamos a lista do Python
+window.onload = async () => {
+    const resposta = await fetch("/api/filmes-lista");
+    filmesDaPagina = await resposta.json();
+    console.log("Filmes carregados para busca local:", filmesDaPagina);
+};
 
-async function carregarFilmes() {
-    // Link da API
-    const url = "https://www.omdbapi.com/?s="+busca+"&apikey=9d5bacaa";
+const btnBuscar = document.getElementById("btnBuscar");
+btnBuscar.addEventListener("click", () => {
+    filtrarFilmes(); // Mudamos o nome para refletir que é um filtro
+});
 
-    // Faz a requisição dos dados e salva
-    const resposta = await fetch(url);
-    const dados = await resposta.json();
-
-    const corpoTabela = document.getElementById("corpoTabela");
-    // Procura o poster do filme na API
-    if (dados.Search) {
-        const linha = document.createElement("tr");
-        dados.Search.forEach(filme => {
-            console.log(filme.Poster); // Teste no console
-            
-            const imgTd = document.createElement("td");
-            const img = document.createElement("img");
-            img.src = filme.Poster;
-            img.width = 250;
-            imgTd.appendChild(img);
-
-            linha.appendChild(imgTd);
-            corpoTabela.appendChild(linha);
-        });
-
-    } if (dados.Search){
-        const linha = document.createElement("tr");
-        dados.Search.forEach(filme => {
-            console.log(filme.Title); // Teste no console
-
-            const titulo = document.createElement("th");
-            titulo.innerText = filme.Title;
-
-            linha.appendChild(titulo);
-            corpoTabela.appendChild(linha);
-       });
-
-    } if (dados.Search){
-        const linha = document.createElement("tr");
-        dados.Search.forEach(filme => {
-            console.log(filme.Title); // Teste no console
-            
-            const desc = document.createElement("td");
-            desc.innerText = filme.Overview;
-
-            linha.appendChild(desc);
-            corpoTabela.appendChild(linha);
-        });
-        
-    }  else {
-        console.log("NENHUM FILME CHAMADO '"+busca+"' FOI ENCONTRADO!");
+window.addEventListener("keydown", function(event){
+    if (event.key == "Enter"){
+        filtrarFilmes();
     }
+});
 
+const inputBuscar = document.getElementById("inputBuscar");
+
+function filtrarFilmes() {
+    const termo = inputBuscar.value.toLowerCase();
+    const corpoTabela = document.getElementById("corpoTabela");
+    corpoTabela.innerHTML = "";
+
+    // FILTRAGEM LOCAL: Olhamos apenas para os filmes que já temos
+    const resultados = filmesDaPagina.filter(filme => 
+        filme.title.toLowerCase().includes(termo)
+    );
+
+    if (resultados.length > 0) {
+        resultados.forEach(filme => {
+            const divCard = document.createElement("div");
+            divCard.className = "cardFilme";
+            
+            // Montando a URL da imagem do TMDb
+            const posterUrl = filme.poster_path 
+                ? "https://image.tmdb.org/t/p/w500" + filme.poster_path 
+                : "caminho/para/imagem-padrao.jpg";
+
+            divCard.innerHTML = `
+                <img class="posterFilme" src="${posterUrl}">
+                <strong class="tituloFilme">${filme.title}</strong>
+            `;
+            corpoTabela.appendChild(divCard);
+        });
+    } else {
+        alert("Nenhum dos filmes em cartaz corresponde a: " + inputBuscar.value);
+    }
 }
-
-carregarFilmes();
