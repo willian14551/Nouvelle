@@ -75,16 +75,17 @@ async def filmesCartaz(request: Request):
         name="emBreve.html",
         context={"request": request, "filmes": filmesCartaz}
     )
+
 @app.get("/cadastro.html")
 async def cadastro(request: Request):
 
     async with httpx.AsyncClient(verify=False) as client:
         resposta = await client.get(url)
         dados = resposta.json()
-        filmesCartaz = dados.get("results", [])[:5]
+        cadastro = dados.get("results", [])[:5]
 
     return templates.TemplateResponse(
         request=request,
         name="cadastro.html",
-        context={"request": request, "filmes": filmesCartaz}
+        context={"request": request, "filmes": cadastro}
     )
