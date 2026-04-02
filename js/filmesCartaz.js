@@ -1,6 +1,10 @@
 console.log("Executando o js ..."); // Teste no console
 
+<<<<<<< HEAD
 const busca = "Harry Potter";
+=======
+const busca = "Alien";
+>>>>>>> felipe
 
 async function carregarFilmes() {
     // Link da API
