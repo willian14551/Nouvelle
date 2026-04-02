@@ -1,0 +1,140 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    background-color: #141414;
+    color: white;
+}
+
+.texto_acima {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.menu {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end;
+    background-color: rgb(150, 28, 28);
+    padding: 10px 40px;
+    gap: 100px;
+}
+
+.menu-links {
+        list-style: none; /* remove as bolinhas da lista */
+        display: flex;
+        gap: 30px;
+}
+
+.menu-links a {
+        color: #F0AD12;
+        text-decoration: none; /* para limpar a letra*/
+        font-size: 30px;
+        font-weight: 500;
+        padding: 8px 12px;
+        transition: all 0.3s ease; /* só pra melhorar o efeito do hover */
+    }
+
+    .menu-links a:hover, .menu-login a:hover{
+        color: #4da6ff;
+    }
+
+    .menu-login {
+        list-style: none;
+        display: flex;
+        gap: 30px;
+        margin-left: auto;
+    }
+
+    .menu-login a {
+        color: #F0AD12;
+        text-decoration: none;
+        font-size: 30px;
+        font-weight: 500;
+        padding: 8px 12px;
+        transition: all 0.3s ease;
+    }
+
+.Local_logo {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 80px;
+    padding: 40px;
+}
+
+.Tamanho_Logo {
+    flex: 0 1 450px;
+}
+
+.Tamanho_Logo img {
+    width: 100%;
+    height: auto;
+}
+
+.Tamanho_Caixas_TXT {
+    flex: 0 1 380px;
+}
+
+.login_senha_caixas {
+    margin-bottom: 15px;
+}
+
+.login_senha_caixas input {
+    width: 100%;
+    height: 50px;
+    background-color: #333;
+    border: none;
+    border-radius: 5px;
+    padding: 0 15px;
+    color: white;
+    font-size: 1rem;
+}
+
+.login_senha_caixas input:focus {
+    outline: 2px solid #F0AD12;
+}
+
+.btn-login {
+    width: 100%;
+    padding: 15px;
+    background-color: rgb(150, 28, 28);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-login:hover{
+    background-color: #F0AD12;
+    color: #141414;
+    transition: all 0.3s ease;
+}
+
+.utilidades_abaixo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    font-size: 0.85rem;
+}
+
+.lembre_de_mim {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.Qual_minha_senha {
+    color: white;
+    text-decoration: underline;
+    font-style: italic;
+    font-weight: bold;
+}
