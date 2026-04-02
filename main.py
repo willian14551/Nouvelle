@@ -88,3 +88,31 @@ async def cadastro(request: Request):
         name="cadastro.html",
         context={"request": request, "filmes": filmesCartaz}
     )
+
+@app.get("/api/detalhes/{filme_id}")
+async def pegar_detalhes(filme_id: int):
+    # Imagine que você busca os detalhes de um filme específico aqui
+    return {"id": filme_id, "status": "Disponível", "assentos": [1, 5, 8]}
+
+@app.get("/emBreve.html")
+async def filmesCartaz(request: Request):
+
+    async with httpx.AsyncClient(verify=False) as client:
+        resposta = await client.get(url)
+        dados = resposta.json()
+        filmesCartaz = dados.get("results", [])[:5]
+
+    return templates.TemplateResponse(
+        request=request,
+        name="filmesCartaz.html",
+        context={"request": request, "filmes": filmesCartaz}
+    )
+
+# --- NOVO ENDPOINT ADICIONADO ABAIXO ---
+# Esta rota serve para o seu JavaScript buscar filmes filtrando apenas os 5 primeiros
+@app.get("/api/filmes-lista")
+async def pegar_lista():
+    async with httpx.AsyncClient(verify=False) as client:
+        resposta = await client.get(url) # Usa a URL do TMDb que você já definiu
+        dados = resposta.json()
+        return dados.get("results", [])[:10] # Retorna os mesmos 10 filmes
