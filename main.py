@@ -5,6 +5,7 @@ FastApi cria o servidor, enquanto o request lida com os pedidos de acessar o sit
 from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from conexao import obter_conexao
 import httpx
 
 # Variável que instância um objeto da classe FastApi, criando o app
@@ -129,3 +130,13 @@ async def pegar_lista():
         resposta = await client.get(url)
         dados = resposta.json()
         return dados.get("results", [])[:10]
+
+@app.get("/api/testar-banco")
+async def testar_banco():
+    conexao = obter_conexao()
+
+    if conexao:
+        conexao.close()
+        return
+    else:
+        return {"status": "Erro", "mensagem": "Não foi possível se conectar ao banco."}
