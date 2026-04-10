@@ -20,7 +20,7 @@ templates = Jinja2Templates(directory="templates")
 API_KEY = "2ba00226f0008ae80f498510e6d1882a"
 url = f"https://api.themoviedb.org/3/movie/now_playing?api_key={API_KEY}&language=pt-BR&page=1"
 
-@app.get("/index.html")
+@app.get("/")
 # Função Assincrona (endpoint) que recebe o parâmetro do tipo Request chamado request
 async def home(request: Request):
 
@@ -50,7 +50,7 @@ async def filmesCartaz(request: Request):
     async with httpx.AsyncClient(verify=False) as client:
         resposta = await client.get(url)
         dados = resposta.json()
-        filmesCartaz = dados.get("results", [])[:5]
+        filmesCartaz = dados.get("results", [])[:18]
 
     return templates.TemplateResponse(
         request=request,
@@ -123,23 +123,13 @@ async def emBreve(request: Request):
         context={"request": request, "filmes": emBreve}
     )
 
-@app.get("/login.html")
-
 # Mostra para o js como buscar somente os 5 primeiros filmes
 @app.get("/api/filmes-lista")
 async def pegar_lista():
     async with httpx.AsyncClient(verify=False) as client:
         resposta = await client.get(url)
         dados = resposta.json()
-        return dados.get("results", [])[:10]
-
-@app.get("/assentos.html")
-async def assentos(request: Request):
-    return templates.TemplateResponse(
-        request=request,
-        name="assentos.html",
-        context={"request": request}
-    )
+        return dados.get("results", [])[:5]
 
 @app.get("/pagamento.html")
 async def pagamento(request: Request):
@@ -149,12 +139,10 @@ async def pagamento(request: Request):
         context={"request": request}
     )
 
-@app.get("/api/testar-banco")
-async def testar_banco():
-    conexao = obter_conexao()
-
-    if conexao:
-        conexao.close()
-        return {"status": "Sucesso", "mensagem": "Conexão com o banco de dados estabelecida e fechada com sucesso."}
-    else:
-        return {"status": "Erro", "mensagem": "Não foi possível se conectar ao banco."}
+@app.get("/assentos.html")
+async def assentos(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="assentos.html",
+        context={"request": request}
+    )
