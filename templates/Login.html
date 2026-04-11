@@ -25,23 +25,32 @@
         <main class="Local_logo"> <div class="Tamanho_Logo">
                 <img src="assets/logo.png" alt="Logo Nouvelle">
             </div>
-
-            <div class="Tamanho_Caixas_TXT"> <form>
-                    <div class="login_senha_caixas"> <input type="text" placeholder="Email ou usuário" required>
-                    </div>
-                    <div class="login_senha_caixas"> <input type="password" placeholder="Senha" required>
-                    </div>
-                    
-                    <button type="submit" class="btn-login">Entrar</button>
-
-                    <div class="utilidades_abaixo"> <div class="lembre_de_mim"> <input type="checkbox" id="remember">
-                            <label for="remember">Lembre-se de mim</label>
-                        </div>
-                        <a href="#" class="Qual_minha_senha">Esqueceu sua senha?</a> </div>
-                </form>
+        </main>
+        <form action="/login" method="POST" id="formLogin">
+            <div class="login_senha_caixas">
+                <input type="email" name="email" placeholder="E-mail" required>
+            </div>
+            <div class="login_senha_caixas">
+                <input type="password" name="senha" placeholder="Senha" required>
             </div>
 
-        </main>
+            <button type="submit" class="btn-login">Entrar</button>
+
+            {% if mensagem %}
+                <p style="color: red; 
+                margin-top: 15px; 
+                text-align: center;">
+                {{ mensagem }}</p>
+            {% endif %}
+
+            <div class="utilidades">
+                <div class="lembre_de_mim">
+                    <input type="checkbox" id="remember">
+                    <label for="remember">Lembre-se de mim</label>
+                </div>
+                <a href="#" class="Qual_minha_senha">Esqueceu sua senha?</a>
+            </div>
+        </form>
     </div>
 </body>
 </html>

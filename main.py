@@ -5,11 +5,15 @@ FastApi cria o servidor, enquanto o request lida com os pedidos de acessar o sit
 from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from passlib.context import CryptContext
+from fastapi import FastAPI, Request, Form
+from fastapi.responses import RedirectResponse
 from conexao import obter_conexao
 import httpx
 
 # Variável que instância um objeto da classe FastApi, criando o app
 app = FastAPI()
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 app.mount("/css", StaticFiles(directory="css"), name="css")
 app.mount("/js", StaticFiles(directory="js"), name="js")
@@ -64,18 +68,13 @@ async def pegar_detalhes(filme_id: int):
     return {"id": filme_id, "status": "Disponível", "assentos": [1, 5, 8]}
 
 @app.get("/emBreve.html")
-async def filmesCartaz(request: Request):
-
-    async with httpx.AsyncClient(verify=False) as client:
-        resposta = await client.get(url)
-        dados = resposta.json()
-        filmesCartaz = dados.get("results", [])[:5]
-
+async def emBreve(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="emBreve.html",
-        context={"request": request, "filmes": filmesCartaz}
+        context={"request": request}
     )
+
 @app.get("/cadastro.html")
 async def cadastro(request: Request):
 
@@ -89,39 +88,67 @@ async def cadastro(request: Request):
         name="cadastro.html",
         context={"request": request, "filmes": filmesCartaz}
     )
-
 @app.get("/login.html")
-async def login(request: Request):
-
-    async with httpx.AsyncClient(verify=False) as client:
-        resposta = await client.get(url)
-        dados = resposta.json()
-        login = dados.get("results", [])[:5]
-
+async def login_pagina(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="login.html",
-        context={"request": request, "filmes": login}
+        context={"request": request}
     )
 
-@app.get("/api/detalhes/{filme_id}")
-async def pegar_detalhes(filme_id: int):
-    # Imagine que você busca os detalhes de um filme específico aqui
-    return {"id": filme_id, "status": "Disponível", "assentos": [1, 5, 8]}
+@app.post("/login")
+async def processar_login(
+    request: Request,
+    email: str = Form(...),
+    senha: str = Form(...),
+):
+    conexao = obter_conexao()
+    if not conexao:
+        return templates.TemplateResponse(
+            request=request,
+            name="login.html", 
+            context={"request": request, "mensagem": "Erro de conexão com o servidor."}
+        )
+    
+    try:
+        cursor = conexao.cursor(dictionary=True) # O Dictionary faz o MySql devolver os dados com os nomes das colunas
 
-@app.get("/emBreve.html")
-async def emBreve(request: Request):
+        sql = "Select cpf, nome, senha FROM Usuario WHERE email = %s"
+        cursor.execute(sql, (email,))
+        usuario = cursor.fetchone()
 
-    async with httpx.AsyncClient(verify=False) as client:
-        resposta = await client.get(url)
-        dados = resposta.json()
-        emBreve = dados.get("results", [])[:5]
+        if not usuario:
+            return templates.TemplateResponse(
+                request=request,
+                name="login.html", 
+                context={"request": request, "mensagem": "E-mail ou senha incorretos."}
+            )
+        
+        senha_valida = pwd_context.verify(senha, usuario['senha'])
 
-    return templates.TemplateResponse(
-        request=request,
-        name="filmesCartaz.html",
-        context={"request": request, "filmes": emBreve}
-    )
+        if not senha_valida:
+            return templates.TemplateResponse(
+                request=request,
+                name="login.html", 
+                context={"request": request, "mensagem": "E-mail ou senha incorretos."}
+            )
+        
+        resposta = RedirectResponse(url="/", status_code=303)
+        resposta.set_cookie(key="usuario_nome", value=usuario['nome'])
+        resposta.set_cookie(key="usuario_cpf", value=usuario['cpf'])
+
+        return resposta
+    except Exception as e:
+        print(f"Erro no Login: {e}")
+        return templates.TemplateResponse(
+            request=request,
+            name="login.html", 
+            context={"request": request, "mensagem": "Ocorreu um erro ao tentar fazer login."}
+        )
+    finally:
+        if conexao and conexao.is_connected():
+            cursor.close()
+            conexao.close()
 
 # Mostra para o js como buscar somente os 5 primeiros filmes
 @app.get("/api/filmes-lista")
