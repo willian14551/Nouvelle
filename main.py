@@ -110,6 +110,12 @@ async def emBreve(request: Request):
 
     emBreve_final = filmes_futuros[:18]
 
+    return templates.TemplateResponse(
+        request=request,
+        name="emBreve.html", 
+        context={"request": request, "filmes": emBreve_final}
+    )
+
 
 @app.get("/cadastro")
 async def cadastro_pagina (request: Request):

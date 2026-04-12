@@ -44,19 +44,13 @@ function carregarDadosCompra() {
 
 // Validação do formulário de pagamento
 function validarFormulario() {
-    const metodoPagamento = document.querySelector('input[name="metodoPagamento"]:checked').value;
-    const campos = [];
-
-    if (metodoPagamento === 'pix') {
-        campos.push({ id: 'pixChave', nome: 'Chave Pix' });
-    } else {
-        campos.push({ id: 'nomeCartao', nome: 'Nome no Cartão' });
-        campos.push({ id: 'numeroCartao', nome: 'Número do Cartão' });
-        campos.push({ id: 'validade', nome: 'Validade' });
-        campos.push({ id: 'cvv', nome: 'CVV' });
-    }
-
-    campos.push({ id: 'email', nome: 'E-mail' });
+    const campos = [
+        { id: 'nomeCartao', nome: 'Nome no Cartão' },
+        { id: 'numeroCartao', nome: 'Número do Cartão' },
+        { id: 'validade', nome: 'Validade' },
+        { id: 'cvv', nome: 'CVV' },
+        { id: 'email', nome: 'E-mail' }
+    ];
 
     let valido = true;
     let mensagensErro = [];
@@ -72,6 +66,7 @@ function validarFormulario() {
         } else {
             elemento.style.borderColor = '#555';
 
+            // Validações específicas
             if (campo.id === 'numeroCartao') {
                 const numeroLimpo = valor.replace(/\s/g, '');
                 if (!/^\d{16}$/.test(numeroLimpo)) {
@@ -111,26 +106,6 @@ function validarFormulario() {
     return { valido, mensagensErro };
 }
 
-function atualizarCamposPagamento() {
-    const metodoPagamento = document.querySelector('input[name="metodoPagamento"]:checked').value;
-    const cartaoFields = document.getElementById('cartaoFields');
-    const pixFields = document.getElementById('pixFields');
-    const pixChave = document.getElementById('pixChave');
-    const camposCartao = ['nomeCartao', 'numeroCartao', 'validade', 'cvv'];
-
-    if (metodoPagamento === 'pix') {
-        cartaoFields.style.display = 'none';
-        pixFields.style.display = 'block';
-        camposCartao.forEach(id => document.getElementById(id).required = false);
-        pixChave.required = true;
-    } else {
-        cartaoFields.style.display = 'block';
-        pixFields.style.display = 'none';
-        camposCartao.forEach(id => document.getElementById(id).required = true);
-        pixChave.required = false;
-    }
-}
-
 // Formatação automática do número do cartão
 function formatarNumeroCartao(event) {
     let valor = event.target.value.replace(/\s/g, '');
@@ -167,18 +142,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Carrega dados da compra
     carregarDadosCompra();
 
-    // Atualiza visibilidade dos campos de pagamento
-    atualizarCamposPagamento();
-
     // Formatação automática dos campos
     document.getElementById('numeroCartao').addEventListener('input', formatarNumeroCartao);
     document.getElementById('validade').addEventListener('input', formatarValidade);
     document.getElementById('cvv').addEventListener('input', limitarCVV);
-
-    // Altera campos quando o método de pagamento mudar
-    document.querySelectorAll('input[name="metodoPagamento"]').forEach(radio => {
-        radio.addEventListener('change', atualizarCamposPagamento);
-    });
 
     // Submissão do formulário
     document.getElementById('formPagamento').addEventListener('submit', function(event) {
@@ -191,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Pagamento processado com sucesso!\n\nUm comprovante foi enviado para seu e-mail.');
 
             // Redireciona para página inicial ou de confirmação
-            window.location.href = '/templates/index.html';
+            window.location.href = '/index.html';
         } else {
             // Mostra erros
             alert('Por favor, corrija os seguintes erros:\n\n' + validacao.mensagensErro.join('\n'));
