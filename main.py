@@ -7,6 +7,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from conexao import obter_conexao
 import httpx
+from datetime import datetime
 
 # Variável que instância um objeto da classe FastApi, criando o app
 app = FastAPI()
@@ -19,6 +20,7 @@ app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 templates = Jinja2Templates(directory="templates")
 API_KEY = "2ba00226f0008ae80f498510e6d1882a"
 url = f"https://api.themoviedb.org/3/movie/now_playing?api_key={API_KEY}&language=pt-BR&page=1"
+url_breve = f"https://api.themoviedb.org/3/movie/upcoming?api_key={API_KEY}&language=pt-BR&page=1"
 
 @app.get("/")
 # Função Assincrona (endpoint) que recebe o parâmetro do tipo Request chamado request
@@ -63,19 +65,6 @@ async def pegar_detalhes(filme_id: int):
     # Imagine que você busca os detalhes de um filme específico aqui
     return {"id": filme_id, "status": "Disponível", "assentos": [1, 5, 8]}
 
-@app.get("/emBreve.html")
-async def filmesCartaz(request: Request):
-
-    async with httpx.AsyncClient(verify=False) as client:
-        resposta = await client.get(url)
-        dados = resposta.json()
-        filmesCartaz = dados.get("results", [])[:5]
-
-    return templates.TemplateResponse(
-        request=request,
-        name="emBreve.html",
-        context={"request": request, "filmes": filmesCartaz}
-    )
 @app.get("/cadastro.html")
 async def cadastro(request: Request):
 
@@ -111,16 +100,26 @@ async def pegar_detalhes(filme_id: int):
 
 @app.get("/emBreve.html")
 async def emBreve(request: Request):
+    hoje = datetime.now().strftime("%Y-%m-%d")
+    filmes_futuros = []
 
     async with httpx.AsyncClient(verify=False) as client:
-        resposta = await client.get(url)
-        dados = resposta.json()
-        emBreve = dados.get("results", [])[:5]
+        # Buscar a páginas 
+        for pagina in range(1, 18):
+            url_paginada = f"https://api.themoviedb.org/3/movie/upcoming?api_key={API_KEY}&language=pt-BR&page={pagina}"
+            resposta = await client.get(url_paginada)
+            dados = resposta.json()
+            todos_filmes = dados.get("results", [])
+        # Filtro de Filmes com data maior que hoje    
+            filtrados = [f for f in todos_filmes if f.get("release_date", "") > hoje]
+            filmes_futuros.extend(filtrados)
+
+    emBreve_final = filmes_futuros[:18]
 
     return templates.TemplateResponse(
         request=request,
-        name="filmesCartaz.html",
-        context={"request": request, "filmes": emBreve}
+        name="emBreve.html", 
+        context={"request": request, "filmes": emBreve_final}
     )
 
 # Mostra para o js como buscar somente os 5 primeiros filmes
@@ -146,3 +145,22 @@ async def assentos(request: Request):
         name="assentos.html",
         context={"request": request}
     )
+
+# teste da API para o js do embreve  ( filtrar e mostrar somente os filmes com data de lançamento maior que a data atual )
+
+@app.get("/api/filmes-em-breve")
+async def api_em_breve():
+    hoje = datetime.now().strftime("%Y-%m-%d")
+    filmes_futuros = []
+
+    async with httpx.AsyncClient(verify=False) as client:
+        for pagina in range(1, 18):
+            url_paginada = f"https://api.themoviedb.org/3/movie/upcoming?api_key={API_KEY}&language=pt-BR&page={pagina}"
+            resposta = await client.get(url_paginada)
+            dados = resposta.json()
+            todos_filmes = dados.get("results", [])
+            
+            filtrados = [f for f in todos_filmes if f.get("release_date", "") > hoje]
+            filmes_futuros.extend(filtrados)
+
+    return filmes_futuros[:18]
