@@ -8,6 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import RedirectResponse
 from conexao import obter_conexao
+from datetime import datetime
 import httpx
 import bcrypt
 
@@ -59,6 +60,23 @@ async def pegar_detalhes(filme_id: int):
     # Imagine que você busca os detalhes de um filme específico aqui
     return {"id": filme_id, "status": "Disponível", "assentos": [1, 5, 8]}
 
+@app.get("/api/filmes-em-breve")
+async def api_em_breve():
+    hoje = datetime.now().strftime("%Y-%m-%d")
+    filmes_futuros = []
+
+    async with httpx.AsyncClient(verify=False) as client:
+        for pagina in range(1, 18):
+            url_paginada = f"https://api.themoviedb.org/3/movie/upcoming?api_key={API_KEY}&language=pt-BR&page={pagina}"
+            resposta = await client.get(url_paginada)
+            dados = resposta.json()
+            todos_filmes = dados.get("results", [])
+            
+            filtrados = [f for f in todos_filmes if f.get("release_date", "") > hoje]
+            filmes_futuros.extend(filtrados)
+
+    return filmes_futuros[:18]
+
 # Mostra o caminho de outra página para o python
 @app.get("/filmesCartaz")
 async def filmesCartaz(request: Request):
@@ -74,13 +92,24 @@ async def filmesCartaz(request: Request):
         context={"request": request, "filmes": filmesCartaz}
     )
 
-@app.get("/emBreve")
+@app.get("/emBreve.html")
 async def emBreve(request: Request):
-    return templates.TemplateResponse(
-        request=request,
-        name="emBreve.html",
-        context={"request": request}
-    )
+    hoje = datetime.now().strftime("%Y-%m-%d")
+    filmes_futuros = []
+
+    async with httpx.AsyncClient(verify=False) as client:
+        # Buscar a páginas 
+        for pagina in range(1, 18):
+            url_paginada = f"https://api.themoviedb.org/3/movie/upcoming?api_key={API_KEY}&language=pt-BR&page={pagina}"
+            resposta = await client.get(url_paginada)
+            dados = resposta.json()
+            todos_filmes = dados.get("results", [])
+        # Filtro de Filmes com data maior que hoje    
+            filtrados = [f for f in todos_filmes if f.get("release_date", "") > hoje]
+            filmes_futuros.extend(filtrados)
+
+    emBreve_final = filmes_futuros[:18]
+
 
 @app.get("/cadastro")
 async def cadastro_pagina (request: Request):
