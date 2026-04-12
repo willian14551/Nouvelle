@@ -104,17 +104,40 @@
     gap: 20px;
 }
 
-.campo-grupo {
-    display: flex;
-    flex-direction: column;
-}
+    .pagamento-opcoes {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
 
-.campo-grupo label {
-    color: #F0AD12;
-    font-weight: bold;
-    margin-bottom: 8px;
-    font-size: 1rem;
-}
+    .opcao-pagamento {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 15px;
+        background-color: rgba(240, 173, 18, 0.12);
+        border: 2px solid #555;
+        border-radius: 8px;
+        cursor: pointer;
+        color: white;
+        transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .opcao-pagamento:hover {
+        background-color: rgba(240, 173, 18, 0.2);
+        border-color: #F0AD12;
+    }
+
+    .opcao-pagamento input {
+        accent-color: #F0AD12;
+    }
+
+    .texto-auxiliar {
+        color: #ccc;
+        font-size: 0.9rem;
+        margin-top: 5px;
+    }
+
 
 .campo-grupo input {
     padding: 12px 15px;
