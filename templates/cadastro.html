@@ -36,7 +36,8 @@
                 <form action="/cadastrar" method="POST" id="formCadastro">
                     
                     <div class="login_senha_caixas"> 
-                        <input type="text" name="cpf" id="cpf" placeholder="CPF (Apenas números)" maxlength="14" required>
+                        <input type="text" name="cpf" id="cpf" placeholder="CPF (000.000.000-00)" maxlength="14" required>
+                        <small id="erroCpf" style="color: #F0AD12; display: none; font-weight: bold;">CPF inválido!</small>
                     </div>
                     
                     <div class="login_senha_caixas"> 
@@ -48,7 +49,8 @@
                     </div>
                     
                     <div class="login_senha_caixas"> 
-                        <input type="text" name="telefone" placeholder="Telefone" required>
+                        <input type="text" name="telefone" id="telefone" placeholder="Telefone (DD) 90000-0000" maxlength="15" required>
+                        <small id="erroTelefone" style="color: #F0AD12; display: none; font-weight: bold;">Telefone inválido!</small>
                     </div>
                     
                     <div class="login_senha_caixas"> 
@@ -73,5 +75,7 @@
 
         </main>
     </div>
+
+<script src="/js/cadastro.js"></script>
 </body>
 </html>
