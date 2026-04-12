@@ -1,6 +1,3 @@
-/* ============================================================
-   CONFIGURAÇÃO DA GRADE (LAYOUT PRINCIPAL)
-   ============================================================ */
 
 .gradeFilmes {
     display: grid;
@@ -13,9 +10,6 @@
     justify-items: center; /* Centraliza os cards dentro das colunas */
 }
 
-/* ============================================================
-   ESTILIZAÇÃO DOS CARDS
-   ============================================================ */
 
 .cardFilme {
     width: 250px;
@@ -32,15 +26,12 @@
     transform: scale(1.05);
 }
 
-/* ============================================================
-   ESTILIZAÇÃO DAS IMAGENS (POSTERS)
-   ============================================================ */
 
 .posterFilme {
     width: 100%;
-    height: 380px; /* Mantendo a altura que você definiu anteriormente */
+    height: 380px; 
     
-    /* Garante que a imagem preencha o espaço sem achatar */
+  
     object-fit: cover; 
     object-position: center;
     
@@ -54,10 +45,6 @@
 .cardFilme:hover .posterFilme {
     border-color: #F0AD12; 
 }
-
-/* ============================================================
-   ESTILIZAÇÃO DOS TÍTULOS
-   ============================================================ */
 
 .tituloFilme {
     margin-top: 12px;
@@ -73,10 +60,6 @@
     
     display: block; /* Garante que o strong se comporte como bloco abaixo da imagem */
 }
-
-/* ============================================================
-   TÍTULO DA SEÇÃO (OPCIONAL)
-   ============================================================ */
 
 .titulo-secao {
     color: white;

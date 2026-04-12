@@ -2,7 +2,7 @@ window.onload = async () => {
     const corpoTabela = document.getElementById("corpoTabela");
 
     try {
-        // Busca os filmes já filtrados por data pelo seu Python
+        // Busca os filmes já filtrados 
         const resposta = await fetch("/api/filmes-em-breve");
         const filmes = await resposta.json();
 
@@ -22,7 +22,6 @@ window.onload = async () => {
                 ? `https://image.tmdb.org/t/p/w500${filme.poster_path}`
                 : "/assets/sem-foto.jpg";
 
-            // Estrutura que casa com o seu CSS
             divCard.innerHTML = `
                 <img class="posterFilme" src="${posterUrl}" alt="${filme.title}">
                 <strong class="tituloFilme">${filme.title}</strong>
