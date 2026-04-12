@@ -1,3 +1,7 @@
+DROP DATABASE IF EXISTS nouvelle;
+CREATE DATABASE nouvelle;
+USE nouvelle;
+
 CREATE TABLE Sala (
     id INT PRIMARY KEY AUTO_INCREMENT,
     qtde_assentos INT
