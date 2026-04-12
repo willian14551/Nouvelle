@@ -9,9 +9,7 @@ from fastapi import FastAPI, Request, Form
 from fastapi.responses import RedirectResponse
 from conexao import obter_conexao
 import httpx
-from datetime import datetime
-import bcrypt 
-
+import bcrypt
 
 # Variável que instância um objeto da classe FastApi, criando o app
 app = FastAPI()
@@ -24,7 +22,6 @@ app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 templates = Jinja2Templates(directory="templates")
 API_KEY = "2ba00226f0008ae80f498510e6d1882a"
 url = f"https://api.themoviedb.org/3/movie/now_playing?api_key={API_KEY}&language=pt-BR&page=1"
-url_breve = f"https://api.themoviedb.org/3/movie/upcoming?api_key={API_KEY}&language=pt-BR&page=1"
 
 @app.get("/")
 # Função Assincrona (endpoint) que recebe o parâmetro do tipo Request chamado request
@@ -167,29 +164,32 @@ async def processar_login(
     try:
         cursor = conexao.cursor(dictionary=True) # O Dictionary faz o MySql devolver os dados com os nomes das colunas
 
-@app.get("/emBreve.html")
-async def emBreve(request: Request):
-    hoje = datetime.now().strftime("%Y-%m-%d")
-    filmes_futuros = []
+        sql = "Select cpf, nome, senha FROM Usuario WHERE email = %s"
+        cursor.execute(sql, (email,))
+        usuario = cursor.fetchone()
 
-    async with httpx.AsyncClient(verify=False) as client:
-        # Buscar a páginas 
-        for pagina in range(1, 18):
-            url_paginada = f"https://api.themoviedb.org/3/movie/upcoming?api_key={API_KEY}&language=pt-BR&page={pagina}"
-            resposta = await client.get(url_paginada)
-            dados = resposta.json()
-            todos_filmes = dados.get("results", [])
-        # Filtro de Filmes com data maior que hoje    
-            filtrados = [f for f in todos_filmes if f.get("release_date", "") > hoje]
-            filmes_futuros.extend(filtrados)
+        if not usuario:
+            return templates.TemplateResponse(
+                request=request,
+                name="login.html", 
+                context={"request": request, "mensagem": "E-mail ou senha incorretos."}
+            )
+        
+        bytes_senha_digitada = senha.encode('utf-8')
+        bytes_senha_banco = usuario['senha'].encode('utf-8')
 
-    emBreve_final = filmes_futuros[:18]
-
-    return templates.TemplateResponse(
-        request=request,
-        name="emBreve.html", 
-        context={"request": request, "filmes": emBreve_final}
-    )
+        senha_valida = bcrypt.checkpw(bytes_senha_digitada, bytes_senha_banco)
+        
+        if not senha_valida:
+            return templates.TemplateResponse(
+                request=request,
+                name="login.html", 
+                context={"request": request, "mensagem": "E-mail ou senha incorretos."}
+            )
+        
+        resposta = RedirectResponse(url="/", status_code=303)
+        resposta.set_cookie(key="usuario_nome", value=usuario['nome'])
+        resposta.set_cookie(key="usuario_cpf", value=usuario['cpf'])
 
         return resposta
     except Exception as e:
@@ -354,22 +354,4 @@ async def assentos(request: Request):
         name="assentos.html",
         context={"request": request}
     )
-
-# teste da API para o js do embreve  ( filtrar e mostrar somente os filmes com data de lançamento maior que a data atual )
-
-@app.get("/api/filmes-em-breve")
-async def api_em_breve():
-    hoje = datetime.now().strftime("%Y-%m-%d")
-    filmes_futuros = []
-
-    async with httpx.AsyncClient(verify=False) as client:
-        for pagina in range(1, 18):
-            url_paginada = f"https://api.themoviedb.org/3/movie/upcoming?api_key={API_KEY}&language=pt-BR&page={pagina}"
-            resposta = await client.get(url_paginada)
-            dados = resposta.json()
-            todos_filmes = dados.get("results", [])
-            
-            filtrados = [f for f in todos_filmes if f.get("release_date", "") > hoje]
-            filmes_futuros.extend(filtrados)
-
-    return filmes_futuros[:18]
+    
