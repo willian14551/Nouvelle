@@ -92,7 +92,7 @@ async def filmesCartaz(request: Request):
         context={"request": request, "filmes": filmesCartaz}
     )
 
-@app.get("/emBreve.html")
+@app.get("/emBreve")
 async def emBreve(request: Request):
     hoje = datetime.now().strftime("%Y-%m-%d")
     filmes_futuros = []
