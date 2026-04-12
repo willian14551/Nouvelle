@@ -5,9 +5,13 @@ FastApi cria o servidor, enquanto o request lida com os pedidos de acessar o sit
 from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from fastapi import FastAPI, Request, Form
+from fastapi.responses import RedirectResponse
 from conexao import obter_conexao
 import httpx
 from datetime import datetime
+import bcrypt 
+
 
 # Variável que instância um objeto da classe FastApi, criando o app
 app = FastAPI()
@@ -45,8 +49,21 @@ async def home(request: Request):
         context={"request": request, "filmes": filmes_recentes}
     )
 
+# Mostra para o js como buscar somente os 5 primeiros filmes
+@app.get("/api/filmes-lista")
+async def pegar_lista():
+    async with httpx.AsyncClient(verify=False) as client:
+        resposta = await client.get(url)
+        dados = resposta.json()
+        return dados.get("results", [])[:5]
+
+@app.get("/api/detalhes/{filme_id}")
+async def pegar_detalhes(filme_id: int):
+    # Imagine que você busca os detalhes de um filme específico aqui
+    return {"id": filme_id, "status": "Disponível", "assentos": [1, 5, 8]}
+
 # Mostra o caminho de outra página para o python
-@app.get("/filmesCartaz.html")
+@app.get("/filmesCartaz")
 async def filmesCartaz(request: Request):
 
     async with httpx.AsyncClient(verify=False) as client:
@@ -60,43 +77,95 @@ async def filmesCartaz(request: Request):
         context={"request": request, "filmes": filmesCartaz}
     )
 
-@app.get("/api/detalhes/{filme_id}")
-async def pegar_detalhes(filme_id: int):
-    # Imagine que você busca os detalhes de um filme específico aqui
-    return {"id": filme_id, "status": "Disponível", "assentos": [1, 5, 8]}
+@app.get("/emBreve")
+async def emBreve(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="emBreve.html",
+        context={"request": request}
+    )
 
-@app.get("/cadastro.html")
-async def cadastro(request: Request):
-
-    async with httpx.AsyncClient(verify=False) as client:
-        resposta = await client.get(url)
-        dados = resposta.json()
-        filmesCartaz = dados.get("results", [])[:5]
-
+@app.get("/cadastro")
+async def cadastro_pagina (request: Request):
     return templates.TemplateResponse(
         request=request,
         name="cadastro.html",
-        context={"request": request, "filmes": filmesCartaz}
+        context={"request": request}
     )
 
-@app.get("/login.html")
-async def login(request: Request):
+@app.post("/cadastrar")
+async def processar_cadastro(
+    request: Request,
+    cpf: str = Form(...),
+    nome: str = Form(...),
+    email: str = Form(...),
+    telefone: str = Form(...),
+    data_nasc: str = Form(...),
+    senha: str = Form(...)
+):
+    bytes_senha = senha.encode('utf-8')
+    salt = bcrypt.gensalt()
+    senha_cripto = bcrypt.hashpw(bytes_senha, salt).decode('utf-8')
 
-    async with httpx.AsyncClient(verify=False) as client:
-        resposta = await client.get(url)
-        dados = resposta.json()
-        login = dados.get("results", [])[:5]
+    conexao = obter_conexao()
+    if not conexao:
+        return templates.TemplateResponse(
+            request=request, 
+            name="cadastro.html",
+            context={"request": request, "mensagem": "Erro de conexão com o banco."})
+    try:
+        cursor = conexao.cursor()
 
+        sql = """
+            INSERT INTO Usuario(cpf, nome, email, telefone, data_nasc, senha)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """
+        valores = (cpf, nome, email, telefone, data_nasc, senha_cripto)
+
+        cursor.execute(sql, valores)
+        conexao.commit()
+
+        return templates.TemplateResponse(
+            request=request, 
+            name="login.html", 
+            context={"request": request, "mensagem": "Cadastro realizado com sucesso! Faça seu login."})
+    
+    except Exception as e:
+        print(f"Erro no banco: {e}")
+        return templates.TemplateResponse(
+            request=request, 
+            name="cadastro.html", 
+            context={"request": request, "mensagem": "Erro: CPF ou E-mail já estão em uso."})  
+    
+    finally:
+        if conexao and conexao.is_connected():
+            cursor.close()
+            conexao.close()
+
+@app.get("/login")
+async def login_pagina(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="login.html",
-        context={"request": request, "filmes": login}
+        context={"request": request}
     )
 
-@app.get("/api/detalhes/{filme_id}")
-async def pegar_detalhes(filme_id: int):
-    # Imagine que você busca os detalhes de um filme específico aqui
-    return {"id": filme_id, "status": "Disponível", "assentos": [1, 5, 8]}
+@app.post("/login")
+async def processar_login(
+    request: Request,
+    email: str = Form(...),
+    senha: str = Form(...),
+):
+    conexao = obter_conexao()
+    if not conexao:
+        return templates.TemplateResponse(
+            request=request,
+            name="login.html", 
+            context={"request": request, "mensagem": "Erro de conexão com o servidor."}
+        )
+    
+    try:
+        cursor = conexao.cursor(dictionary=True) # O Dictionary faz o MySql devolver os dados com os nomes das colunas
 
 @app.get("/emBreve.html")
 async def emBreve(request: Request):
@@ -122,15 +191,155 @@ async def emBreve(request: Request):
         context={"request": request, "filmes": emBreve_final}
     )
 
-# Mostra para o js como buscar somente os 5 primeiros filmes
-@app.get("/api/filmes-lista")
-async def pegar_lista():
-    async with httpx.AsyncClient(verify=False) as client:
-        resposta = await client.get(url)
-        dados = resposta.json()
-        return dados.get("results", [])[:5]
+        return resposta
+    except Exception as e:
+        print(f"Erro no Login: {e}")
+        return templates.TemplateResponse(
+            request=request,
+            name="login.html", 
+            context={"request": request, "mensagem": "Ocorreu um erro ao tentar fazer login."}
+        )
+    finally:
+        if conexao and conexao.is_connected():
+            cursor.close()
+            conexao.close()
 
-@app.get("/pagamento.html")
+
+@app.get("/logout")
+async def logout():
+    resposta = RedirectResponse(url="/", status_code=303)
+    resposta.delete_cookie("usuario_nome")
+    resposta.delete_cookie("usuario_cpf")
+    return resposta
+
+@app.get("/perfil")
+async def carregar_perfil(request: Request):
+    cpf_logado = request.cookies.get("usuario_cpf")
+
+    if not cpf_logado:
+        return RedirectResponse(url="/login.html", status_code=303)
+    
+    conexao = obter_conexao()
+    if not conexao:
+        return RedirectResponse(url="/", status_code=303)
+    
+    try:
+        cursor = conexao.cursor(dictionary=True)
+
+        # Aqui a parte do READ do CRUD
+        sql = "SELECT cpf, nome, email, telefone, data_nasc FROM Usuario WHERE cpf = %s"
+        cursor.execute(sql, (cpf_logado,))
+        usuario_dados = cursor.fetchone()
+
+        return templates.TemplateResponse(
+            request=request,
+            name="perfil.html",
+            context={"request": request, "usuario": usuario_dados}
+        )
+    
+    except Exception as e:
+        print(f"Erro ao carregar perfil: {e}")
+        return RedirectResponse(url="/", status_code=303)
+    finally:
+        if conexao and conexao.is_connected():
+            cursor.close()
+            conexao.close()
+
+@app.post("/atualizar_perfil")
+async def atualizar_perfil(
+    request: Request,
+    nome: str = Form(...),
+    email: str = Form(...),
+    telefone: str = Form(...),
+    data_nasc: str = Form(...)
+):
+    cpf_logado = request.cookies.get("usuario_cpf")
+
+    if not cpf_logado:
+        return RedirectResponse(url="/login", status_code=303)
+    
+    conexao = obter_conexao()
+    if not conexao:
+        return RedirectResponse(url="/", status_code=303)
+    
+    try:
+        cursor = conexao.cursor(dictionary=True)
+
+        # Aqui que rola o update
+        sql_update = """
+            UPDATE Usuario
+            SET nome = %s, email = %s, telefone = %s, data_nasc = %s
+            WHERE cpf = %s
+        """
+        cursor.execute(sql_update, (nome, email, telefone, data_nasc, cpf_logado))
+        conexao.commit()
+
+        cursor.execute("SELECT cpf, nome, email, telefone, data_nasc FROM Usuario WHERE cpf = %s", (cpf_logado,))
+        usuario_atualizado = cursor.fetchone()
+
+        resposta = templates.TemplateResponse(
+            request = request,
+            name = "perfil.html",
+            context = {"request": request, "usuario": usuario_atualizado, "mensagem": "Dados atualizados com sucesso!"}
+        )
+
+        resposta.set_cookie(key="usuario_nome", value = nome)
+
+        return resposta
+    
+    except Exception as e:
+        print(f"Erro ao atualizar: {e}")
+
+        return RedirectResponse(url="perfil", status_code=303)
+    
+    finally:
+        if conexao and conexao.is_connected():
+            cursor.close()
+            conexao.close()
+
+@app.post("/deletar_conta")
+async def deletar_conta(request: Request):
+    cpf_logado = request.cookies.get("usuario_cpf")
+
+    if not cpf_logado:
+        return RedirectResponse(url = "/login", status_code=303)
+    
+    conexao = obter_conexao()
+    if not conexao:
+        return RedirectResponse(url="/", status_code=303)
+    
+    try:
+        cursor = conexao.cursor()
+
+        cursor.execute("DELETE FROM Usuario WHERE cpf = %s", (cpf_logado,)) 
+        conexao.commit()
+
+        resposta = RedirectResponse(url="/", status_code=303)
+        resposta.delete_cookie("usuario_nome")
+        resposta.delete_cookie("usuario_cpf")
+        return resposta
+
+    except Exception as e:
+        print(f"Erro ao deletar conta: {e}")
+
+        cursor.execute("SELECT cpf, nome, email, telefone, data_nasc FROM Usuario WHERE cpf = %s", (cpf_logado,))
+        usuario_atualizado = cursor.fetchone()
+
+        return templates.TemplateResponse(
+            request = request,
+            name="perfil.html",
+            context={
+                "request": request,
+                "usuario": usuario_atualizado,
+                "mensagem": "Erro: Não é possível excluir a conta pois existem ingressos vinculados a ela."
+                }
+        )
+    finally:
+        if conexao and conexao.is_connected():
+            cursor.close()
+            conexao.close()
+
+@app.get("/pagamento")
 async def pagamento(request: Request):
     return templates.TemplateResponse(
         request=request,
@@ -138,7 +347,7 @@ async def pagamento(request: Request):
         context={"request": request}
     )
 
-@app.get("/assentos.html")
+@app.get("/assentos")
 async def assentos(request: Request):
     return templates.TemplateResponse(
         request=request,
