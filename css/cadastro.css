@@ -1,3 +1,8 @@
+#menuCadastro{
+    border-bottom: 10px solid rgb(150, 28, 28);
+    border-radius: 8px;
+    text-shadow: 0 0 10px #f1c764;
+}
 .Local_logo {
     flex: 1;
     display: flex;
@@ -83,4 +88,20 @@ main {
     border-radius: 10px;
     width: 50%;
     margin: 5% auto 0;
+}
+
+@media (max-width: 768px) {
+    main {
+        width: 90%;
+        padding: 20px;
+    }
+    .Local_logo {
+        flex-direction: column;
+        gap: 30px;
+        padding: 20px;
+    }
+    .Tamanho_Logo, .Tamanho_Caixas_TXT {
+        flex: 1 1 100%;
+        width: 100%;
+    }
 }
