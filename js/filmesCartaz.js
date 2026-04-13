@@ -45,6 +45,7 @@ function filtrarFilmes() {
                 <img class="posterFilme" src="${posterUrl}">
                 <strong class="tituloFilme">${filme.title}</strong>
             `;
+            divCard.onclick = () => window.location.href = `/assentos/${filme.id}`;
             corpoTabela.appendChild(divCard);
         });
     } else {

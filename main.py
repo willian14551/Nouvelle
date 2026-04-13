@@ -376,11 +376,11 @@ async def pagamento(request: Request):
         context={"request": request}
     )
 
-@app.get("/assentos")
-async def assentos(request: Request):
+@app.get("/assentos/{filme_id}")
+async def assentos(request: Request, filme_id: int):
     return templates.TemplateResponse(
         request=request,
         name="assentos.html",
-        context={"request": request}
+        context={"request": request, "filme_id": filme_id}
     )
     

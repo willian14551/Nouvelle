@@ -52,6 +52,7 @@
     flex-direction: column; /* Deixa a imagem em cima e título embaixo */
     align-items: center;    /* Centraliza o título com o poster */
     width: 250px;
+    cursor: pointer;
 }
 
 .posterFilme {

@@ -92,7 +92,7 @@
                 alert(`Assentos selecionados: ${assentos.join(', ')}\nTotal: R$ ${total.toFixed(2).replace('.', ',')}`);
 
                 // Redireciona para a página de pagamento
-                window.location.href = '/pagamento.html';
+                window.location.href = "/pagamento";
             }
         });
 

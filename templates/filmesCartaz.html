@@ -38,7 +38,7 @@
 
     <div class="gradeFilmes" id="corpoTabela">
       {% for filme in filmes %}
-      <div class="cardFilme">
+      <div class="cardFilme" onclick="window.location.href='/assentos/{{ filme.id }}'">
         <img class="posterFilme" src="https://image.tmdb.org/t/p/w500{{ filme.poster_path }}" alt="{{ filme.title }}">
         <strong class="tituloFilme">{{ filme.title }}</strong>
       </div>
