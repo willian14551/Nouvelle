@@ -1,3 +1,8 @@
+.menuEmBreve{
+    border-bottom: 10px solid rgb(150, 28, 28);
+    border-radius: 8px;
+    text-shadow: 0 0 10px #f1c764;
+}
 
 .gradeFilmes {
     display: grid;
@@ -21,7 +26,7 @@
     cursor: pointer;
 }
 
-/* Efeito de Zoom ao passar o mouse (:P) */
+/* Efeito de Zoom ao passar o mouse */
 .cardFilme:hover {
     transform: scale(1.05);
 }
@@ -41,7 +46,7 @@
     transition: border-color 0.3s ease;
 }
 
-/* Cor Amarela (Marelo :3) ao colocar o mouse na imagem */
+/* Cor Amarela ao colocar o mouse na imagem */
 .cardFilme:hover .posterFilme {
     border-color: #F0AD12; 
 }
