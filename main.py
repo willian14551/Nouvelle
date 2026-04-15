@@ -60,6 +60,58 @@ async def pegar_detalhes(filme_id: int):
     # Imagine que você busca os detalhes de um filme específico aqui
     return {"id": filme_id, "status": "Disponível", "assentos": [1, 5, 8]}
 
+@app.get("/detalhes/{filme_id}")
+async def detalhes_pagina(request: Request, filme_id: int):
+    url_detalhes = f"https://api.themoviedb.org/3/movie/{filme_id}?api_key={API_KEY}&language=pt-BR"
+    
+    async with httpx.AsyncClient(verify=False) as client:
+        resposta = await client.get(url_detalhes)
+        filme_dados = resposta.json()
+        
+    # Pega a data de hoje
+    hoje = datetime.now().strftime("%Y-%m-%d")
+    # Pega a data de lançamento do filme (se não tiver, usa string vazia)
+    data_lancamento = filme_dados.get("release_date", "")
+
+    # Função para formatar a data
+    def formatar_data_br(valor):
+        if not valor:
+            return ""
+        try:
+            # Converte a string da API para um objeto de data e depois para o formato PT
+            data_obj = datetime.strptime(valor, "%Y-%m-%d")
+            return data_obj.strftime("%d/%m/%Y")
+        except:
+            return valor
+
+    # Regista o filtro no Jinja2
+    templates.env.filters['data_pt'] = formatar_data_br
+
+    # Coloque isto perto de onde definiu o filtro de data
+    def formatar_duracao(minutos):
+        if not minutos:
+            return "N/A"
+        horas = minutos // 60
+        resto_minutos = minutos % 60
+        # O :02d garante que 5 minutos fiquem como "05"
+        return f"{horas}h {resto_minutos:02d}min"
+
+    # Regista o filtro no ambiente do Jinja2
+    templates.env.filters['tempo_h'] = formatar_duracao
+    
+    # Se a data de lançamento for menor ou igual a hoje, o ingresso pode ser comprado
+    pode_comprar = data_lancamento <= hoje if data_lancamento else False
+
+    return templates.TemplateResponse(
+        request=request,
+        name="detalhes.html",
+        context={
+            "request": request, 
+            "filme": filme_dados,
+            "pode_comprar": pode_comprar # Enviamos a variável para o HTML
+        }
+    )
+
 @app.get("/api/filmes-em-breve")
 async def api_em_breve():
     hoje = datetime.now().strftime("%Y-%m-%d")
@@ -384,6 +436,14 @@ async def pagamento(request: Request):
 
 @app.get("/assentos")
 async def assentos(request: Request):
+    # Verifica se o usuário tem o cookie de CPF (ou seja, se está logado)
+    usuario_logado = request.cookies.get("usuario_cpf")
+
+    if not usuario_logado:
+        # Se não estiver logado, redireciona para a página de login
+        # Você pode passar um parâmetro 'proxima' para voltar aqui depois do login
+        return RedirectResponse(url="/login", status_code=303)
+
     return templates.TemplateResponse(
         request=request,
         name="assentos.html",

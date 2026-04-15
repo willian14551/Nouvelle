@@ -1,3 +1,7 @@
+.menu{
+    border-bottom: 110px solid black; /* Borda preta abaixo do menu para ser o fundo da barra de pesquisa */
+}
+
 .menuFilmesCartaz{
     border-bottom: 10px solid rgb(150, 28, 28);
     border-radius: 8px;
@@ -12,7 +16,7 @@
 .search-box {
     position: sticky; /* Faz o menu grudar no topo ao rolar a página */
     top: 150px; /* Deixa a barra de pesquisa subir até esta posição (no caso fica "colado" com o menu)*/
-    z-index: 1000; /* Garante que o menu fique sobre os outros elementos */
+    z-index: 1001; /* Garante que o menu fique sobre os outros elementos */
     margin: 20px;
     display: flex;
     width: 100%;
@@ -20,7 +24,8 @@
     background-color: #2f3640;
     border-radius: 8px;
     overflow: hidden; /* Garante que o botão não saia da borda arredondada */
-    height: 50px;
+    height: 50px; /* Altura da barra de pesquisa */
+    margin: -90px auto 40px auto; /* O -90px puxa a barra PARA CIMA, entrando na área da borda preta. O 'auto' centraliza nas laterais. O '40px' dá um respiro embaixo dela. */
 }
 
 .search-box input {
@@ -47,6 +52,12 @@
     transition: background 0.3s;
 }
 
+.msgErro, .msgErro1 {
+    color: rgb(150, 28, 28);
+    margin-top: 20px;
+    
+}
+
 /* Container que segura todos os filmes */
 .gradeFilmes {
     display: flex;
@@ -64,12 +75,10 @@
     transition: transform 0.3s ease; /* Efeito de zoom suave */
 }
 
-/* Efeito de Zoom ao passar o mouse (:P) */
 .cardFilme:hover {
     transform: scale(1.05);
-}
-.cardFilme:hover .posterFilme {
-    border-color: #F0AD12; 
+    border-color: #F0AD12;
+    cursor: pointer;
 }
 
 .posterFilme {
@@ -85,9 +94,16 @@
     font-size: 14px;
     display: -webkit-box; /* Evita que títulos muito longos quebrem o layout */
     overflow: hidden;
+    color: white;
+    text-transform: uppercase;
+    text-decoration: none !important;
 }
 
 @media (max-width: 768px) {
+    .menu{
+        border: 0; /* Remove a borda preta do menu no mobile */
+    }
+
     #inputBuscar {
         width: calc(100% - 40px); 
     }
@@ -105,6 +121,9 @@
 }
 
 @media (max-width: 480px) {
+    .menu{
+        border: 0; /* Remove a borda preta do menu no mobile */
+    }
     .cardFilme {
         width: 100%; /* Deixa 1 filme por linha em telas muito pequenas */
     }

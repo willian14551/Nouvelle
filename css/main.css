@@ -72,7 +72,6 @@ body{
         flex-wrap: wrap;
         justify-content: space-between; /* Mantém logo na esquerda e ícone na direita */
         gap: 20px;
-        
     }
     /* Sobrescreve o visibility: hidden */
     .menu-links, .menu-login, .Tamanho_Logo {

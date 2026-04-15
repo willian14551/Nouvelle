@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/assets/miniLogo.png" type="image/x-icon">
     <title>Nouvelle - Em Breve</title>
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/emBreve.css">
@@ -40,10 +41,12 @@
         <div class="gradeFilmes" id="corpoTabela">
             {% for filme in filmes %}
             <div class="cardFilme">
-                <img class="posterFilme" 
-                     src="https://image.tmdb.org/t/p/w500{{ filme.poster_path }}" 
-                     alt="{{ filme.title }}">
-                <strong class="tituloFilme">{{ filme.title }}</strong>
+                <a href="/detalhes/{{ filme.id }}">
+                    <img class="posterFilme" 
+                        src="https://image.tmdb.org/t/p/w500{{ filme.poster_path }}" 
+                        alt="{{ filme.title }}">
+                    <strong class="tituloFilme">{{ filme.title }}</strong>
+                </a>
             </div>
             {% endfor %}
         </div>

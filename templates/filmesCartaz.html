@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/assets/miniLogo.png" type="image/x-icon">
+    <title>nouvelle - Filmes em Cartaz</title>
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/filmesCartaz.css"> 
-    <title>Filmes em Cartaz</title>
 </head>
 <body>
   <nav class="menu">
@@ -39,14 +40,20 @@
     <div class="search-box">
       <input type="text" id="inputBuscar" placeholder="Buscar..">
       <button id="btnBuscar">🔍︎</button>
-      <!-- LUPA EM TXT => "https://www.emojiall.com/pt/code/1F50D-FE0E" -->
+      <!-- LINK PARA A LUPA EM TXT => "https://www.emojiall.com/pt/code/1F50D-FE0E" -->
     </div>
+
+    <h2 class="tituloPag">Filmes em Cartaz</h2>
+    <h1 class="msgErro"></h1>
+    <h1 class="msgErro1"></h1>
 
     <div class="gradeFilmes" id="corpoTabela">
       {% for filme in filmes %}
       <div class="cardFilme">
-        <img class="posterFilme" src="https://image.tmdb.org/t/p/w500{{ filme.poster_path }}" alt="{{ filme.title }}">
-        <strong class="tituloFilme">{{ filme.title }}</strong>
+        <a href="/detalhes/{{ filme.id }}">
+          <img class="posterFilme" src="https://image.tmdb.org/t/p/w500{{ filme.poster_path }}" alt="{{ filme.title }}">
+          <strong class="tituloFilme">{{ filme.title }}</strong>
+        </a>
       </div>
       {% endfor %}
     </div>

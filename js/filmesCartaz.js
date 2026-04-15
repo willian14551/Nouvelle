@@ -10,7 +10,7 @@ window.onload = async () => {
 
 const btnBuscar = document.getElementById("btnBuscar");
 btnBuscar.addEventListener("click", () => {
-    filtrarFilmes(); // Mudamos o nome para refletir que é um filtro
+    filtrarFilmes();
 });
 
 window.addEventListener("keydown", function(event){
@@ -48,6 +48,9 @@ function filtrarFilmes() {
             corpoTabela.appendChild(divCard);
         });
     } else {
-        alert("Nenhum dos filmes em cartaz corresponde a: " + inputBuscar.value);
+        msgErro = document.querySelector(".msgErro");
+        msgErro1 = document.querySelector(".msgErro1");
+        msgErro.textContent = "O filme '" + inputBuscar.value + "' ainda está em exibição ou já saiu de cartaz.";
+        msgErro1.textContent = "Tente buscar outro filme.";
     }
 }
