@@ -3,13 +3,7 @@
 }
 
 .menuFilmesCartaz{
-    border-bottom: 10px solid rgb(150, 28, 28);
-    border-radius: 8px;
     text-shadow: 0 0 10px #f1c764;
-}
-.menuFilmesCartaz:hover{
-    border-bottom: 20px solid rgb(150, 28, 28) !important;
-    transition: all 0.5s ease; /* Melhora o efeito do hover */
 }
 
 /* Div da barra de pesquisa */
@@ -100,6 +94,15 @@
 }
 
 @media (max-width: 768px) {
+    .menuFilmesCartaz{
+        display: block;
+        max-width: 100%;
+        border-bottom: 0;
+        border-radius: 0;
+        text-shadow: none !important;
+        background-color: rgb(114, 23, 23);
+    }
+
     .menu{
         border: 0; /* Remove a borda preta do menu no mobile */
     }

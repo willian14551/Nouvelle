@@ -10,7 +10,9 @@
 </head>
 <body>
     <nav class="menu">
-        <img src="/assets/logo.png" alt="Nouvelle" width="200" height="100">
+        <a href="/">
+            <img src="/assets/logo.png" alt="Nouvelle" width="200" height="100">
+        </a>
 
         <ul class="menu-links">
             <li><a href="/index">Início</a></li>
@@ -20,8 +22,8 @@
         
         <ul class="menu-login">
             {% if request.cookies.get('usuario_nome') %}
-                <li><a href="/perfil" style="color: #F0AD12; text-decoration: none; font-size: 20px;">Olá, {{ request.cookies.get('usuario_nome').split()[0] }}</a></li>
-                <li><a href="/logout" class="btn-entrar" style="background-color: #555;">Sair</a></li>
+                <li><a id="menuPerfil" href="/perfil" >Olá, {{ request.cookies.get('usuario_nome').split()[0] }}</a></li>
+                <li><a id="menuLogout" href="/logout" class="btn-entrar">Sair</a></li>
             {% else %}
                 <li><a href="/login" class="btn-entrar">Entrar</a></li>
                 <li><a href="/cadastro" class="btn-cadastrar">Cadastrar</a></li>

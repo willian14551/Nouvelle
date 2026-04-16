@@ -10,7 +10,9 @@
 </head>
 <body>
     <nav class="menu">
-        <img src="/assets/logo.png" alt="Nouvelle" width="200" height="100">
+        <a href="/">
+            <img src="/assets/logo.png" alt="Nouvelle" width="200" height="100">
+        </a>
 
         <input type="checkbox" id="menu-burguer">
         <label for="menu-burguer" class="hamburger">
@@ -26,8 +28,8 @@
         </ul>
         <ul class="menu-login">
             {% if request.cookies.get('usuario_nome') %}
-                <li><a id="menuPerfil" href="/perfil" style="color: #F0AD12; text-decoration: none; font-size: 20px;">Olá, {{ request.cookies.get('usuario_nome').split()[0] }}</a></li>
-                <li><a id="menuLogout" href="/logout" class="btn-entrar" style="background-color: #555;">Sair</a></li>
+                <li><a id="menuPerfil" href="/perfil" >Olá, {{ request.cookies.get('usuario_nome').split()[0] }}</a></li>
+                <li><a id="menuLogout" href="/logout" class="btn-entrar">Sair</a></li>
             {% else %}
                 <li><a id="menuLogin" href="/login" class="btn-entrar">Entrar</a></li>
                 <li><a id="menuCadastro" href="/cadastro" class="btn-cadastrar">Cadastrar</a></li>
@@ -35,10 +37,13 @@
         </ul>
     </nav>
 
-        <main class="Local_logo"> <div class="Tamanho_Logo">
+    <div class="caixaLogin">
+        <main class="Local_logo">
+            <div class="Tamanho_Logo">
                 <img src="assets/logo.png" alt="Logo Nouvelle">
             </div>
         </main>
+        
         <form action="/login" method="POST" id="formLogin">
             <div class="login_senha_caixas">
                 <input type="email" name="email" placeholder="E-mail" required>
@@ -64,6 +69,8 @@
                 <a href="#" class="Qual_minha_senha">Esqueceu sua senha?</a>
             </div>
         </form>
+        
     </div>
+    
 </body>
 </html>

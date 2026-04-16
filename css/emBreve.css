@@ -1,6 +1,4 @@
 .menuEmBreve{
-    border-bottom: 10px solid rgb(150, 28, 28);
-    border-radius: 8px;
     text-shadow: 0 0 10px #f1c764;
 }
 
@@ -35,7 +33,7 @@
 .posterFilme {
     width: 100%;
     height: 380px; 
-    
+    text-decoration: none;
   
     object-fit: cover; 
     object-position: center;
@@ -73,4 +71,16 @@
     margin-top: 30px;
     text-transform: uppercase;
     letter-spacing: 2px;
+}
+
+@media (max-width: 768px) {
+    .menuEmBreve{
+        display: block;
+        max-width: 100%;
+        border-bottom: 0;
+        border-radius: 0;
+        text-shadow: none !important;
+        background-color: rgb(114, 23, 23);
+    }
+    
 }

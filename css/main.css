@@ -39,7 +39,7 @@ body{
 }
 
 .menu-links a:hover, .menu-login a:hover{
-    transform: translateY(10px);
+    transform: translateY(10px); /* Empurra pra baixo */
     transition: transform 0.3s ease; /* Efeito de zoom suave */
 }
 

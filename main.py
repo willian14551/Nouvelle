@@ -68,9 +68,9 @@ async def detalhes_pagina(request: Request, filme_id: int):
         resposta = await client.get(url_detalhes)
         filme_dados = resposta.json()
         
-    # Pega a data de hoje
+    # Recebe a data de hoje
     hoje = datetime.now().strftime("%Y-%m-%d")
-    # Pega a data de lançamento do filme (se não tiver, usa string vazia)
+    # Recebe a data de lançamento do filme (se não tiver, usa string vazia)
     data_lancamento = filme_dados.get("release_date", "")
 
     # Função para formatar a data
@@ -87,7 +87,7 @@ async def detalhes_pagina(request: Request, filme_id: int):
     # Regista o filtro no Jinja2
     templates.env.filters['data_pt'] = formatar_data_br
 
-    # Coloque isto perto de onde definiu o filtro de data
+    # Filtro de data
     def formatar_duracao(minutos):
         if not minutos:
             return "N/A"
