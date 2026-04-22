@@ -111,4 +111,23 @@ main {
         flex: 1 1 100%;
         width: 100%;
     }
+    .login_senha_caixas input {
+        font-size: 30px;
+        margin-bottom: 10px;
+        height: 80px;
+    }
+    .btn-login{
+        font-size: 30px;
+        padding: 10px;
+        margin-bottom: 20px;
+    }
+    .utilidades_abaixo{
+        display:grid;
+        justify-content: center;
+        align-items: center;
+    }
+    .link_login {
+        font-size: 25px;
+        margin-bottom: 30px;
+    }
 }

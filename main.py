@@ -8,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import RedirectResponse
 from conexao import obter_conexao
-from datetime import datetime
+from datetime import datetime, timedelta
 import httpx
 import bcrypt
 
@@ -187,6 +187,26 @@ async def processar_cadastro(
     data_nasc: str = Form(...),
     senha: str = Form(...)
 ):
+    # --- INÍCIO DA VALIDAÇÃO DE IDADE ---
+    # Convertemos a data que veio do formulário (string) para um objeto de data
+    data_nascimento = datetime.strptime(data_nasc, "%Y-%m-%d")
+    hoje = datetime.now()
+
+    # Calculamos a idade real:
+    # 1. Subtraímos os anos.
+    # 2. Verificamos se o dia/mês atual já passou do dia/mês de nascimento.
+    # Se não passou, subtraímos 1 da idade.
+    idade = hoje.year - data_nascimento.year - ((hoje.month, hoje.day) < (data_nascimento.month, data_nascimento.day))
+
+    # Se a idade for menor que 18 (inclui datas futuras que geram idade negativa), barramos aqui
+    if idade < 18:
+        return templates.TemplateResponse(
+            request=request, 
+            name="cadastro.html", 
+            context={"request": request, "mensagem": "Você precisa ter pelo menos 18 anos para se cadastrar."}
+        )
+    # --- FIM DA VALIDAÇÃO ---
+
     bytes_senha = senha.encode('utf-8')
     salt = bcrypt.gensalt()
     senha_cripto = bcrypt.hashpw(bytes_senha, salt).decode('utf-8')

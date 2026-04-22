@@ -2,6 +2,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const cpfInput = document.getElementById('cpf');
     const telInput = document.getElementById('telefone');
     const form = document.getElementById('formCadastro');
+    const dataNasc = document.getElementById('data_nasc');
+    const nomeInput = document.getElementById('Nome');
 
     // Máscara do CPF (000.000.000-00)
     cpfInput.addEventListener('input', function(e) {
@@ -36,6 +38,26 @@ document.addEventListener("DOMContentLoaded", function() {
         return resto == parseInt(cpf.substring(10, 11));
     }
 
+    dataNasc.addEventListener('submit', function(e) {
+        const hoje = new Date(); // Data atual do sistema
+        const dataNascimento = new Date(dataNasc.value); // Data que o usuário escolheu
+        
+        // Cálculo da idade subtraindo os anos
+        let idade = hoje.getFullYear() - dataNascimento.getFullYear();
+        
+        // Verifica se já fez aniversário este ano
+        const mes = hoje.getMonth() - dataNascimento.getMonth();
+        if (mes < 0 || (mes === 0 && hoje.getDate() < dataNascimento.getDate())) {
+            idade--;
+        }
+
+        // Validação: Se a idade for menor que 18
+        if (idade < 18) {
+            e.preventDefault(); // Impede o envio do formulário
+            exibirErro(dataNasc, "Você precisa ter pelo menos 18 anos para se cadastrar.");
+        }
+    });
+
     // Invalidade do CPF e telefone
     form.addEventListener('submit', function(e) {
         const cpfValido = validarCPF(cpfInput.value);
@@ -55,6 +77,18 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
+    // adição da idade minima e nome que seja maior que 5 caracteres
+
+    form.addEventListener('submit', function(e) {
+
+        //validando nome
+        const nomeValor = nomeInput.value.trim();
+        if (nomeValor.length < 5) {
+            e.preventDefault();
+
+            exibirErro(nomeInput, "O nome deve ser completo !!");
+        }
+    });
     function exibirErro(input, mensagem) {
         const erro = document.createElement('p');
         erro.className = 'msg-erro';
