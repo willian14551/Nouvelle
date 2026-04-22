@@ -51,7 +51,7 @@
                 </div>
                 
                 <div class="login_senha_caixas"> 
-                    <input type="text" name="nome" placeholder="Nome completo" required>
+                    <input type="text" name="nome" id="Nome" placeholder="Nome completo" required>
                 </div>
                 
                 <div class="login_senha_caixas"> 
@@ -64,7 +64,7 @@
                 </div>
                 
                 <div class="login_senha_caixas"> 
-                    <input type="date" name="data_nasc" style="color: #999;" required>
+                    <input type="date" name="data_nasc" id="data_nasc" style="color: #999;" required>
                 </div>
                 
                 <div class="login_senha_caixas"> 
@@ -73,13 +73,14 @@
                 
                 <button type="submit" class="btn-login">Finalizar Cadastro</button>
 
-                {% if mensagem %}
-                    <p style="color: red; margin-top: 15px; text-align: center;">{{ mensagem }}</p>
-                {% endif %}
-
                 <div class="utilidades_abaixo"> 
                     <a href="/login" class="link_login">Já tem uma conta? Faça login</a>
                 </div>
+
+                {% if mensagem %}
+                    <h2 style="color: rgb(255, 230, 0); margin-top: 15px; text-align: center;">{{ mensagem }}</h2>
+                {% endif %}
+
             </form>
         </div>
 

@@ -93,7 +93,7 @@
 }
 
 @media (max-width: 768px) {
-    .menuLogin, #menuPerfil{
+    #menuLogin{
         display: block;
         max-width: 100%;
         border-bottom: 0;
@@ -128,7 +128,7 @@
         align-items: center;
     }
     .lembre_de_mim, .Qual_minha_senha{
-        font-size: 25   px;
+        font-size: 25px;
         margin-bottom: 30px;
     }
 

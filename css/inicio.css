@@ -125,9 +125,9 @@
         padding: 20px;
     }
     .info-filme h3 {
-        font-size: 28px;
+        font-size: 50px !important;
     }
     .info-filme p {
-        font-size: 15px;
+        font-size: 30px;
     }
 }

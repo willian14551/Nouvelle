@@ -53,12 +53,12 @@ body{
 .hamburger {
     display: none; /* Esconde o menu "hamburguer" na tela grande */
     flex-direction: column;
-    gap: 6px;
+    gap: 10px;
 }
 
 .hamburger span {
-    width: 35px;
-    height: 4px;
+    width: 50px;
+    height: 8px;
     background-color: #F0AD12;
     border-radius: 2px;
 }
@@ -97,12 +97,12 @@ body{
     }
     /* Transforma o Hambúrguer em um X para cada <span>*/
     #menu-burguer:checked ~ .hamburger span:nth-child(1) {
-        transform: rotate(45deg) translate(7px, 7px);
+        transform: rotate(45deg) translate(20px, 20px);
     }
     #menu-burguer:checked ~ .hamburger span:nth-child(2) {
         opacity: 0;
     }
     #menu-burguer:checked ~ .hamburger span:nth-child(3) {
-        transform: rotate(-45deg) translate(7px, -7px);
+        transform: rotate(-45deg) translate(6px, -4px);
     }
 }
