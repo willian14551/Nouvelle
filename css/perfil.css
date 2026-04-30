@@ -7,6 +7,14 @@
     padding: 40px;
 }
 
+.imagemPerfil{
+    border-radius: 40px;
+}
+
+.btn-img-perfil-atualizar, .btn-img-perfil-excluir {
+    width: 60% !important;
+}
+
 .Tamanho_Logo {
     flex: 0 1 450px;
 }
@@ -35,7 +43,7 @@
 }
 
 /* --- BOTÕES --- */
-.btn-login {
+.btn-login, .btn-img-perfil-atualizar, .btn-img-perfil-excluir {
     width: 100%;
     padding: 15px;
     background-color: #141414;
@@ -47,7 +55,7 @@
     transition: all 0.3s ease;
 }
 
-.btn-login:hover {
+.btn-login:hover, .btn-img-perfil-atualizar:hover, .btn-img-perfil-excluir:hover {
     background-color: #F0AD12;
     color: #141414;
 }
