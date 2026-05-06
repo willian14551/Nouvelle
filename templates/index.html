@@ -28,6 +28,10 @@
         </ul>
         <ul class="menu-login">
             {% if request.cookies.get('usuario_nome') %}
+                {% if request.cookies.get('usuario_permissao') == 'ADMINISTRADOR' %}
+                    <li><a href="/admin" class="btn-admin">Painel Admin</a></li>
+                {% endif %}
+                
                 <li><a id="menuPerfil" href="/perfil" >Olá, {{ request.cookies.get('usuario_nome').split()[0] }}</a></li>
                 <li><a id="menuLogout" href="/logout" class="btn-entrar">Sair</a></li>
             {% else %}
