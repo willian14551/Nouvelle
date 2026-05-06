@@ -271,7 +271,7 @@ async def processar_login(
     try:
         cursor = conexao.cursor(dictionary=True) # O Dictionary faz o MySql devolver os dados com os nomes das colunas
 
-        sql = "Select cpf, nome, senha FROM Usuario WHERE email = %s"
+        sql = "Select cpf, nome, senha, permissao FROM Usuario WHERE email = %s"
         cursor.execute(sql, (email,))
         usuario = cursor.fetchone()
 
@@ -297,6 +297,7 @@ async def processar_login(
         resposta = RedirectResponse(url="/", status_code=303)
         resposta.set_cookie(key="usuario_nome", value=usuario['nome'])
         resposta.set_cookie(key="usuario_cpf", value=usuario['cpf'])
+        resposta.set_cookie(key="usuario_permissao", value=usuario['permissao'])
 
         return resposta
     except Exception as e:
@@ -317,7 +318,20 @@ async def logout():
     resposta = RedirectResponse(url="/", status_code=303)
     resposta.delete_cookie("usuario_nome")
     resposta.delete_cookie("usuario_cpf")
+    resposta.delete_cookie("usuario_permissao")
     return resposta
+
+@app.get("/admin")
+async def painel_admin(request:Request):
+    permissao = request.cookies.get("usuario_permissao")
+
+    if permissao != 'ADMINISTRADOR':
+        return RedirectResponse(url="/", status_code=303)
+    return templates.TemplateResponse(
+        request=request,
+        name="admin.html",
+        context={"request": request}
+    )
 
 @app.get("/perfil")
 async def carregar_perfil(request: Request):
