@@ -75,3 +75,5 @@ ALTER TABLE sessao ADD CONSTRAINT FK_sessao_Filme
     FOREIGN KEY (fk_Filme_id)
     REFERENCES Filme (id)
     ON DELETE RESTRICT;
+
+ALTER TABLE Usuario ADD COLUMN foto_perfil VARCHAR(255);

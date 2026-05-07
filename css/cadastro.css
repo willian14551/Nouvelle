@@ -23,6 +23,36 @@
     flex: 0 1 380px;
 }
 
+.divFotoPerfil{
+    padding-bottom: 15px;
+    padding-top: 20px;
+}
+#preview-img{
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #F0AD12;
+    margin-bottom: 15px;
+}
+
+.botao-upload {
+    background-color: #141414;
+    border-radius: 5px;
+    width: 100%;
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    display: inline-block;
+    padding: 15px;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+.botao-upload:hover {
+    background-color: #F0AD12;
+    color: #000;
+}
+
 .login_senha_caixas {
     margin-bottom: 15px;
 }

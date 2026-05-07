@@ -4,6 +4,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const form = document.getElementById('formCadastro');
     const dataNasc = document.getElementById('data_nasc');
     const nomeInput = document.getElementById('Nome');
+    const fotoInput = document.getElementById('foto_perfil');
+    const previewImg = document.getElementById('preview-img');
+    const containerPreview = document.getElementById('container-preview');
 
     // Máscara do CPF (000.000.000-00)
     cpfInput.addEventListener('input', function(e) {
@@ -98,4 +101,23 @@ document.addEventListener("DOMContentLoaded", function() {
         erro.style.marginTop = "5px";
         input.parentNode.appendChild(erro);
     }
+
+    fotoInput.addEventListener('change', function() {
+        const nomeArquivo = this.files[0] ? this.files[0].name : "Selecionar Imagem";
+        document.querySelector('.botao-upload').innerText = nomeArquivo;
+
+        if (arquivo) {
+            const leitor = new FileReader(); // Ferramenta do JS para ler arquivos
+
+            leitor.onload = function(e) {
+                // Quando o leitor terminar de processar, coloca o resultado no 'src' da imagem
+                previewImg.src = e.target.result;
+                containerPreview.style.display = 'block'; // Mostra a imagem
+            }
+
+            leitor.readAsDataURL(arquivo); // Transforma o arquivo em um link temporário para exibição
+        } else {
+            containerPreview.style.display = 'none'; // Se o usuário cancelar a seleção, esconde a prévia
+        }
+    });
 });

@@ -44,6 +44,15 @@
 
         <div class="Tamanho_Caixas_TXT"> 
             <form action="/cadastrar" method="POST" id="formCadastro">
+
+                <div class="divFotoPerfil">
+                    <div id="container-preview" style="display: block; margin-top: 10px; text-align: center;">
+                        <img id="preview-img" src="/assets/fotoPerfilDefault.png" alt="Foto de Perfil">
+                    </div>
+
+                    <label for="btnAddFoto" class="botao-upload">Selecionar Imagem</label>
+                    <input type="file" name="selecionar_imagem_de_perfil" id="btnAddFoto" class="selecionarImagemPerfil" accept="image/*" style="display: none;">
+                </div>
                 
                 <div class="login_senha_caixas"> 
                     <input type="text" name="cpf" id="cpf" placeholder="CPF (000.000.000-00)" maxlength="14" required>

@@ -2,7 +2,7 @@
 Importar as ferramentas
 FastApi cria o servidor, enquanto o request lida com os pedidos de acessar o site
 '''
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Form, File, UploadFile
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, Request, Form
@@ -11,6 +11,8 @@ from conexao import obter_conexao
 from datetime import datetime, timedelta
 import httpx
 import bcrypt
+import shutil
+import os
 
 # Variável que instância um objeto da classe FastApi, criando o app
 app = FastAPI()
@@ -185,7 +187,8 @@ async def processar_cadastro(
     email: str = Form(...),
     telefone: str = Form(...),
     data_nasc: str = Form(...),
-    senha: str = Form(...)
+    senha: str = Form(...),
+    foto_perfil: UploadFile = File(None)
 ):
     # --- INÍCIO DA VALIDAÇÃO DE IDADE ---
     # Convertemos a data que veio do formulário (string) para um objeto de data
@@ -207,6 +210,21 @@ async def processar_cadastro(
         )
     # --- FIM DA VALIDAÇÃO ---
 
+    caminho_final = "/assets/fotoPerfilDefault.png"
+
+    if foto_perfil and foto_perfil.filename:
+        pasta_destino = os.path.join("assets", "uploads")
+        os.makedirs(pasta_destino, exist_ok=True)
+        
+        nome_arquivo = f"{cpf}_{foto_perfil.filename}"
+        caminho_disco = os.path.join(pasta_destino, nome_arquivo)
+        
+        with open(caminho_disco, "wb") as buffer:
+            shutil.copyfileobj(foto_perfil.file, buffer)
+        
+        # Caminho que vai para o banco de dados
+        caminho_final = f"/assets/uploads/{nome_arquivo}"
+
     bytes_senha = senha.encode('utf-8')
     salt = bcrypt.gensalt()
     senha_cripto = bcrypt.hashpw(bytes_senha, salt).decode('utf-8')
@@ -221,10 +239,10 @@ async def processar_cadastro(
         cursor = conexao.cursor()
 
         sql = """
-            INSERT INTO Usuario(cpf, nome, email, telefone, data_nasc, senha)
-            VALUES (%s, %s, %s, %s, %s, %s)
+            INSERT INTO Usuario(cpf, nome, email, telefone, data_nasc, senha, caminho_final)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
-        valores = (cpf, nome, email, telefone, data_nasc, senha_cripto)
+        valores = (cpf, nome, email, telefone, data_nasc, senha_cripto, caminho_final)
 
         cursor.execute(sql, valores)
         conexao.commit()
