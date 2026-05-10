@@ -26,7 +26,7 @@ python -m venv venv
 source venv/bin/activate
 
 # Instale as dependências
-pip install fastapi uvicorn pydantic mysql-connector-python bcrypt httpx python-multipart jinja2
+pip install fastapi uvicorn pydantic pydantic-core mysql-connector-python bcrypt httpx python-multipart jinja2
 
 # Inicie a backend
 uvicorn main:app --reload
