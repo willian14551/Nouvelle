@@ -9,6 +9,7 @@ CREATE TABLE Sala (
 
 CREATE TABLE Filme (
     id INT PRIMARY KEY AUTO_INCREMENT,
+    tmdb_id INT UNIQUE,
     nome VARCHAR(100),
     duracao INT,
     descricao TEXT
@@ -46,9 +47,12 @@ CREATE TABLE sessao (
 
 CREATE TABLE Ingresso (
     id INT PRIMARY KEY AUTO_INCREMENT,
+    numero_assento VARCHAR(10),
     fk_Pagamento_id INT,
     fk_sessao_id INT
 );
+
+-- Foreign Keys
 
 ALTER TABLE Pagamento ADD CONSTRAINT FK_Pagamento_Usuario
     FOREIGN KEY (fk_Usuario_cpf)
@@ -60,7 +64,6 @@ ALTER TABLE Ingresso ADD CONSTRAINT FK_Ingresso_Pagamento
     REFERENCES Pagamento (id)
     ON DELETE RESTRICT;
 
-/* NOVA REGRA: Ingresso conectado à Sessão */
 ALTER TABLE Ingresso ADD CONSTRAINT FK_Ingresso_sessao
     FOREIGN KEY (fk_sessao_id)
     REFERENCES sessao (id)
