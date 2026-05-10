@@ -2,38 +2,979 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Painel do Administrador</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/assets/miniLogo.png" type="image/x-icon">
+    <title>Nouvelle - Admin</title>
     <link rel="stylesheet" href="/css/main.css">
-    </head>
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
 <body>
-    <nav class="menu">
-        <a href="/"><img src="/assets/logo.png" alt="Nouvelle" width="200" height="100"></a>
-        <ul class="menu-links">
-            <li><a href="/">Voltar para o Site</a></li>
-        </ul>
-    </nav>
 
-    <main style="padding: 40px; color: white; text-align: center;">
-        <h1 style="color: #F0AD12;">Painel de Controle - Administração</h1>
-        <p>Bem-vindo. Você tem acesso total ao sistema Nouvelle.</p>
-        
-        <div style="margin-top: 50px; display: flex; justify-content: center; gap: 20px;">
-            <div style="background-color: #333; padding: 20px; border-radius: 8px; width: 300px;">
-                <h3 style="color: #F0AD12;">Gerenciar Filmes</h3>
-                <p>Adicionar ou remover filmes de cartaz.</p>
-                <button class="btn-login" style="margin-top: 15px;">Acessar</button>
-            </div>
-            <div style="background-color: #333; padding: 20px; border-radius: 8px; width: 300px;">
-                <h3 style="color: #F0AD12;">Gerenciar Sessões</h3>
-                <p>Adicionar, atualizar ou remover sessões.</p>
-                <button class="btn-login" style="margin-top: 15px;">Acessar</button>
-            </div>
-            <div style="background-color: #333; padding: 20px; border-radius: 8px; width: 300px;">
-                <h3 style="color: #F0AD12;">Gerenciar Usuários</h3>
-                <p>Ver lista de clientes cadastrados.</p>
-                <button class="btn-login" style="margin-top: 15px;">Acessar</button>
-            </div>
+<!-- NAVBAR -->
+<nav class="menu">
+    <a href="/"><img src="/assets/logo.png" alt="Nouvelle" width="200" height="100"></a>
+    <ul class="menu-links">
+        <li><a href="/">Voltar ao Site</a></li>
+    </ul>
+    <ul class="menu-login">
+            {% if request.cookies.get('usuario_nome') %}
+                {% if request.cookies.get('usuario_permissao') == 'ADMINISTRADOR' %}
+                    <li><a href="/admin" class="btn-admin">Painel Admin</a></li>
+                {% endif %}
+                
+                <li><a id="menuPerfil" href="/perfil" >Olá, {{ request.cookies.get('usuario_nome').split()[0] }}</a></li>
+                <li><a id="menuLogout" href="/logout" class="btn-entrar">Sair</a></li>
+            {% else %}
+                <li><a id="menuLogin" href="/login" class="btn-entrar">Entrar</a></li>
+                <li><a id="menuCadastro" href="/cadastro" class="btn-cadastrar">Cadastrar</a></li>
+            {% endif %}
+        </ul>
+</nav>
+
+<!-- TÍTULO -->
+<div class="admin-titulo">
+    <h1>Painel de Administração</h1>
+    <p>Gerencie filmes, salas, sessões, usuários e ingressos.</p>
+</div>
+<div class="abas-container">
+    <div class="abas-nav">
+        <button class="aba-btn ativa" onclick="trocarAba('filmes')">Filmes</button>
+        <button class="aba-btn" onclick="trocarAba('salas')">Salas</button>
+        <button class="aba-btn" onclick="trocarAba('sessoes')">Sessões</button>
+        <button class="aba-btn" onclick="trocarAba('usuarios')">Usuários</button>
+        <button class="aba-btn" onclick="trocarAba('ingressos')">Ingressos</button>
+        <button class="aba-btn" onclick="trocarAba('assentos')">Assentos</button>
+    </div>
+
+    <!-- ABA DE FILMES -->
+    <div class="aba-painel ativa" id="aba-filmes">
+        <div class="secao-header">
+            <h2>Filmes Cadastrados</h2>
+            <button class="btn btn-gold" onclick="abrirNovoFilme()">+ Novo Filme</button>
         </div>
-    </main>
+        <div class="tabela-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th><th>Nome</th><th>Duração</th><th>Descrição</th><th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-filmes">
+                    <tr><td colspan="5" class="carregando">Carregando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ABA de SALAS -->
+    <div class="aba-painel" id="aba-salas">
+        <div class="secao-header">
+            <h2>Salas de Cinema</h2>
+            <button class="btn btn-gold" onclick="novaSala()">+ Nova Sala</button>
+        </div>
+        <div class="tabela-wrapper">
+            <table>
+                <thead>
+                    <tr><th>#</th><th>ID Sala</th><th>Qtde Assentos</th><th>Ações</th></tr>
+                </thead>
+                <tbody id="tabela-salas">
+                    <tr><td colspan="4" class="carregando">Carregando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ABA de SESSÕES -->
+    <div class="aba-painel" id="aba-sessoes">
+        <div class="secao-header">
+            <h2>Sessões Programadas</h2>
+            <button class="btn btn-gold" onclick="abrirModal('modal-sessao')">+ Nova Sessão</button>
+        </div>
+        <div class="tabela-wrapper">
+            <table>
+                <thead>
+                    <tr><th>#</th><th>Filme</th><th>Sala</th><th>Horário</th><th>Tipo</th><th>Ações</th></tr>
+                </thead>
+                <tbody id="tabela-sessoes">
+                    <tr><td colspan="6" class="carregando">Carregando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ABA de USUÁRIOS -->
+    <div class="aba-painel" id="aba-usuarios">
+        <div class="secao-header">
+            <h2>Usuários Cadastrados</h2>
+        </div>
+        <div class="tabela-wrapper">
+            <table>
+                <thead>
+                    <tr><th>CPF</th><th>Nome</th><th>Email</th><th>Telefone</th><th>Permissão</th><th>Ações</th></tr>
+                </thead>
+                <tbody id="tabela-usuarios">
+                    <tr><td colspan="6" class="carregando">Carregando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ABA de INGRESSOS -->
+    <div class="aba-painel" id="aba-ingressos">
+        <div class="secao-header">
+            <h2>Compras / Ingressos</h2>
+            <button class="btn btn-gold" onclick="abrirModal('modal-ingresso')">+ Novo Ingresso</button>
+        </div>
+        <div class="tabela-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th><th>Usuário</th><th>Sessão</th><th>Valor Total</th>
+                        <th>Método</th><th>Status</th><th>Data</th><th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-ingressos">
+                    <tr><td colspan="8" class="carregando">Carregando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ABA de ASSENTOS -->
+    <div class="aba-painel" id="aba-assentos">
+        <div class="secao-header">
+            <h2>Assentos por Sessão</h2>
+        </div>
+        <div class="campo" style="max-width:400px; margin-bottom:1rem;">
+            <label>Selecione uma Sessão</label>
+            <select id="assento-sessao-select" onchange="carregarAssentos(this.value)">
+                <option value="">-- escolha uma sessão --</option>
+            </select>
+        </div>
+        <div class="tabela-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ingresso #</th><th>Assento</th><th>Usuário</th>
+                        <th>CPF</th><th>Status Pgto</th><th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-assentos">
+                    <tr><td colspan="6" class="carregando">Selecione uma sessão acima.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<!-- MODAL do FILME -->
+<div class="modal-overlay" id="modal-filme">
+    <div class="modal">
+        <button class="fechar-modal" onclick="fecharModal('modal-filme')">✕</button>
+        <h3 id="modal-filme-titulo">Novo Filme</h3>
+        <input type="hidden" id="filme-id">
+        <input type="hidden" id="filme-tmdb-id">
+
+        <!-- Busca TMDB (só aparece no modo "Novo Filme") -->
+        <div id="bloco-busca-tmdb">
+            <div class="campo">
+                <label>Buscar no TMDB</label>
+                <div style="display:flex;gap:8px">
+                    <input type="text" id="tmdb-busca-input" placeholder="Ex: Interestelar" style="flex:1">
+                    <button class="btn btn-blue" onclick="buscarTMDB()" type="button">🔍 Buscar</button>
+                </div>
+            </div>
+            <div id="tmdb-resultados" style="display:none;max-height:180px;overflow-y:auto;border:1px solid #333;border-radius:6px;margin-bottom:12px"></div>
+        </div>
+
+        <div class="campo">
+            <label>Nome do Filme</label>
+            <input type="text" id="filme-nome" placeholder="Preenchido ao selecionar do TMDB">
+        </div>
+        <div class="campo">
+            <label>Duração (em minutos)</label>
+            <input type="number" id="filme-duracao" placeholder="Ex: 169">
+        </div>
+        <div class="campo">
+            <label>Descrição / Sinopse</label>
+            <textarea id="filme-descricao" placeholder="Breve descrição do filme..."></textarea>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-blue" onclick="fecharModal('modal-filme')">Cancelar</button>
+            <button class="btn btn-gold" onclick="salvarFilme()">Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL da SALA -->
+<div class="modal-overlay" id="modal-sala">
+    <div class="modal">
+        <button class="fechar-modal" onclick="fecharModal('modal-sala')">✕</button>
+        <h3 id="modal-sala-titulo">Nova Sala</h3>
+        <input type="hidden" id="sala-id">
+        <div class="campo">
+            <label>Quantidade de Assentos</label>
+            <input type="number" id="sala-qtde" placeholder="Ex: 80">
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-blue" onclick="fecharModal('modal-sala')">Cancelar</button>
+            <button class="btn btn-gold" onclick="salvarSala()">Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL da SESSÃO -->
+<div class="modal-overlay" id="modal-sessao">
+    <div class="modal">
+        <button class="fechar-modal" onclick="fecharModal('modal-sessao')">✕</button>
+        <h3 id="modal-sessao-titulo">Nova Sessão</h3>
+        <input type="hidden" id="sessao-id">
+        <div class="campo">
+            <label>Filme</label>
+            <select id="sessao-filme"></select>
+        </div>
+        <div class="campo">
+            <label>Sala</label>
+            <select id="sessao-sala"></select>
+        </div>
+        <div class="campo">
+            <label>Data e Horário</label>
+            <input type="datetime-local" id="sessao-horario">
+        </div>
+        <div class="campo">
+            <label>Tipo</label>
+            <select id="sessao-tipo">
+                <option value="DUB">Dublado</option>
+                <option value="LEG">Legendado</option>
+            </select>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-blue" onclick="fecharModal('modal-sessao')">Cancelar</button>
+            <button class="btn btn-gold" onclick="salvarSessao()">Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL de INGRESSO -->
+<div class="modal-overlay" id="modal-ingresso">
+    <div class="modal">
+        <button class="fechar-modal" onclick="fecharModal('modal-ingresso')">✕</button>
+        <h3>Novo Ingresso (Manual)</h3>
+        <div class="campo">
+            <label>CPF do Usuário</label>
+            <input type="text" id="ingresso-cpf" placeholder="000.000.000-00" maxlength="14" oninput="mascaraCPF(this)">
+        </div>
+        <div class="campo">
+            <label>Sessão</label>
+            <select id="ingresso-sessao"></select>
+        </div>
+        <div class="campo">
+            <label>Valor Total (R$)</label>
+            <input type="number" step="0.01" id="ingresso-valor" placeholder="35.00">
+        </div>
+        <div class="campo">
+            <label>Método de Pagamento</label>
+            <select id="ingresso-metodo">
+                <option value="PIX">PIX</option>
+                <option value="CARTAO_CREDITO">Cartão de Crédito</option>
+                <option value="CARTAO_DEBITO">Cartão de Débito</option>
+            </select>
+        </div>
+        <div class="campo">
+            <label>Status do Pagamento</label>
+            <select id="ingresso-status">
+                <option value="PENDENTE">Pendente</option>
+                <option value="APROVADO">Aprovado</option>
+                <option value="RECUSADO">Recusado</option>
+            </select>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-blue" onclick="fecharModal('modal-ingresso')">Cancelar</button>
+            <button class="btn btn-gold" onclick="salvarIngresso()">Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL de ALTERAR STATUS DO PAGAMENTO -->
+<div class="modal-overlay" id="modal-status">
+    <div class="modal">
+        <button class="fechar-modal" onclick="fecharModal('modal-status')">✕</button>
+        <h3>Alterar Status do Pagamento</h3>
+        <input type="hidden" id="status-pagamento-id">
+        <div class="campo">
+            <label>Novo Status</label>
+            <select id="status-novo">
+                <option value="PENDENTE">Pendente</option>
+                <option value="APROVADO">Aprovado</option>
+                <option value="RECUSADO">Recusado</option>
+                <option value="ESTORNADO">Estornado</option>
+            </select>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-blue" onclick="fecharModal('modal-status')">Cancelar</button>
+            <button class="btn btn-gold" onclick="salvarStatus()">Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL de EDITAR ASSENTO -->
+<div class="modal-overlay" id="modal-assento">
+    <div class="modal">
+        <button class="fechar-modal" onclick="fecharModal('modal-assento')">✕</button>
+        <h3>Editar Assento</h3>
+        <input type="hidden" id="assento-ingresso-id">
+        <div class="campo">
+            <label>Número do Assento</label>
+            <input type="text" id="assento-numero" placeholder="Ex: A1, B5">
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-blue" onclick="fecharModal('modal-assento')">Cancelar</button>
+            <button class="btn btn-gold" onclick="salvarAssento()">Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST FEEDBACK -->
+<div id="feedback"></div>
+
+<script>
+    //  UTILITÁRIOS
+
+    function trocarAba(nome) {
+        document.querySelectorAll('.aba-painel').forEach(p => p.classList.remove('ativa'));
+        document.querySelectorAll('.aba-btn').forEach(b => b.classList.remove('ativa'));
+        document.getElementById('aba-' + nome).classList.add('ativa');
+        event.target.classList.add('ativa');
+
+        // Carrega os dados da aba ao clicar
+        if (nome === 'filmes')    carregarFilmes();
+        if (nome === 'salas')     carregarSalas();
+        if (nome === 'sessoes')   carregarSessoes();
+        if (nome === 'usuarios')  carregarUsuarios();
+        if (nome === 'ingressos') carregarIngressos();
+        if (nome === 'assentos')  preencherSelectAssentos();
+    }
+
+    function abrirModal(id) {
+        // Popula dropdowns quando necessário antes de abrir
+        if (id === 'modal-sessao')  { preencherSelectFilmes(); preencherSelectSalas(); }
+        if (id === 'modal-ingresso'){ preencherSelectSessoes(); }
+        document.getElementById(id).classList.add('aberto');
+    }
+
+    function fecharModal(id) {
+        document.getElementById(id).classList.remove('aberto');
+    }
+
+    function toast(msg, tipo = 'ok') {
+        const el = document.getElementById('feedback');
+        el.textContent = msg;
+        el.className = 'visivel ' + tipo;
+        setTimeout(() => el.className = '', 3000);
+    }
+
+    //  FORMATAÇÃO 
+
+    function formatarData(iso) {
+        if (!iso) return '-';
+        const d = new Date(iso);
+        return d.toLocaleString('pt-BR');
+    }
+
+    function badgeStatus(s) {
+        const mapa = {
+            PENDENTE:  'badge-pendente',
+            APROVADO:  'badge-aprovado',
+            RECUSADO:  'badge-recusado',
+            ESTORNADO: 'badge-estornado'
+        };
+        return `<span class="badge ${mapa[s] || ''}">${s}</span>`;
+    }
+
+    function badgePermissao(p) {
+        return p === 'ADMINISTRADOR'
+            ? `<span class="badge badge-admin">ADMIN</span>`
+            : `<span class="badge badge-cliente">CLIENTE</span>`;
+    }
+
+    // FILMES
+
+    async function carregarFilmes() {
+        /*
+         * GET /api/admin/filmes
+         * Busca todos os filmes cadastrados no banco local.
+         */
+        const tbody = document.getElementById('tabela-filmes');
+        tbody.innerHTML = '<tr><td colspan="5" class="carregando">Carregando...</td></tr>';
+
+        const res = await fetch('/api/admin/filmes');
+        const filmes = await res.json();
+
+        if (!filmes.length) {
+            tbody.innerHTML = '<tr><td colspan="5" class="carregando">Nenhum filme cadastrado.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = filmes.map((f, i) => `
+            <tr>
+                <td>${i + 1}</td>
+                <td><strong>${f.nome}</strong></td>
+                <td>${f.duracao} min</td>
+                <td style="max-width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${f.descricao || '-'}</td>
+                <td class="acoes">
+                    <button class="btn btn-blue btn-sm" onclick="editarFilme(${f.id}, '${escapar(f.nome)}', ${f.duracao}, '${escapar(f.descricao)}')">Editar</button>
+                    <button class="btn btn-red btn-sm" onclick="deletarFilme(${f.id})">Excluir</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function abrirNovoFilme() {
+        // Limpa os campos E define o título do modal para criar um novo filme (CREATE)
+        document.getElementById('filme-id').value = '';
+        document.getElementById('filme-tmdb-id').value = '';
+        document.getElementById('filme-nome').value = '';
+        document.getElementById('filme-duracao').value = '';
+        document.getElementById('filme-descricao').value = '';
+        document.getElementById('tmdb-busca-input').value = '';
+        document.getElementById('tmdb-resultados').style.display = 'none';
+        document.getElementById('tmdb-resultados').innerHTML = '';
+        document.getElementById('bloco-busca-tmdb').style.display = '';
+        document.getElementById('modal-filme-titulo').textContent = 'Novo Filme';
+        abrirModal('modal-filme');
+    }
+
+    function editarFilme(id, nome, duracao, descricao) {
+        // Preenche os campos do modal com os dados existentes (UPDATE)
+        // A busca TMDB é escondida, na hora de editar só nome, duração e descrição podem mudar
+        document.getElementById('filme-id').value = id;
+        document.getElementById('filme-tmdb-id').value = '';
+        document.getElementById('filme-nome').value = nome;
+        document.getElementById('filme-duracao').value = duracao;
+        document.getElementById('filme-descricao').value = descricao;
+        document.getElementById('bloco-busca-tmdb').style.display = 'none';
+        document.getElementById('modal-filme-titulo').textContent = 'Editar Filme';
+        abrirModal('modal-filme');
+    }
+
+    async function buscarTMDB() {
+        const q = document.getElementById('tmdb-busca-input').value.trim();
+        if (!q) { toast('Digite um nome para buscar.', 'err'); return; }
+
+        const res = await fetch(`/api/admin/buscar-tmdb?q=${encodeURIComponent(q)}`);
+        const filmes = await res.json();
+
+        const container = document.getElementById('tmdb-resultados');
+        if (!filmes.length) {
+            container.innerHTML = '<p style="padding:8px;color:#aaa">Nenhum resultado encontrado.</p>';
+            container.style.display = '';
+            return;
+        }
+
+        container.style.display = '';
+        container.innerHTML = filmes.map(f => `
+            <div onclick="selecionarTMDB(${f.tmdb_id})"
+                 style="padding:8px 12px;cursor:pointer;border-bottom:1px solid #333;transition:background .15s"
+                 onmouseover="this.style.background='#2a2a2a'" onmouseout="this.style.background=''">
+                <strong>${f.nome}</strong>
+                <span style="color:#aaa;font-size:.85em;margin-left:8px">${f.data_lancamento?.slice(0,4) || ''}</span>
+                <p style="margin:2px 0 0;font-size:.8em;color:#999;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${f.descricao || ''}</p>
+            </div>
+        `).join('');
+    }
+
+    async function selecionarTMDB(tmdbId) {
+        // Busca os detalhes completos e preenche os campos
+        const res = await fetch(`/api/admin/tmdb-detalhes/${tmdbId}`);
+        const dados = await res.json();
+
+        document.getElementById('filme-tmdb-id').value = dados.tmdb_id;
+        document.getElementById('filme-nome').value = dados.nome;
+        document.getElementById('filme-duracao').value = dados.duracao || '';
+        document.getElementById('filme-descricao').value = dados.descricao || '';
+        document.getElementById('tmdb-resultados').style.display = 'none';
+        document.getElementById('tmdb-busca-input').value = dados.nome;
+        toast(`"${dados.nome}" selecionado. Confira os dados e salve.`);
+    }
+
+    async function salvarFilme() {
+        /* Se filme-id estiver preenchido = PUT /api/admin/filmes/{id} (UPDATE) */
+        /* Se filme-id estiver vazio = POST /api/admin/filmes (CREATE) */
+        const id      = document.getElementById('filme-id').value;
+        const tmdbId  = document.getElementById('filme-tmdb-id').value;
+        const nome    = document.getElementById('filme-nome').value.trim();
+        const duracao = parseInt(document.getElementById('filme-duracao').value);
+        const descricao = document.getElementById('filme-descricao').value.trim();
+
+        if (!nome || !duracao) { toast('Preencha nome e duração.', 'err'); return; }
+
+        // Na criação o tmdb_id é obrigatório (busca no TMDB antes de salvar)
+        if (!id && !tmdbId) {
+            toast('Selecione um filme do TMDB antes de salvar.', 'err');
+            return;
+        }
+
+        const metodo  = id ? 'PUT' : 'POST';
+        const url     = id ? `/api/admin/filmes/${id}` : '/api/admin/filmes';
+        const payload = id
+            ? { nome, duracao, descricao }
+            : { tmdb_id: parseInt(tmdbId), nome, duracao, descricao };
+
+        const res = await fetch(url, {
+            method: metodo,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+            toast(id ? 'Filme atualizado!' : 'Filme criado!');
+            fecharModal('modal-filme');
+            carregarFilmes();
+        } else {
+            const err = await res.json();
+            toast(err.erro || 'Erro ao salvar filme.', 'err');
+        }
+    }
+
+    async function deletarFilme(id) {
+        /* DELETE /api/admin/filmes/{id} */
+        /* Remove o filme. O banco impedirá exclusão se houver sessões vinculadas (Foreign Key) */
+        if (!confirm('Excluir este filme? Isso só funciona se não houver sessões vinculadas.')) return;
+        const res = await fetch(`/api/admin/filmes/${id}`, { method: 'DELETE' });
+        if (res.ok) { toast('Filme excluído.'); carregarFilmes(); }
+        else        { toast('Não é possível excluir: existem sessões vinculadas.', 'err'); }
+    }
+
+    //  SALAS
+
+    async function carregarSalas() {
+        /* GET /api/admin/salas */
+        const tbody = document.getElementById('tabela-salas');
+        tbody.innerHTML = '<tr><td colspan="4" class="carregando">Carregando...</td></tr>';
+
+        const res   = await fetch('/api/admin/salas');
+        const salas = await res.json();
+
+        if (!salas.length) {
+            tbody.innerHTML = '<tr><td colspan="4" class="carregando">Nenhuma sala cadastrada.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = salas.map((s, i) => `
+            <tr>
+                <td>${i + 1}</td>
+                <td>Sala ${s.id}</td>
+                <td>${s.qtde_assentos}</td>
+                <td>
+                    <button class="btn btn-blue btn-sm" onclick="editarSala(${s.id}, ${s.qtde_assentos})">Editar</button>
+                    <button class="btn btn-red btn-sm" onclick="deletarSala(${s.id})">Excluir</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async function salvarSala() {
+        /* Se sala-id preenchido = PUT /api/admin/salas/{id} (UPDATE) */
+        /* Se sala-id vazio      = POST /api/admin/salas      (CREATE) */
+        const id   = document.getElementById('sala-id').value;
+        const qtde = parseInt(document.getElementById('sala-qtde').value);
+        if (!qtde || qtde < 1) { toast('Informe uma quantidade válida.', 'err'); return; }
+
+        const url    = id ? `/api/admin/salas/${id}` : '/api/admin/salas';
+        const method = id ? 'PUT' : 'POST';
+        const res = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ qtde_assentos: qtde })
+        });
+
+        if (res.ok) {
+            toast(id ? 'Sala atualizada!' : 'Sala criada!');
+            fecharModal('modal-sala');
+            carregarSalas();
+        } else {
+            toast('Erro ao salvar sala.', 'err');
+        }
+    }
+
+    function novaSala() {
+        document.getElementById('sala-id').value               = '';
+        document.getElementById('sala-qtde').value             = '';
+        document.getElementById('modal-sala-titulo').textContent = 'Nova Sala';
+        abrirModal('modal-sala');
+    }
+
+    function editarSala(id, qtdeAtual) {
+        document.getElementById('sala-id').value               = id;
+        document.getElementById('sala-qtde').value             = qtdeAtual;
+        document.getElementById('modal-sala-titulo').textContent = `Editar Sala ${id}`;
+        abrirModal('modal-sala');
+    }
+
+    async function deletarSala(id) {
+        /* DELETE /api/admin/salas/{id} */
+        if (!confirm('Excluir esta sala?')) return;
+        const res = await fetch(`/api/admin/salas/${id}`, { method: 'DELETE' });
+        if (res.ok) { toast('Sala excluída.'); carregarSalas(); }
+        else        { toast('Não é possível excluir: existem sessões nessa sala.', 'err'); }
+    }
+
+    // SESSÕES
+
+    async function carregarSessoes() {
+        /* GET /api/admin/sessoes — retorna sessões com JOIN em Filme e Sala */
+        const tbody = document.getElementById('tabela-sessoes');
+        tbody.innerHTML = '<tr><td colspan="6" class="carregando">Carregando...</td></tr>';
+
+        const res     = await fetch('/api/admin/sessoes');
+        const sessoes = await res.json();
+
+        if (!sessoes.length) {
+            tbody.innerHTML = '<tr><td colspan="6" class="carregando">Nenhuma sessão cadastrada.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = sessoes.map((s, i) => `
+            <tr>
+                <td>${i + 1}</td>
+                <td>${s.filme_nome}</td>
+                <td>Sala ${s.sala_id}</td>
+                <td>${formatarData(s.horario_inicio)}</td>
+                <td>${s.dub_leg === 'DUB' ? 'Dublado' : 'Legendado'}</td>
+                <td class="acoes">
+                    <button class="btn btn-blue btn-sm" onclick="editarSessao(${s.id}, ${s.fk_Filme_id}, ${s.fk_Sala_id}, '${s.horario_inicio}', '${s.dub_leg}')">Editar</button>
+                    <button class="btn btn-red btn-sm" onclick="deletarSessao(${s.id})">Excluir</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async function preencherSelectFilmes() {
+        const sel = document.getElementById('sessao-filme');
+        const res = await fetch('/api/admin/filmes');
+        const filmes = await res.json();
+        sel.innerHTML = filmes.map(f => `<option value="${f.id}">${f.nome}</option>`).join('');
+    }
+
+    async function preencherSelectSalas() {
+        const sel = document.getElementById('sessao-sala');
+        const res = await fetch('/api/admin/salas');
+        const salas = await res.json();
+        sel.innerHTML = salas.map(s => `<option value="${s.id}">Sala ${s.id} (${s.qtde_assentos} assentos)</option>`).join('');
+    }
+
+    async function preencherSelectSessoes() {
+        const sel = document.getElementById('ingresso-sessao');
+        const res = await fetch('/api/admin/sessoes');
+        const sessoes = await res.json();
+        if (!sessoes.length) {
+            sel.innerHTML = '<option value="">Nenhuma sessão cadastrada</option>';
+            return;
+        }
+        sel.innerHTML = '<option value="">-- selecione uma sessão --</option>' +
+            sessoes.map(s => `<option value="${s.id}">[${s.id}] ${s.filme_nome} - ${formatarData(s.horario_inicio)}</option>`).join('');
+    }
+
+    function editarSessao(id, filmeId, salaId, horario, tipo) {
+        document.getElementById('sessao-id').value = id;
+        // Formata o horário para o formato datetime-local (YYYY-MM-DDTHH:mm)
+        document.getElementById('sessao-horario').value = horario.slice(0, 16);
+        document.getElementById('sessao-tipo').value = tipo;
+        document.getElementById('modal-sessao-titulo').textContent = 'Editar Sessão';
+        abrirModal('modal-sessao');
+        // Após abrir seleciona os valores corretos nos dropdowns
+        setTimeout(() => {
+            document.getElementById('sessao-filme').value = filmeId;
+            document.getElementById('sessao-sala').value = salaId;
+        }, 100);
+    }
+
+    async function salvarSessao() {
+         /* POST /api/admin/sessoes  → cria nova sessão */
+         /* PUT  /api/admin/sessoes/{id} → atualiza sessão existente */
+        const id      = document.getElementById('sessao-id').value;
+        const filmeId = document.getElementById('sessao-filme').value;
+        const salaId  = document.getElementById('sessao-sala').value;
+        const horario = document.getElementById('sessao-horario').value;
+        const tipo    = document.getElementById('sessao-tipo').value;
+
+        if (!filmeId || !salaId || !horario) { toast('Preencha todos os campos.', 'err'); return; }
+
+        const metodo = id ? 'PUT' : 'POST';
+        const url    = id ? `/api/admin/sessoes/${id}` : '/api/admin/sessoes';
+
+        const res = await fetch(url, {
+            method: metodo,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fk_Filme_id: parseInt(filmeId), fk_Sala_id: parseInt(salaId), horario_inicio: horario, dub_leg: tipo })
+        });
+
+        if (res.ok) {
+            toast(id ? 'Sessão atualizada!' : 'Sessão criada!');
+            fecharModal('modal-sessao');
+            carregarSessoes();
+        } else {
+            toast('Erro ao salvar sessão.', 'err');
+        }
+    }
+
+    async function deletarSessao(id) {
+        /* DELETE /api/admin/sessoes/{id} */
+        if (!confirm('Excluir esta sessão?')) return;
+        const res = await fetch(`/api/admin/sessoes/${id}`, { method: 'DELETE' });
+        if (res.ok) { toast('Sessão excluída.'); carregarSessoes(); }
+        else        { toast('Não é possível excluir: existem ingressos vinculados.', 'err'); }
+    }
+
+    //  USUÁRIOS
+    async function carregarUsuarios() {
+        /* GET /api/admin/usuarios */
+        const tbody = document.getElementById('tabela-usuarios');
+        tbody.innerHTML = '<tr><td colspan="6" class="carregando">Carregando...</td></tr>';
+
+        const res      = await fetch('/api/admin/usuarios');
+        const usuarios = await res.json();
+
+        tbody.innerHTML = usuarios.map(u => `
+            <tr>
+                <td><code>${u.cpf}</code></td>
+                <td>${u.nome}</td>
+                <td>${u.email}</td>
+                <td>${u.telefone || '-'}</td>
+                <td>${badgePermissao(u.permissao)}</td>
+                <td class="acoes">
+                    <button class="btn btn-blue btn-sm" onclick="alternarPermissao('${u.cpf}', '${u.permissao}')">
+                        ${u.permissao === 'ADMINISTRADOR' ? 'Tornar Cliente' : 'Tornar Admin'}
+                    </button>
+                    <button class="btn btn-red btn-sm" onclick="deletarUsuario('${u.cpf}')">Excluir</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async function alternarPermissao(cpf, permissaoAtual) {
+        const nova = permissaoAtual === 'ADMINISTRADOR' ? 'CLIENTE' : 'ADMINISTRADOR';
+        if (!confirm(`Alterar permissão para ${nova}?`)) return;
+
+        const res = await fetch(`/api/admin/usuarios/${cpf}/permissao`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ permissao: nova })
+        });
+
+        if (res.ok) { 
+            toast('Permissão atualizada!'); 
+            carregarUsuarios(); 
+        } else { 
+            // Ele vai pegar a mensagem de erro enviada pelo BACKEND se houver uma se não conseguir atualizar
+            const erroData = await res.json();
+            toast(erroData.erro || 'Erro ao alterar permissão.', 'err'); 
+        }
+    }
+
+    async function deletarUsuario(cpf) {
+        /* DELETE /api/admin/usuarios/{cpf} */
+        if (!confirm('Excluir este usuário? Isso removerá todos os dados vinculados.')) return;
+        const res = await fetch(`/api/admin/usuarios/${cpf}`, { method: 'DELETE' });
+        if (res.ok) { toast('Usuário excluído.'); carregarUsuarios(); }
+        else { 
+            // Ele vai pegar a mensagem de erro enviada pelo BACKEND se houver uma se não conseguir excluir
+            const erroData = await res.json();
+            toast(erroData.erro || 'Erro ao alterar permissão.', 'err'); 
+        }
+    }
+
+    // INGRESSOS
+
+    async function carregarIngressos() {
+         /* GET /api/admin/ingressos */
+         /* Retorna ingressos com JOIN em Pagamento, Usuario e a Sessao */
+        const tbody = document.getElementById('tabela-ingressos');
+        tbody.innerHTML = '<tr><td colspan="8" class="carregando">Carregando...</td></tr>';
+
+        const res      = await fetch('/api/admin/ingressos');
+        const ingressos = await res.json();
+
+        if (!ingressos.length) {
+            tbody.innerHTML = '<tr><td colspan="8" class="carregando">Nenhum ingresso encontrado.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = ingressos.map((ing, i) => `
+            <tr>
+                <td>${ing.id}</td>
+                <td>${ing.usuario_nome}</td>
+                <td>[${ing.fk_sessao_id}] ${ing.filme_nome || '-'}</td>
+                <td>R$ ${parseFloat(ing.valor_total).toFixed(2)}</td>
+                <td>${ing.metodo_pagamento?.replace('_', ' ')}</td>
+                <td>${badgeStatus(ing.status)}</td>
+                <td>${formatarData(ing.criado_em)}</td>
+                <td class="acoes">
+                    <button class="btn btn-blue btn-sm" onclick="abrirAlterarStatus(${ing.pagamento_id}, '${ing.status}')">Status</button>
+                    <button class="btn btn-red btn-sm" onclick="deletarIngresso(${ing.id})">Excluir</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function abrirAlterarStatus(pagamentoId, statusAtual) {
+        /* Abre o modal de alteração de status de pagamento */
+        document.getElementById('status-pagamento-id').value = pagamentoId;
+        document.getElementById('status-novo').value = statusAtual;
+        abrirModal('modal-status');
+    }
+
+    async function salvarStatus() {
+         /* PUT /api/admin/pagamentos/{id}/status */
+         /* Atualiza o status do pagamento */
+        const id     = document.getElementById('status-pagamento-id').value;
+        const status = document.getElementById('status-novo').value;
+
+        const res = await fetch(`/api/admin/pagamentos/${id}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status })
+        });
+
+        if (res.ok) {
+            toast('Status atualizado!');
+            fecharModal('modal-status');
+            carregarIngressos();
+        } else {
+            toast('Erro ao atualizar status.', 'err');
+        }
+    }
+
+    async function salvarIngresso() {
+         /* POST /api/admin/ingressos */
+         /* Cria um Pagamento com Ingresso manualmente */
+        const cpf     = document.getElementById('ingresso-cpf').value.trim();
+        const sessaoId= document.getElementById('ingresso-sessao').value;
+        const valor   = parseFloat(document.getElementById('ingresso-valor').value);
+        const metodo  = document.getElementById('ingresso-metodo').value;
+        const status  = document.getElementById('ingresso-status').value;
+
+        if (!cpf)      { toast('Informe o CPF do usuário.', 'err'); return; }
+        if (!/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(cpf)) { toast('CPF inválido. Use o formato 000.000.000-00.', 'err'); return; }
+        if (!sessaoId) { toast('Selecione uma sessão.', 'err'); return; }
+        if (!valor || valor <= 0) { toast('Informe um valor válido.', 'err'); return; }
+
+        const res = await fetch('/api/admin/ingressos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fk_Usuario_cpf: cpf, fk_sessao_id: parseInt(sessaoId), valor_total: valor, metodo_pagamento: metodo, status })
+        });
+
+        if (res.ok) {
+            toast('Ingresso criado!');
+            fecharModal('modal-ingresso');
+            carregarIngressos();
+        } else {
+            const err = await res.json();
+            toast(err.erro || 'Erro ao criar ingresso.', 'err');
+        }
+    }
+
+    async function deletarIngresso(id) {
+        /* DELETE /api/admin/ingressos/{id} */
+        if (!confirm('Excluir este ingresso permanentemente?')) return;
+        const res = await fetch(`/api/admin/ingressos/${id}`, { method: 'DELETE' });
+        if (res.ok) { toast('Ingresso excluído.'); carregarIngressos(); }
+        else        { toast('Erro ao excluir ingresso.', 'err'); }
+    }
+
+    // ASSENTOS
+
+    async function preencherSelectAssentos() {
+        /* Preenche o select de sessões na aba de assentos */
+        const sel = document.getElementById('assento-sessao-select');
+        const res = await fetch('/api/admin/sessoes');
+        const sessoes = await res.json();
+        sel.innerHTML = '<option value="">-- escolha uma sessão --</option>' +
+            sessoes.map(s =>
+                `<option value="${s.id}">[${s.id}] ${s.filme_nome} — ${s.horario_inicio} (${s.dub_leg})</option>`
+            ).join('');
+        // Limpa tabela ao trocar de aba
+        document.getElementById('tabela-assentos').innerHTML =
+            '<tr><td colspan="6" class="carregando">Selecione uma sessão acima.</td></tr>';
+    }
+
+    async function carregarAssentos(sessaoId) {
+        /* GET /api/admin/sessoes/{id}/assentos */
+        const tbody = document.getElementById('tabela-assentos');
+        if (!sessaoId) {
+            tbody.innerHTML = '<tr><td colspan="6" class="carregando">Selecione uma sessão acima.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = '<tr><td colspan="6" class="carregando">Carregando...</td></tr>';
+        const res = await fetch(`/api/admin/sessoes/${sessaoId}/assentos`);
+        const dados = await res.json();
+        if (!dados.length) {
+            tbody.innerHTML = '<tr><td colspan="6" class="carregando">Nenhum assento ocupado nessa sessão.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = dados.map(a => `
+            <tr>
+                <td>${a.ingresso_id}</td>
+                <td><strong>${a.numero_assento || '—'}</strong></td>
+                <td>${a.usuario_nome}</td>
+                <td>${a.usuario_cpf}</td>
+                <td>${badgeStatus(a.status_pagamento)}</td>
+                <td>
+                    <button class="btn btn-blue btn-sm"
+                        onclick="editarAssento(${a.ingresso_id}, '${escapar(a.numero_assento || '')}')">
+                        Editar
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function editarAssento(ingressoId, assentoAtual) {
+        document.getElementById('assento-ingresso-id').value = ingressoId;
+        document.getElementById('assento-numero').value      = assentoAtual;
+        abrirModal('modal-assento');
+    }
+
+    async function salvarAssento() {
+        /* PUT /api/admin/ingressos/{id}/assento */
+        const id      = document.getElementById('assento-ingresso-id').value;
+        const numero  = document.getElementById('assento-numero').value.trim().toUpperCase();
+        if (!numero) { toast('Informe o número do assento.', 'err'); return; }
+        const res = await fetch(`/api/admin/ingressos/${id}/assento`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ numero_assento: numero })
+        });
+        if (res.ok) {
+            toast('Assento atualizado!');
+            fecharModal('modal-assento');
+            // Recarrega a tabela da sessão atual
+            const sessaoId = document.getElementById('assento-sessao-select').value;
+            carregarAssentos(sessaoId);
+        } else {
+            toast('Erro ao atualizar assento.', 'err');
+        }
+    }
+
+    // HELPER
+    function mascaraCPF(input) {
+        // Remove tudo que não for dígito
+        let v = input.value.replace(/\D/g, '').slice(0, 11);
+        // Aplica a máscara XXX.XXX.XXX-XX progressivamente
+        if (v.length > 9)      v = v.replace(/^(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
+        else if (v.length > 6) v = v.replace(/^(\d{3})(\d{3})(\d{1,3})/,        '$1.$2.$3');
+        else if (v.length > 3) v = v.replace(/^(\d{3})(\d{1,3})/,               '$1.$2');
+        input.value = v;
+    }
+
+    function escapar(str) {
+        return (str || '').replace(/'/g, "\\'").replace(/"/g, '\\"');
+    }
+
+    // Ao abrir a página, já carrega a aba de filmes
+    carregarFilmes();
+</script>
 </body>
 </html>
