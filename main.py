@@ -351,7 +351,7 @@ async def carregar_perfil(request: Request):
     cpf_logado = request.cookies.get("usuario_cpf")
 
     if not cpf_logado:
-        return RedirectResponse(url="/login.html", status_code=303)
+        return RedirectResponse(url="/login", status_code=303)
     
     conexao = obter_conexao()
     if not conexao:
@@ -494,6 +494,14 @@ async def deletar_conta(request: Request):
 
 @app.get("/pagamento")
 async def pagamento(request: Request):
+    # Verifica se o usuário tem o cookie de CPF (ou seja, se está logado)
+    usuario_logado = request.cookies.get("usuario_cpf")
+
+    if not usuario_logado:
+        # Se não estiver logado, redireciona para a página de login
+        # Você pode passar um parâmetro 'proxima' para voltar aqui depois do login
+        return RedirectResponse(url="/login", status_code=303)
+
     return templates.TemplateResponse(
         request=request,
         name="pagamento.html",
