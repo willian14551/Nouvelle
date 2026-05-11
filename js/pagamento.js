@@ -154,14 +154,48 @@ document.addEventListener('DOMContentLoaded', function() {
         const validacao = validarFormulario();
 
         if (validacao.valido) {
-            // Simula processamento do pagamento
-            alert('Pagamento processado com sucesso!\n\nUm comprovante foi enviado para seu e-mail.');
+            // Mostra modal de sucesso
+            document.getElementById('modalTitle').textContent = 'Pagamento Confirmado';
+            document.getElementById('SmodalMessage').textContent = 'Pagamento processado com sucesso!\n\nUm comprovante foi enviado para seu e-mail.';
+            document.getElementById('btnModalAction').textContent = 'Voltar ao Início';
+            document.getElementById('modalConfirmacao').style.display = 'block';
 
-            // Redireciona para página inicial ou de confirmação
-            window.location.href = '/index.html';
+            // Limpa localStorage após confirmação
+            localStorage.removeItem('assentosSelecionados');
+            localStorage.removeItem('filmeSelecionado');
+            localStorage.removeItem('salaSelecionada');
+            localStorage.removeItem('horarioSelecionado');
+            localStorage.removeItem('dataSelecionada');
         } else {
-            // Mostra erros
-            alert('Por favor, corrija os seguintes erros:\n\n' + validacao.mensagensErro.join('\n'));
+            // Mostra modal de erro
+            document.getElementById('modalTitle').textContent = 'Erro na Validação';
+            document.getElementById('modalMessage').textContent = 'Por favor, corrija os seguintes erros:\n\n' + validacao.mensagensErro.join('\n');
+            document.getElementById('btnModalAction').textContent = 'OK';
+            document.getElementById('modalConfirmacao').style.display = 'block';
+            document.getElementById('modalConfirmacao').style.display = 'block';
         }
     });
+});
+
+// Event listeners para o modal
+document.getElementById('btnModalAction').addEventListener('click', function() {
+    const modal = document.getElementById('modalConfirmacao');
+    modal.style.display = 'none';
+
+    // Se for sucesso, redireciona para a página inicial
+    if (document.getElementById('modalTitle').textContent === 'Pagamento Confirmado') {
+        window.location.href = '/';
+    }
+});
+
+document.querySelector('.modal-close').addEventListener('click', function() {
+    document.getElementById('modalConfirmacao').style.display = 'none';
+});
+
+// Fecha o modal ao clicar fora dele
+window.addEventListener('click', function(event) {
+    const modal = document.getElementById('modalConfirmacao');
+    if (event.target === modal) {
+        modal.style.display = 'none';
+    }
 });

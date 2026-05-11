@@ -80,19 +80,49 @@ document.getElementById('btnComprar').addEventListener('click', function(event) 
 
     if (assentosSelecionados.size > 0) {
         const assentos = Array.from(assentosSelecionados).sort();
-
-        // Salva dados no localStorage para a página de pagamento
-        localStorage.setItem('assentosSelecionados', JSON.stringify(assentos));
-        localStorage.setItem('filmeSelecionado', 'Homem-Aranha: Sem Volta Para Casa');
-        localStorage.setItem('salaSelecionada', 'Sala 03');
-        localStorage.setItem('horarioSelecionado', '19:30');
-        localStorage.setItem('dataSelecionada', '15 de Abril, 2026');
-
         const total = assentosSelecionados.size * PRECO_ASSENTO;
-        alert(`Assentos selecionados: ${assentos.join(', ')}\nTotal: R$ ${total.toFixed(2).replace('.', ',')}`);
 
-        // Redireciona para a página de pagamento
-        window.location.href = "/pagamento";
+        // Preenche o modal
+        document.getElementById('modalAssentos').textContent = assentos.join(', ');
+        document.getElementById('modalTotal').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+
+        // Mostra o modal
+        document.getElementById('modalConfirmacao').style.display = 'block';
+    }
+});
+
+// Event listeners para o modal
+document.getElementById('btnConfirmar').addEventListener('click', function() {
+    // Fecha o modal
+    document.getElementById('modalConfirmacao').style.display = 'none';
+
+    // Salva dados no localStorage para a página de pagamento
+    const assentos = Array.from(assentosSelecionados).sort();
+    localStorage.setItem('assentosSelecionados', JSON.stringify(assentos));
+    localStorage.setItem('filmeSelecionado', 'Homem-Aranha: Sem Volta Para Casa');
+    localStorage.setItem('salaSelecionada', 'Sala 03');
+    localStorage.setItem('horarioSelecionado', '19:30');
+    localStorage.setItem('dataSelecionada', '15 de Abril, 2026');
+
+    // Redireciona para a página de pagamento
+    window.location.href = "/pagamento";
+});
+
+document.getElementById('btnCancelar').addEventListener('click', function() {
+    // Fecha o modal
+    document.getElementById('modalConfirmacao').style.display = 'none';
+});
+
+document.querySelector('.modal-close').addEventListener('click', function() {
+    // Fecha o modal
+    document.getElementById('modalConfirmacao').style.display = 'none';
+});
+
+// Fecha o modal ao clicar fora dele
+window.addEventListener('click', function(event) {
+    const modal = document.getElementById('modalConfirmacao');
+    if (event.target === modal) {
+        modal.style.display = 'none';
     }
 });
 
