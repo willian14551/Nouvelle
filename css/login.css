@@ -6,7 +6,8 @@
 /* ============================================= */
 /* DIV DO LOGIN */
 .caixaLogin{
-    margin: 0 300px 100px 300px;
+    width: 50%;
+    margin: 0 auto 0;
 }
 .Local_logo {
     flex: 1;
@@ -15,7 +16,6 @@
     align-items: center;
     gap: 80px;
     padding: 30px;
-    padding-bottom: 0;
 }
 .Tamanho_Logo {
     flex: 0 1 450px;

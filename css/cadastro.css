@@ -5,11 +5,11 @@
 
 /* ============================================= */
 /* LOCAL DA LOGO */
-main {
+.divCadastro {
     width: 50%;
-    margin: 5% auto 0;
+    margin: 0 auto 0;
 }
-.Local_logo {
+.local_logo {
     flex: 1;
     display: flex;
     justify-content: center;
@@ -17,10 +17,10 @@ main {
     gap: 80px;
     padding: 40px;
 }
-.Tamanho_Logo {
+.tamanho_Logo {
     flex: 0 1 450px;
 }
-.Tamanho_Logo img {
+.tamanho_Logo img {
     width: 100%;
     height: auto;
 }
