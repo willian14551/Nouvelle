@@ -119,6 +119,24 @@
         </div>
     </main>
 
+    <div id="modalConfirmacao" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Confirmar Compra</h2>
+                <span class="modal-close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p><strong>Assentos Selecionados:</strong> <span id="modalAssentos"></span></p>
+                <p><strong>Total:</strong> <span id="modalTotal"></span></p>
+                <p>Deseja continuar para o pagamento?</p>
+            </div>
+            <div class="modal-footer">
+                <button id="btnCancelar" class="btn-modal btn-cancelar">Cancelar</button>
+                <button id="btnConfirmar" class="btn-modal btn-confirmar">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
     <script src="/js/assentos.js"></script>
 </body>
 </html>
