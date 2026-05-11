@@ -43,23 +43,26 @@
         </ul>
     </nav>
 
-
     <main class="Local_logo">
         <div class="Tamanho_Logo">
             <img src="/assets/logo.png" alt="Logo Nouvelle">
+
+            {% if mensagem %}
+                <h2 class="mensagem_erro">{{ mensagem }}</h2>
+            {% endif %}
         </div>
 
         <div class="Tamanho_Caixas_TXT"> 
             <form action="/cadastrar" method="POST" id="formCadastro" enctype="multipart/form-data">
 
                 <div class="divFotoPerfil">
-                    <div id="container-preview" style="display: block; margin-top: 10px; text-align: center;">
+                    <div id="container-preview">
                         <img id="preview-img" src="/assets/fotoPerfilDefault.png" alt="Foto de Perfil">
                     </div>
 
                     <p id="nomeArquivo"></p>
                     <label for="btnAddFoto" class="botao-upload">Selecionar Imagem</label>
-                    <input type="file" name="foto_perfil" id="btnAddFoto" class="selecionarImagemPerfil" accept="image/*" style="display: none;">
+                    <input type="file" name="foto_perfil" id="btnAddFoto" class="selecionarImagemPerfil" accept="image/*">
                 </div>
                 
                 <div class="login_senha_caixas"> 
@@ -94,13 +97,8 @@
                     <a href="/login" class="link_login">Já tem uma conta? Faça login</a>
                 </div>
 
-                {% if mensagem %}
-                    <h2 style="color: rgb(255, 230, 0); margin-top: 15px; text-align: center;">{{ mensagem }}</h2>
-                {% endif %}
-
             </form>
         </div>
-
     </main>
 
 <script src="/js/cadastro.js"></script>

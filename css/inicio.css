@@ -1,6 +1,10 @@
+/* INDICATIVO DA PÁGINA ATUAL NA BARRA DE NAVEGAÇÃO NO DESKTOP*/
 .menuInicio{
     text-shadow: 0 0 10px #f1c764;
 }
+
+/* ============================================= */
+/* CARROSSEL DE FILMES */
 .banner-carrossel {
     position: relative;
     width: 100%;
@@ -10,60 +14,7 @@
     overflow: hidden;
 }
 
-.slides-carrossel {
-    width: 100%;
-    height: 100%;
-    position: relative;
-}
-
-.slide {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
-    z-index: 0;
-}
-
-.slide.ativo {
-    opacity: 1;
-    z-index: 1;
-}
-
-.slide img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: top;
-}
-
-.info-filme {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 40px 60px;
-    color: #fff;
-    z-index: 2;
-}
-
-.info-filme h3 {
-    font-size: 40px;
-    color: #F0AD12;
-    margin-bottom: 10px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-}
-
-.info-filme p {
-    font-size: 18px;
-    max-width: 600px;
-    line-height: 1.5;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
-}
-
-/* As Setas de Navegação */
+/* SETAS DE NAVEGAÇÃO */
 .seta {
     position: absolute;
     top: 50%;
@@ -77,21 +28,72 @@
     z-index: 10; /* Fica acima de tudo */
     transition: background-color 0.3s;
 }
-
 .seta:hover {
     background-color: #F0AD12;
     color: #111;
 }
-
 .seta-esquerda {
     left: 20px;
 }
-
 .seta-direita {
     right: 20px;
 }
 
+/* MOVIMENTAÇÃO DO CARROSSEL */
+.slides-carrossel {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+.slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    z-index: 0;
+}
+.slide.ativo {
+    opacity: 1;
+    z-index: 1;
+}
+.slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+}
+
+/* ============================================= */
+/* INFORMAÇÕES DO FILME ATUAL */
+.info-filme {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 40px 60px;
+    color: #fff;
+    z-index: 2;
+}
+.info-filme h3 {
+    font-size: 40px;
+    color: #F0AD12;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+.info-filme p {
+    font-size: 18px;
+    max-width: 600px;
+    line-height: 1.5;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+}
+
+/* ============================================= */
+/* RESPONSIVIDADE PARA O CELULAR */
 @media (max-width: 768px) {
+    /* INDICATIVO DA PÁGINA ATUAL NA BARRA DE NAVEGAÇÃO NO MOBILE*/
     .menuInicio{
         display: block;
         max-width: 100%;
@@ -101,9 +103,20 @@
         background-color: rgb(114, 23, 23);
     }
 
+    /* ============================================= */
+    /* CARROSSEL DE FILMES */
     .banner-carrossel {
         min-height: 400px;
     }
+    
+    /* SETAS DE NAVEGAÇÃO */
+    .seta {
+        /* Se a imagem é 16:9, a altura dela é 56.25% da largura. Metade disso é 28.12vw. */
+        top: 28.12vw; 
+        transform: translateY(-50%); /* Garante o alinhamento perfeito pelo centro da seta */
+    }
+
+    /* MOVIMENTAÇÃO DO CARROSSEL */
     .slide{
         height: auto;
         display: flex;
@@ -112,11 +125,9 @@
     .slide img {
         height: 50%;
     }
-    .seta {
-        /* Se a imagem é 16:9, a altura dela é 56.25% da largura. Metade disso é 28.12vw. */
-        top: 28.12vw; 
-        transform: translateY(-50%); /* Garante o alinhamento perfeito pelo centro da seta */
-    }
+    
+    /* ============================================= */
+    /* INFORMAÇÕES DO FILME ATUAL */
     .info-filme{
         position: relative; /* Tira o "position:absolute" que prendia o texto na imagem */
         inset: auto; /* Atalho moderno para as quatro direções ao mesmo tempo, evita o top:auto, bottom:auto, etc. */

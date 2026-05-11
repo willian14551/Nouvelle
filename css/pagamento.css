@@ -1,3 +1,11 @@
+/* MAIN DO PAGAMENTO */
+main {
+    background-color: rgb(150, 28, 28);
+    padding: 40px;
+    border-radius: 10px;
+    width: 50%;
+    margin: 5% auto 0;
+}
 .pagamento-container {
     background-color: rgb(150, 28, 28);
     padding: 40px;
@@ -10,37 +18,37 @@
     gap: 40px;
 }
 
+/* ============================================= */
+/* DIV DO RESUMO DO PEDIDO */
 .resumo-pedido {
     background-color: rgba(0, 0, 0, 0.5);
     padding: 30px;
     border-radius: 8px;
 }
-
 .resumo-pedido h1 {
     color: #F0AD12;
     font-size: 2.2rem;
     margin-bottom: 30px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
-
 .pedido-info {
     display: flex;
     flex-direction: column;
     gap: 30px;
 }
-
 .info-section h2 {
     color: #F0AD12;
     font-size: 1.5rem;
     margin-bottom: 20px;
 }
 
+/* ============================================= */
+/* DETALHES DO FILME */
 .detalhes-filme {
     background-color: rgba(0, 0, 0, 0.3);
     padding: 20px;
     border-radius: 6px;
 }
-
 .info-item {
     display: flex;
     justify-content: space-between;
@@ -48,22 +56,21 @@
     margin-bottom: 10px;
     color: white;
 }
-
 .info-item:last-child {
     margin-bottom: 0;
 }
-
 .info-item .label {
     color: #F0AD12;
     font-weight: bold;
 }
 
+/* ============================================= */
+/* PREÇO FINAL */
 .preco-final {
     background-color: rgba(0, 0, 0, 0.3);
     padding: 20px;
     border-radius: 6px;
 }
-
 .preco-linha {
     display: flex;
     justify-content: space-between;
@@ -71,11 +78,9 @@
     margin-bottom: 10px;
     font-size: 1.1rem;
 }
-
 .preco-linha:last-child {
     margin-bottom: 0;
 }
-
 .preco-linha.total {
     border-top: 2px solid #F0AD12;
     padding-top: 10px;
@@ -84,38 +89,37 @@
     color: #F0AD12;
 }
 
-/* Formulário de Pagamento */
+/* ============================================= */
+/* FORMULÁRIO DE PAGAMENTO */
 .formulario-pagamento {
     background-color: rgba(0, 0, 0, 0.5);
     padding: 30px;
     border-radius: 8px;
 }
-
 .formulario-pagamento h2 {
     color: #F0AD12;
     font-size: 1.8rem;
     margin-bottom: 25px;
     text-align: center;
 }
-
 .form-pagamento {
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 
+/* ============================================= */
+/* INPUTS DO FORMULÁRIO */
 .campo-grupo {
     display: flex;
     flex-direction: column;
 }
-
 .campo-grupo label {
     color: #F0AD12;
     font-weight: bold;
     margin-bottom: 8px;
     font-size: 1rem;
 }
-
 .campo-grupo input {
     padding: 12px 15px;
     background-color: #333;
@@ -125,22 +129,21 @@
     font-size: 1rem;
     transition: border-color 0.3s ease;
 }
-
 .campo-grupo input:focus {
     outline: none;
     border-color: #F0AD12;
 }
-
 .campo-grupo input::placeholder {
     color: #999;
 }
-
 .campo-linha {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 15px;
 }
 
+/* ============================================= */
+/* BOTÃO DE FINALIZAR COMPRA */
 .btn-finalizar {
     width: 100%;
     padding: 15px;
@@ -154,50 +157,16 @@
     transition: all 0.3s ease;
     margin-top: 10px;
 }
-
 .btn-finalizar:hover {
     background-color: #F0AD12;
     color: #141414;
     box-shadow: 0 0 15px rgba(240, 173, 18, 0.5);
 }
 
-.btn-login:hover {
-    background-color: #F0AD12;
-    color: #141414;
-    transition: all 0.3s ease;
-}
-
-.utilidades_abaixo {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 15px;
-    font-size: 0.85rem;
-}
-
-.lembre_de_mim {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.link_login {
-    color: #F0AD12;
-    text-decoration: none;
-    font-style: italic;
-    font-weight: bold;
-}
-
-main {
-    background-color: rgb(150, 28, 28);
-    padding: 40px;
-    border-radius: 10px;
-    width: 50%;
-    margin: 5% auto 0;
-}
-
-/* Responsividade */
+/* ============================================= */
+/* RESPONSIVIDADE PARA MOBILE */
 @media (max-width: 768px) {
+    /* MAIN DO PAGAMENTO */
     .pagamento-container {
         grid-template-columns: 1fr;
         width: 95%;
@@ -205,29 +174,41 @@ main {
         gap: 20px;
     }
 
+    /* ============================================= */
+    /* DIV DO RESUMO DO PEDIDO */
     .resumo-pedido h1 {
         font-size: 1.8rem;
     }
 
+    /* ============================================= */
+    /* FORMULÁRIO DE PAGAMENTO */
     .formulario-pagamento h2 {
         font-size: 1.5rem;
     }
 
+    /* ============================================= */
+    /* INPUTS DO FORMULÁRIO */
     .campo-linha {
         grid-template-columns: 1fr;
     }
 }
 
+/* ============================================= */
+/* RESPONSIVIDADE PARA MOBILE */
 @media (max-width: 480px) {
+    /* MAIN DO PAGAMENTO */
     .pagamento-container {
         padding: 15px;
     }
 
-    .resumo-pedido,
-    .formulario-pagamento {
+    /* ============================================= */
+    /* DIV DO RESUMO DO PEDIDO */
+    .resumo-pedido, .formulario-pagamento {
         padding: 20px;
     }
 
+    /* ============================================= */
+    /* DETALHES DO FILME */
     .info-item {
         flex-direction: column;
         align-items: flex-start;

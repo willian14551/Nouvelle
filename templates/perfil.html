@@ -45,8 +45,12 @@
 
     <main class="main-perfil"> 
         <div class="Tamanho_Logo">
-            <h1 style="color: #F0AD12; font-size: 40px; margin-bottom: 20px;">Meus Dados</h1>
-            <p>Aqui você pode atualizar suas informações ou excluir sua conta.</p>
+            <h1 class="tituloPerfil">Meus Dados</h1>
+            <p class="descricaoPerfil">Aqui você pode atualizar suas informações ou excluir sua conta.</p>
+
+            {% if mensagem %}
+                <p class="mensagem_erro">{{ mensagem }}</p>
+            {% endif %}
         </div> 
 
         <div class="Tamanho_Caixas_TXT"> 
@@ -59,7 +63,7 @@
 
                     <p id="nomeArquivo"></p>
                     <label for="btnAddFoto" class="botao-upload">Alterar Imagem</label>
-                    <input type="file" name="foto_perfil" id="btnAddFoto" accept="image/*" style="display: none;">
+                    <input type="file" name="foto_perfil" id="btnAddFoto" accept="image/*">
 
                     {% if request.cookies.get('usuario_caminho_final') != 'assets/fotoPerfilDefault.png' %}
                         <button type="submit" name="excluir_foto" value="true" class="btn-excluir-foto">Excluir Imagem</button>
@@ -100,9 +104,7 @@
                 <button type="submit" class="btn-login" style="background-color: #8B0000; color: white;">Excluir Minha Conta</button>
             </form>
 
-            {% if mensagem %}
-                <p style="color: #F0AD12; margin-top: 15px; text-align: center;">{{ mensagem }}</p>
-            {% endif %}
+            
         </div>
     </main>
 <script src="/js/perfil.js"></script>

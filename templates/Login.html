@@ -48,7 +48,13 @@
                 <img src="assets/logo.png" alt="Logo Nouvelle">
             </div>
         </main>
-        
+
+        {% if mensagem %}
+            <p class="mensagem_erro">
+                {{ mensagem }}
+            </p>
+        {% endif %}
+    
         <form action="/login" method="POST" id="formLogin">
             <div class="login_senha_caixas">
                 <input type="email" name="email" placeholder="E-mail" required>
@@ -59,19 +65,13 @@
 
             <button type="submit" class="btn-login">Entrar</button>
 
-            {% if mensagem %}
-                <p style="color: red; 
-                margin-top: 15px; 
-                text-align: center;">
-                {{ mensagem }}</p>
-            {% endif %}
 
             <div class="utilidades">
                 <div class="lembre_de_mim">
                     <input type="checkbox" id="remember">
                     <label for="remember">Lembre-se de mim</label>
                 </div>
-                <a href="#" class="Qual_minha_senha">Esqueceu sua senha?</a>
+                <a href="#" class="qual_minha_senha">Esqueceu sua senha?</a>
             </div>
         </form>
         

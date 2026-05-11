@@ -1,43 +1,42 @@
-#menuLogin{
+/* INDICATIVO DA PÁGINA ATUAL NA BARRA DE NAVEGAÇÃO NO DESKTOP */
+.btn-entrar{
     text-shadow: 0 0 10px #f1c764;
 }
 
-.texto_acima {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
+/* ============================================= */
+/* DIV DO LOGIN */
 .caixaLogin{
     margin: 0 300px 100px 300px;
 }
-
 .Local_logo {
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 80px;
-    padding: 40px;
+    padding: 30px;
+    padding-bottom: 0;
 }
-
 .Tamanho_Logo {
     flex: 0 1 450px;
 }
-
 .Tamanho_Logo img {
     width: 100%;
     height: auto;
 }
 
-.Tamanho_Caixas_TXT {
-    flex: 0 1 380px;
+/* MENSAGEM DE ERRO */
+.mensagem_erro {
+    color: red;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 30px;
 }
 
+/* CAIXAS DE TEXTO (input) */
 .login_senha_caixas {
     margin-bottom: 15px;
 }
-
 .login_senha_caixas input {
     width: 100%;
     height: 50px;
@@ -48,11 +47,11 @@
     color: white;
     font-size: 1rem;
 }
-
 .login_senha_caixas input:focus {
     outline: 2px solid #F0AD12;
 }
 
+/* BOTÃO DE LOGIN */
 .btn-login {
     width: 100%;
     padding: 15px;
@@ -64,13 +63,13 @@
     cursor: pointer;
     margin-bottom: 1%;
 }
-
 .btn-login:hover{
     background-color: #F0AD12;
     color: #141414;
     transition: all 0.3s ease;
 }
 
+/* UTILIDADES */
 .utilidades {
     display: flex;
     justify-content: space-between;
@@ -78,22 +77,23 @@
     margin-top: 15px;
     font-size: 0.85rem;
 }
-
 .lembre_de_mim {
     display: flex;
     align-items: center;
     gap: 8px;
 }
-
-.Qual_minha_senha {
+.qual_minha_senha {
     color: white;
     text-decoration: underline;
     font-style: italic;
     font-weight: bold;
 }
 
+/* ============================================= */
+/* RESPONSIVIDADE PARA O CELULAR */
 @media (max-width: 768px) {
-    #menuLogin{
+    /* INDICATIVO DA PÁGINA ATUAL NA BARRA DE NAVEGAÇÃO NO MOBILE */
+    .btn-entrar{
         display: block;
         max-width: 100%;
         border-bottom: 0;
@@ -102,26 +102,27 @@
         background-color: rgb(114, 23, 23);
     }
 
+    /* ============================================= */
+    /* DIV DO LOGIN */
     .caixaLogin{
         margin: 0 30px 10px 30px;
     }
-    
-    .Tamanho_Caixas_TXT {
-        width: 100%;
-    }
 
+    /* CAIXAS DE TEXTO (input) */
     .login_senha_caixas input{
         font-size: 30px;
         margin-bottom: 10px;
         height: 80px;
     }
 
+    /* BOTÃO DE LOGIN */
     .btn-login{
         font-size: 30px;
         padding: 10px;
         margin-bottom: 20px;
     }
 
+    /* UTILIDADES */
     .utilidades{
         display:grid;
         justify-content: center;

@@ -1,7 +1,10 @@
+/* INDICATIVO DA PÁGINA ATUAL NA BARRA DE NAVEGAÇÃO NO DESKTOP */
 .menuEmBreve{
     text-shadow: 0 0 10px #f1c764;
 }
 
+/* ============================================= */
+/* CONTAINER DOS FILMES */
 .gradeFilmes {
     display: grid;
     /* Cria colunas automáticas que se ajustam ao tamanho da tela */
@@ -12,8 +15,6 @@
     margin: 0 auto;
     justify-items: center; /* Centraliza os cards dentro das colunas */
 }
-
-
 .cardFilme {
     width: 250px;
     display: flex;
@@ -23,13 +24,9 @@
     transition: transform 0.3s ease; /* Efeito de zoom suave */
     cursor: pointer;
 }
-
-/* Efeito de Zoom ao passar o mouse */
 .cardFilme:hover {
-    transform: scale(1.05);
+    transform: scale(1.05); /* Efeito de Zoom ao passar o mouse */
 }
-
-
 .posterFilme {
     width: 100%;
     height: 380px; 
@@ -43,12 +40,12 @@
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7); 
     transition: border-color 0.3s ease;
 }
-
-/* Cor Amarela ao colocar o mouse na imagem */
 .cardFilme:hover .posterFilme {
-    border-color: #F0AD12; 
+    border-color: #F0AD12; /* Cor Amarela ao colocar o mouse na imagem */
 }
 
+/* ============================================= */
+/* INFORMAÇÃO DO FILME */
 .tituloFilme {
     margin-top: 12px;
     font-size: 1.1rem;
@@ -63,7 +60,6 @@
     
     display: block; /* Garante que o strong se comporte como bloco abaixo da imagem */
 }
-
 .titulo-secao {
     color: white;
     text-align: center;
@@ -73,7 +69,10 @@
     letter-spacing: 2px;
 }
 
+/* ============================================= */
+/* RESPONSIVIDADE PARA O CELULAR */
 @media (max-width: 768px) {
+    /* INDICATIVO DA PÁGINA ATUAL NA BARRA DE NAVEGAÇÃO NO MOBILE */
     .menuEmBreve{
         display: block;
         max-width: 100%;
