@@ -62,7 +62,7 @@ async def logout():
     return response
 
 # Mostra para o js como buscar somente os 5 primeiros filmes
-@app.get("/api/filmes-lista")
+@app.get("/api/filmes-em-cartaz")
 async def pegar_lista():
     async with httpx.AsyncClient(verify=False) as client:
         resposta = await client.get(url)
