@@ -1,19 +1,19 @@
 window.onload = async () => {
     try {
         const resposta = await fetch("/api/filmes-em-cartaz");
-        const filmesDaPagina = await resposta.json();
-        console.log("Filmes carregados para busca local:", filmesDaPagina);
+        const filmesEmCartaz = await resposta.json();
+        console.log("Filmes carregados para busca local:", filmesEmCartaz);
 
-        if (filmesDaPagina.length === 0) {
-            msgErro.textContent= "Nenhum filme em cartaz no momento.";
+        if (filmesEmCartaz.length === 0) {
+            msgErro.textContent = "Nenhum filme em cartaz no momento.";
             return;
         }
 
+        // Barra de pesquisa
         const btnBuscar = document.getElementById("btnBuscar");
         btnBuscar.addEventListener("click", () => {
             filtrarFilmes();
         });
-
         window.addEventListener("keydown", function(event){
             if (event.key == "Enter"){
                 filtrarFilmes();
@@ -28,7 +28,7 @@ window.onload = async () => {
             corpoTabela.innerHTML = "";
 
             // FILTRAGEM LOCAL: Olhamos apenas para os filmes que já temos
-            const resultados = filmesDaPagina.filter(filme => 
+            const resultados = filmesEmCartaz.filter(filme => 
                 filme.title.toLowerCase().includes(termo)
             );
 
@@ -57,9 +57,7 @@ window.onload = async () => {
         }
 
     } catch (error) {
-        
+        console.error("Erro ao carregar API:", erro);
+        msgErro.textContentL = "Erro ao conectar com o servidor.";
     }
-    
 };
-
-

@@ -43,15 +43,19 @@
         </ul>
     </nav>
 
-    <main class="Local_logo">
-        <div class="Tamanho_Logo">
-            <img src="/assets/logo.png" alt="Logo Nouvelle">
+    <div class="mainCadastro">
+        <main class="Local_logo">
+            <div class="Tamanho_Logo">
+                <img src="assets/logo.png" alt="Logo Nouvelle">
+            </div>
+        </main>
 
-            {% if mensagem %}
-                <h2 class="mensagem_erro">{{ mensagem }}</h2>
-            {% endif %}
-        </div>
-
+        {% if mensagem %}
+            <h2 class="mensagem_erro">
+                {{ mensagem }}
+            </h2>
+        {% endif %}
+        
         <div class="Tamanho_Caixas_TXT"> 
             <form action="/cadastrar" method="POST" id="formCadastro" enctype="multipart/form-data">
 
@@ -59,10 +63,11 @@
                     <div id="container-preview">
                         <img id="preview-img" src="/assets/fotoPerfilDefault.png" alt="Foto de Perfil">
                     </div>
-
-                    <p id="nomeArquivo"></p>
-                    <label for="btnAddFoto" class="botao-upload">Selecionar Imagem</label>
-                    <input type="file" name="foto_perfil" id="btnAddFoto" class="selecionarImagemPerfil" accept="image/*">
+                    <div id="container-btnImg">
+                        <p id="nomeArquivo"></p>
+                        <label for="btnAddFoto" class="botao-upload">Selecionar Imagem</label>
+                        <input type="file" name="foto_perfil" id="btnAddFoto" class="selecionarImagemPerfil" accept="image/*">
+                    </div>
                 </div>
                 
                 <div class="login_senha_caixas"> 
@@ -99,7 +104,7 @@
 
             </form>
         </div>
-    </main>
+    </div>
 
 <script src="/js/cadastro.js"></script>
 </body>
