@@ -49,6 +49,18 @@ async def home(request: Request):
         context={"request": request, "filmes": filmes_recentes}
     )
 
+# INATIVIDADE DO USUÁRIO
+@app.get("/logout")
+async def logout():
+    response = RedirectResponse(url="/login", status_code=303)
+    
+    # Remove todos os cookies que foram criados no login
+    response.delete_cookie("usuario_nome")
+    response.delete_cookie("usuario_cpf")
+    response.delete_cookie("usuario_foto")
+    
+    return response
+
 # Mostra para o js como buscar somente os 5 primeiros filmes
 @app.get("/api/filmes-lista")
 async def pegar_lista():
@@ -210,20 +222,24 @@ async def processar_cadastro(
         )
     # --- FIM DA VALIDAÇÃO ---
 
-    caminho_final = "/assets/fotoPerfilDefault.png"
+    caminho_final = "assets/fotoPerfilDefault.png"
 
+    # Verificação e salvamento da foto de perfil, se houver
     if foto_perfil and foto_perfil.filename:
         pasta_destino = os.path.join("assets", "uploads")
         os.makedirs(pasta_destino, exist_ok=True)
         
-        nome_arquivo = f"{cpf}_{foto_perfil.filename}"
+        extensao = os.path.splitext(foto_perfil.filename)[1]
+        nome_arquivo = f"{cpf}{extensao}"
+
         caminho_disco = os.path.join(pasta_destino, nome_arquivo)
         
+        # Salva o arquivo
         with open(caminho_disco, "wb") as buffer:
             shutil.copyfileobj(foto_perfil.file, buffer)
         
         # Caminho que vai para o banco de dados
-        caminho_final = f"/assets/uploads/{nome_arquivo}"
+        caminho_final = f"assets/uploads/{nome_arquivo}"
 
     bytes_senha = senha.encode('utf-8')
     salt = bcrypt.gensalt()
@@ -289,7 +305,7 @@ async def processar_login(
     try:
         cursor = conexao.cursor(dictionary=True) # O Dictionary faz o MySql devolver os dados com os nomes das colunas
 
-        sql = "Select cpf, nome, senha FROM Usuario WHERE email = %s"
+        sql = "Select cpf, nome, senha, caminho_final FROM Usuario WHERE email = %s"
         cursor.execute(sql, (email,))
         usuario = cursor.fetchone()
 
@@ -304,7 +320,7 @@ async def processar_login(
         bytes_senha_banco = usuario['senha'].encode('utf-8')
 
         senha_valida = bcrypt.checkpw(bytes_senha_digitada, bytes_senha_banco)
-        
+
         if not senha_valida:
             return templates.TemplateResponse(
                 request=request,
@@ -315,7 +331,8 @@ async def processar_login(
         resposta = RedirectResponse(url="/", status_code=303)
         resposta.set_cookie(key="usuario_nome", value=usuario['nome'])
         resposta.set_cookie(key="usuario_cpf", value=usuario['cpf'])
-
+        resposta.set_cookie(key="senha_usuario", value=usuario['senha'])
+        resposta.set_cookie(key="usuario_caminho_final", value=usuario['caminho_final'])
         return resposta
     except Exception as e:
         print(f"Erro no Login: {e}")
@@ -328,14 +345,6 @@ async def processar_login(
         if conexao and conexao.is_connected():
             cursor.close()
             conexao.close()
-
-
-@app.get("/logout")
-async def logout():
-    resposta = RedirectResponse(url="/", status_code=303)
-    resposta.delete_cookie("usuario_nome")
-    resposta.delete_cookie("usuario_cpf")
-    return resposta
 
 @app.get("/perfil")
 async def carregar_perfil(request: Request):
@@ -376,10 +385,11 @@ async def atualizar_perfil(
     nome: str = Form(...),
     email: str = Form(...),
     telefone: str = Form(...),
-    data_nasc: str = Form(...)
+    data_nasc: str = Form(...),
+    excluir_foto: str = Form(None),
+    foto_perfil: UploadFile = File(None)
 ):
     cpf_logado = request.cookies.get("usuario_cpf")
-
     if not cpf_logado:
         return RedirectResponse(url="/login", status_code=303)
     
@@ -387,27 +397,45 @@ async def atualizar_perfil(
     if not conexao:
         return RedirectResponse(url="/", status_code=303)
     
+    # Caso o usuário enviou uma NOVA FOTO
+    elif foto_perfil and foto_perfil.filename:
+        os.makedirs("assets/uploads", exist_ok=True)
+        extensao = os.path.splitext(foto_perfil.filename)[1]
+        nome_arquivo = f"{cpf_logado}{extensao}"
+        caminho_disco = os.path.join("assets/uploads", nome_arquivo)
+        
+        with open(caminho_disco, "wb") as buffer:
+            shutil.copyfileobj(foto_perfil.file, buffer)
+        
+        caminho_foto = f"assets/uploads/{nome_arquivo}"
+
+    # Caso o usuário clicou em EXCLUIR
+    if excluir_foto == "true":
+        caminho_foto = "assets/fotoPerfilDefault.png"
+
     try:
         cursor = conexao.cursor(dictionary=True)
 
         # Aqui que rola o update
         sql_update = """
             UPDATE Usuario
-            SET nome = %s, email = %s, telefone = %s, data_nasc = %s
+            SET nome = %s, email = %s, telefone = %s, data_nasc = %s, caminho_final = %s
             WHERE cpf = %s
         """
-        cursor.execute(sql_update, (nome, email, telefone, data_nasc, cpf_logado))
+        cursor.execute(sql_update, (nome, email, telefone, data_nasc, caminho_foto, cpf_logado))
         conexao.commit()
 
         cursor.execute("SELECT cpf, nome, email, telefone, data_nasc FROM Usuario WHERE cpf = %s", (cpf_logado,))
         usuario_atualizado = cursor.fetchone()
 
+        resposta = RedirectResponse(url="/perfil", status_code=303)
         resposta = templates.TemplateResponse(
             request = request,
             name = "perfil.html",
             context = {"request": request, "usuario": usuario_atualizado, "mensagem": "Dados atualizados com sucesso!"}
         )
-
+        
+        resposta.set_cookie(key="usuario_caminho_final", value=caminho_foto)
         resposta.set_cookie(key="usuario_nome", value = nome)
 
         return resposta

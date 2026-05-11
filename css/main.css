@@ -47,6 +47,14 @@ body{
     margin-left: auto;
 }
 
+.foto-nav-mini {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid black;
+}
+
 #menu-burguer {
     display: none; /* Esconde o menu "hamburguer" na tela grande */
 }

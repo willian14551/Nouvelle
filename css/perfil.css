@@ -1,4 +1,8 @@
-.Local_logo {
+#menuPerfil{
+    text-shadow: 0 0 10px #f1c764;
+}
+
+.main-perfil {
     flex: 1;
     display: flex;
     justify-content: center;
@@ -7,8 +11,12 @@
     padding: 40px;
 }
 
-.imagemPerfil{
-    border-radius: 40px;
+#preview-img{
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #F0AD12;
 }
 
 .btn-img-perfil-atualizar, .btn-img-perfil-excluir {
@@ -43,7 +51,7 @@
 }
 
 /* --- BOTÕES --- */
-.btn-login, .btn-img-perfil-atualizar, .btn-img-perfil-excluir {
+.btn-login, .btn-img-perfil-atualizar, .btn-img-perfil-excluir, .botao-upload, .btn-excluir-foto {
     width: 100%;
     padding: 15px;
     background-color: #141414;
@@ -55,7 +63,7 @@
     transition: all 0.3s ease;
 }
 
-.btn-login:hover, .btn-img-perfil-atualizar:hover, .btn-img-perfil-excluir:hover {
+.btn-login:hover, .btn-img-perfil-atualizar:hover, .btn-img-perfil-excluir:hover, .botao-upload:hover, .btn-excluir-foto:hover {
     background-color: #F0AD12;
     color: #141414;
 }

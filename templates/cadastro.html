@@ -26,32 +26,40 @@
             <li><a class="menuFilmesCartaz" href="/filmesCartaz">Filmes em Cartaz</a></li>      
             <li><a class="menuEmBreve" href="/emBreve">Em Breve</a></li> 
         </ul>
+        
         <ul class="menu-login">
             {% if request.cookies.get('usuario_nome') %}
-                <li><a id="menuPerfil" href="/perfil" >Olá, {{ request.cookies.get('usuario_nome').split()[0] }}</a></li>
+                <li class="item-perfil-nav">
+                    <a id="menuPerfil" href="/perfil" >
+                        Olá, {{ request.cookies.get('usuario_nome').split()[0] }}
+                        <img src="/{{ request.cookies.get('usuario_caminho_final') }}" alt="Foto" class="foto-nav-mini">
+                    </a>
+                </li>
                 <li><a id="menuLogout" href="/logout" class="btn-entrar">Sair</a></li>
             {% else %}
-                <li><a id="menuLogin" href="/login" class="btn-entrar">Entrar</a></li>
-                <li><a id="menuCadastro" href="/cadastro" class="btn-cadastrar">Cadastrar</a></li>
+                <li><a href="/login" class="btn-entrar">Entrar</a></li>
+                <li><a href="/cadastro" class="btn-cadastrar">Cadastrar</a></li>
             {% endif %}
         </ul>
     </nav>
 
 
-    <main class="Local_logo"> <div class="Tamanho_Logo">
+    <main class="Local_logo">
+        <div class="Tamanho_Logo">
             <img src="/assets/logo.png" alt="Logo Nouvelle">
         </div>
 
         <div class="Tamanho_Caixas_TXT"> 
-            <form action="/cadastrar" method="POST" id="formCadastro">
+            <form action="/cadastrar" method="POST" id="formCadastro" enctype="multipart/form-data">
 
                 <div class="divFotoPerfil">
                     <div id="container-preview" style="display: block; margin-top: 10px; text-align: center;">
                         <img id="preview-img" src="/assets/fotoPerfilDefault.png" alt="Foto de Perfil">
                     </div>
 
+                    <p id="nomeArquivo"></p>
                     <label for="btnAddFoto" class="botao-upload">Selecionar Imagem</label>
-                    <input type="file" name="selecionar_imagem_de_perfil" id="btnAddFoto" class="selecionarImagemPerfil" accept="image/*" style="display: none;">
+                    <input type="file" name="foto_perfil" id="btnAddFoto" class="selecionarImagemPerfil" accept="image/*" style="display: none;">
                 </div>
                 
                 <div class="login_senha_caixas"> 

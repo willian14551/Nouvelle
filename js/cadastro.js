@@ -4,8 +4,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const form = document.getElementById('formCadastro');
     const dataNasc = document.getElementById('data_nasc');
     const nomeInput = document.getElementById('Nome');
-    const fotoInput = document.getElementById('foto_perfil');
+    const fotoInput = document.getElementById('btnAddFoto');
     const previewImg = document.getElementById('preview-img');
+    const paragNomeArquivo = document.getElementById('nomeArquivo');
     const containerPreview = document.getElementById('container-preview');
 
     // Máscara do CPF (000.000.000-00)
@@ -103,21 +104,26 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     fotoInput.addEventListener('change', function() {
-        const nomeArquivo = this.files[0] ? this.files[0].name : "Selecionar Imagem";
-        document.querySelector('.botao-upload').innerText = nomeArquivo;
+        const arquivo = this.files[0]; // Obtém o arquivo selecionado
 
-        if (arquivo) {
-            const leitor = new FileReader(); // Ferramenta do JS para ler arquivos
+        // Atualiza o texto do botão
+        const nomeArquivo = arquivo ? arquivo.name : "Selecionar Imagem"; // Verifica se um arquivo foi selecionado
+        document.querySelector('.botao-upload').innerText = "Alterar Imagem";
+        paragNomeArquivo.innerText = nomeArquivo;
+        console.log("Arquivo selecionado: " + nomeArquivo); // Teste no console
+
+        if (arquivo) { 
+            const leitor = new FileReader();
 
             leitor.onload = function(e) {
-                // Quando o leitor terminar de processar, coloca o resultado no 'src' da imagem
                 previewImg.src = e.target.result;
-                containerPreview.style.display = 'block'; // Mostra a imagem
+                containerPreview.style.display = 'block';
             }
 
-            leitor.readAsDataURL(arquivo); // Transforma o arquivo em um link temporário para exibição
+            leitor.readAsDataURL(arquivo);
         } else {
-            containerPreview.style.display = 'none'; // Se o usuário cancelar a seleção, esconde a prévia
+            containerPreview.style.display = 'none';
+            console.log("Nenhum arquivo selecionado."); // Teste no console
         }
     });
 });

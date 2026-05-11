@@ -23,7 +23,8 @@ CREATE TABLE Usuario (
     data_nasc DATE,
     estudante BOOLEAN,
     pcd BOOLEAN,
-    permissao ENUM('CLIENTE', 'ADMINISTRADOR') DEFAULT 'CLIENTE'
+    permissao ENUM('CLIENTE', 'ADMINISTRADOR') DEFAULT 'CLIENTE',
+    caminho_final VARCHAR(255) DEFAULT 'assets/fotoPerfilDefault.png'
 );
 
 CREATE TABLE Pagamento (
@@ -75,5 +76,3 @@ ALTER TABLE sessao ADD CONSTRAINT FK_sessao_Filme
     FOREIGN KEY (fk_Filme_id)
     REFERENCES Filme (id)
     ON DELETE RESTRICT;
-
-ALTER TABLE Usuario ADD COLUMN foto_perfil VARCHAR(255);
