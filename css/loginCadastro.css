@@ -1,0 +1,24 @@
+/* DIV GERAL */
+.divCadastro, .divLogin {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    width: 70%;
+    margin: 30px auto 80px;
+}
+
+/* LOCAL DA LOGO */
+.divLeft {
+    position: sticky; /* Faz o menu grudar no mesmo local ao rolar a página */
+    top: 210px; /* Deixa o menu subir até esta posição (no caso "congela" no mesmo lugar) */
+    align-self: flex-start; /* Impede que a div estique até o final do formulário */
+    flex: 1;
+    display: flex;
+    justify-content: left;
+    padding: 40px;
+}
+
+/* LOCAL DOS INPUTS */
+.divRight {
+    flex: 0 1 380px;
+}

@@ -7,6 +7,7 @@
     <title>Nouvelle - Login</title>
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="/css/loginCadastro.css">
 </head>
 <body>
     <nav class="menu">
@@ -42,12 +43,12 @@
         </ul>
     </nav>
 
-    <div class="caixaLogin">
-        <main class="Local_logo">
+    <div class="divLogin">
+        <div class="divLeft">
             <div class="Tamanho_Logo">
                 <img src="assets/logo.png" alt="Logo Nouvelle">
             </div>
-        </main>
+        </div>
 
         {% if mensagem %}
             <p class="mensagem_erro">
@@ -55,26 +56,27 @@
             </p>
         {% endif %}
     
-        <form action="/login" method="POST" id="formLogin">
-            <div class="login_senha_caixas">
-                <input type="email" name="email" placeholder="E-mail" required>
-            </div>
-            <div class="login_senha_caixas">
-                <input type="password" name="senha" placeholder="Senha" required>
-            </div>
-
-            <button type="submit" class="btn-login">Entrar</button>
-
-
-            <div class="utilidades">
-                <div class="lembre_de_mim">
-                    <input type="checkbox" id="remember">
-                    <label for="remember">Lembre-se de mim</label>
+        <div class="divRight">
+            <form action="/login" method="POST" id="formLogin">
+                <div class="login_senha_caixas">
+                    <input type="email" name="email" placeholder="E-mail" required>
                 </div>
-                <a href="#" class="qual_minha_senha">Esqueceu sua senha?</a>
-            </div>
-        </form>
-        
+                <div class="login_senha_caixas">
+                    <input type="password" name="senha" placeholder="Senha" required>
+                </div>
+
+                <button type="submit" class="btn-login">Entrar</button>
+
+
+                <div class="utilidades">
+                    <div class="lembre_de_mim">
+                        <input type="checkbox" id="remember">
+                        <label for="remember">Lembre-se de mim</label>
+                    </div>
+                    <a href="#" class="qual_minha_senha">Esqueceu sua senha?</a>
+                </div>
+            </form> 
+        </div>
     </div>
     
 </body>

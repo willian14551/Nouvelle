@@ -5,18 +5,6 @@
 
 /* ============================================= */
 /* LOCAL DA LOGO */
-.divCadastro {
-    width: 50%;
-    margin: 0 auto 0;
-}
-.local_logo {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 80px;
-    padding: 40px;
-}
 .tamanho_Logo {
     flex: 0 1 450px;
 }
@@ -25,7 +13,7 @@
     height: auto;
 }
 .mensagem_erro {
-    color: black;
+    color: red;
     margin-top: 20px;
     text-align: center;
     font-size: 30px;
@@ -33,9 +21,6 @@
 
 /* ============================================= */
 /* CAIXAS DE TEXTO (input) */
-.Tamanho_Caixas_TXT {
-    flex: 0 1 380px;
-}
 .divFotoPerfil{
     padding-bottom: 15px;
     padding-top: 20px;
@@ -55,7 +40,7 @@
     border: 3px solid #F0AD12;
 }
 #nomeArquivo{
-    color: black;
+    color: #F0AD12;
     font-weight: bold;
     text-decoration: underline;
     margin: 10px;
