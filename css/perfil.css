@@ -6,15 +6,17 @@
 /* ============================================= */
 /* MAIN DO PERFIL */
 .main-perfil {
-    flex: 1;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     gap: 80px;
     padding: 40px;
 }
 .tamanho_logo {
     flex: 0 1 450px;
+    position: sticky;
+    top: 180px;
+    align-self: flex-start;
 }
 .tituloPerfil{
     color: #F0AD12;
@@ -28,19 +30,23 @@
     margin-bottom: 30px;
 }
 .mensagem_erro {
-    color: #F0AD12;
+    color: red;
     margin-top: 15px;
     text-align: center;
+    font-size: 30px;
 }
 
 /* ============================================= */
-/* CAIXAS DE TEXTO (input) */
-/* DIV DOS INPUTS */
-.Tamanho_Caixas_TXT {
-    flex: 0 1 380px;
+/* IMAGEM PERFIL */
+.divFotoPerfil{
+    display: flex;
+    align-items: center;
+}
+.divFotoPerfil label, .divFotoPerfil button {
+    flex: 1;            /* Faz os botões ocuparem o espaço restante */
+    margin-bottom: 5px; /* Espaçamento caso haja mais de um botão */
 }
 
-/* IMAGEM  DE PERFIL */
 #preview-img{
     width: 200px;
     height: 200px;
@@ -49,10 +55,22 @@
     border: 3px solid #F0AD12;
 }
 #nomeArquivo{
-    color: black;
+    color: #F0AD12;
     font-weight: bold;
     text-decoration: underline;
-    margin: 10px;
+    margin-top: 20px;
+}
+
+/* BOTÕES IMAGEM */
+.botoes_nome_imagem{
+    margin-left: 50px;
+}
+
+/* ============================================= */
+/* CAIXAS DE TEXTO (input) */
+/* DIV DOS INPUTS */
+.Tamanho_Caixas_TXT {
+    flex: 0 1 380px;
 }
 
 /* BOTÕES DA IMAGEM DE PERFIL */

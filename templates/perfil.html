@@ -49,7 +49,9 @@
             <p class="descricaoPerfil">Aqui você pode atualizar suas informações ou excluir sua conta.</p>
 
             {% if mensagem %}
-                <p class="mensagem_erro">{{ mensagem }}</p>
+                <p class="mensagem_erro">
+                    {{ mensagem }}
+                </p>
             {% endif %}
 
             <form action="/atualizar_foto_perfil" method="POST" id="formPerfil" enctype="multipart/form-data">
@@ -58,10 +60,12 @@
                         <img id="preview-img" src="/{{ request.cookies.get('usuario_caminho_final') }}" alt="Foto de Perfil">
                     </div>
 
-                    <p id="nomeArquivo"></p>
-                    <label for="btnAddFoto" class="botao-upload">Alterar Imagem</label>
-                    <input type="file" name="foto_perfil" id="btnAddFoto" accept="image/*">
-
+                    <div class="botoes_nome_imagem">
+                        <label for="btnAddFoto" class="botao-upload">Alterar Imagem</label>
+                        <input type="file" name="foto_perfil" id="btnAddFoto" accept="image/*">
+                        <p id="nomeArquivo"></p>
+                    </div>
+                    
                     {% if request.cookies.get('usuario_caminho_final') != 'assets/fotoPerfilDefault.png' %}
                         <button type="submit" name="excluir_foto" value="true" class="btn-excluir-foto">Excluir Imagem</button>
                     {% endif %}

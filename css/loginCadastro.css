@@ -39,6 +39,10 @@
 #divRight {
     flex: 0 1 380px;
 }
+.tituloPagina{
+    color: #F0AD12;
+    margin-bottom: 30px;
+}
 
 /* CAIXAS DE TEXTO (input) */
 .login_senha_caixas {
