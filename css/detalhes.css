@@ -140,7 +140,6 @@
     .lista-generos {
         justify-content: center;
         flex-wrap: wrap; /* Quebra de linha */
-        justify-content: center;
     }
     .sinopse-area h3, .generos-area h3 {
         align-items: center;

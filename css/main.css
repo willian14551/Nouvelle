@@ -71,6 +71,11 @@ body{
 /* ============================================= */
 /* RESPONSIVIDADE PARA O CELULAR */
 @media (max-width: 768px) {
+    .menu-links, .menu-login{
+        justify-content: center;
+        flex-wrap: wrap; /* Quebra de linha */
+        font-size: 45px;
+    }
     .menu-links a:hover, .menu-login a:hover{
         transform: none;
         transition: none;
