@@ -1,19 +1,30 @@
 window.onload = async () => {
-    const corpoTabela = document.getElementById("corpoTabela");
-
     try {
         // Busca os filmes já filtrados 
         const resposta = await fetch("/api/filmes-em-breve");
-        const filmes = await resposta.json();
+        const filmesEmBreve = await resposta.json();
+        console.log("Filmes carregados para busca local:", filmesEmBreve);
 
-        if (filmes.length === 0) {
-            corpoTabela.innerHTML = "<p style='color:white; text-align:center;'>Nenhum lançamento futuro encontrado.</p>";
+        if (filmesEmBreve.length === 0) {
+            msgErro.textContent = "Nenhum lançamento futuro encontrado.";
             return;
         }
 
+        // Barra de pesquisa
+        const btnBuscar = document.getElementById("btnBuscar");
+        btnBuscar.addEventListener("click", () => {
+            filtrarFilmes();
+        });
+        window.addEventListener("keydown", function(event){
+            if (event.key == "Enter"){
+                filtrarFilmes();
+            }
+        });
+
+        const corpoTabela = document.getElementById("corpoTabela");
         corpoTabela.innerHTML = ""; // Limpa o container
 
-        filmes.forEach(filme => {
+        filmesEmBreve.forEach(filme => {
             const divCard = document.createElement("div");
             divCard.className = "cardFilme";
 
