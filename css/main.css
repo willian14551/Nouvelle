@@ -71,6 +71,10 @@ body{
 /* ============================================= */
 /* RESPONSIVIDADE PARA O CELULAR */
 @media (max-width: 768px) {
+    .menu-links a:hover, .menu-login a:hover{
+        transform: none;
+        transition: none;
+    }
     /* BARRA DE NAVEGAÇÃO HAMBURGUER */
     .hamburger {
         display: flex; /* Mostra o ícone do menu */

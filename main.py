@@ -366,7 +366,8 @@ async def logout():
 @app.get("/admin")
 async def painel_admin(request: Request):
     if not _is_admin(request):
-        return RedirectResponse(url="/", status_code=303)
+        return RedirectResponse(url="/login", status_code=303)
+
     return templates.TemplateResponse(
         request=request,
         name="admin.html",
@@ -380,7 +381,7 @@ async def painel_admin(request: Request):
 @app.get("/api/admin/salas")
 async def listar_salas(request: Request):
     if not _is_admin(request):
-        return JSONResponse({"erro": "Acesso negado"}, status_code=403)
+        return JSONResponse({"erro": "Acesso negado"}, status_code=403)    
     conexao = obter_conexao()
     if not conexao:
         return JSONResponse({"erro": "Erro de conexão"}, status_code=500)
