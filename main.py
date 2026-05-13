@@ -10,6 +10,7 @@ from conexao import obter_conexao
 from datetime import datetime, timedelta
 import httpx
 import bcrypt
+import json
 
 # Variável que instância um objeto da classe FastApi, criando o app
 app = FastAPI()
@@ -1033,6 +1034,72 @@ async def carregar_perfil(request: Request):
     except Exception as e:
         print(f"Erro ao carregar perfil: {e}")
         return RedirectResponse(url="/", status_code=303)
+    finally:
+        if conexao and conexao.is_connected():
+            cursor.close()
+            conexao.close()
+
+@app.get("/meusIngressos")
+async def meus_ingressos(request: Request):
+    cpf_logado = request.cookies.get("usuario_cpf")
+
+    if not cpf_logado:
+        return templates.TemplateResponse(
+            request=request,
+            name="meusIngressos.html",
+            context={
+                "request": request,
+                "ingressos": [],
+                "mensagem": "Faça login para acessar seus ingressos."
+            }
+        )
+
+    conexao = obter_conexao()
+    if not conexao:
+        return RedirectResponse(url="/", status_code=303)
+
+    try:
+        cursor = conexao.cursor(dictionary=True)
+
+        sql = """
+            SELECT
+                i.id AS ingresso_id,
+                i.numero_assento,
+                p.id AS pagamento_id,
+                p.valor_total,
+                p.metodo_pagamento,
+                p.status,
+                p.criado_em,
+                se.horario_inicio,
+                se.dub_leg,
+                f.nome AS filme_nome,
+                f.duracao,
+                f.descricao AS filme_descricao,
+                s.qtde_assentos AS sala_quantidade
+            FROM Ingresso i
+            JOIN Pagamento p ON i.fk_Pagamento_id = p.id
+            JOIN sessao se ON i.fk_sessao_id = se.id
+            JOIN Filme f ON se.fk_Filme_id = f.id
+            JOIN Sala s ON se.fk_Sala_id = s.id
+            JOIN Usuario u ON p.fk_Usuario_cpf = u.cpf
+            WHERE u.cpf = %s
+            ORDER BY se.horario_inicio DESC
+        """
+        cursor.execute(sql, (cpf_logado,))
+        ingressos = cursor.fetchall() or []
+
+        return templates.TemplateResponse(
+            request=request,
+            name="meusIngressos.html",
+            context={
+                "request": request,
+                "ingressos": ingressos,
+                "ingressos_json": json.dumps(ingressos, default=str)
+            }
+        )
+    except Exception as e:
+        print(f"Erro ao carregar ingressos: {e}")
+        return RedirectResponse(url="/perfil", status_code=303)
     finally:
         if conexao and conexao.is_connected():
             cursor.close()

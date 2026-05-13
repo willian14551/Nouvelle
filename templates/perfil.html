@@ -32,7 +32,8 @@
                     <li><a href="/admin" class="btn-admin">Painel Admin</a></li>
                 {% endif %}
                 
-                <li><a id="menuPerfil" href="/perfil" >Olá, {{ request.cookies.get('usuario_nome').split()[0] }}</a></li>
+                <li><a id="menuPerfil" href="/perfil">Olá, {{ request.cookies.get('usuario_nome').split()[0] }}</a></li>
+                <li><a href="/meusIngressos">Meus Ingressos</a></li>
                 <li><a id="menuLogout" href="/logout" class="btn-entrar">Sair</a></li>
             {% else %}
                 <li><a id="menuLogin" href="/login" class="btn-entrar">Entrar</a></li>
@@ -57,7 +58,8 @@
                 
                 <div class="login_senha_caixas"> 
                     <label style="color: #F0AD12;">Nome completo:</label>
-                    <input type="text" name="nome" value="{{ usuario.nome }}" required>
+                    <input type="text" name="nome" id="Nome" value="{{ usuario.nome }}" required>
+                    <small id="erroNome" style="color: #F0AD12; display: none; font-weight: bold;">O nome deve ser completo!!</small>
                 </div>
                 
                 <div class="login_senha_caixas"> 
@@ -67,15 +69,17 @@
                 
                 <div class="login_senha_caixas"> 
                     <label style="color: #F0AD12;">Telefone:</label>
-                    <input type="text" name="telefone" value="{{ usuario.telefone }}" required>
+                    <input type="text" name="telefone" id="telefone" placeholder="Telefone (DD) 90000-0000" value="{{ usuario.telefone }}" maxlength="15" required>
+                    <small id="erroTelefone" style="color: #F0AD12; display: none; font-weight: bold;">Telefone inválido!</small>
                 </div>
                 
                 <div class="login_senha_caixas"> 
                     <label style="color: #F0AD12;">Data de Nascimento:</label>
-                    <input type="date" name="data_nasc" value="{{ usuario.data_nasc }}" required>
+                    <input type="date" name="data_nasc" id="data_nasc" value="{{ usuario.data_nasc }}" style="color: #999;" required>
                 </div>
                 
                 <button type="submit" class="btn-login" style="margin-bottom: 15px;">Atualizar Dados</button>
+                <a href="/meusIngressos" class="btn-login" style="display: inline-block; margin-bottom: 15px; background-color: #333;">Meus Ingressos</a>
             </form>
 
             <hr style="border: 1px solid #333; margin: 20px 0;">
@@ -89,5 +93,7 @@
             {% endif %}
         </div>
     </main>
+
+    <script src="/js/perfil.js"></script>
 </body>
 </html>

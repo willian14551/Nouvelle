@@ -42,20 +42,20 @@
     </nav>
 
     <main class="conteudo-principal">
-        <h2 style="color: white; text-align: center; margin-top: 30px; font-size: 2rem;">Em Breve</h2>
-        
-        <div class="gradeFilmes" id="corpoTabela">
-            {% for filme in filmes %}
-            <div class="cardFilme">
-                <a href="/detalhes/{{ filme.id }}">
-                    <img class="posterFilme" 
-                        src="https://image.tmdb.org/t/p/w500{{ filme.poster_path }}" 
-                        alt="{{ filme.title }}">
-                    <strong class="tituloFilme">{{ filme.title }}</strong>
-                </a>
+        <center>
+            <!-- Caixa de Pesquisa -->
+            <div class="search-box">
+                <input type="text" id="inputBuscar" placeholder="Buscar..">
+                <button id="btnBuscar">🔍︎</button>
+                <!-- LINK PARA A LUPA EM TXT => "https://www.emojiall.com/pt/code/1F50D-FE0E" -->
             </div>
-            {% endfor %}
-        </div>
+
+            <h2 class="tituloPag">Em Breve</h2>
+            <h1 class="msgErro"></h1>
+            <h1 class="msgErro1"></h1>
+
+            <div class="gradeFilmes" id="corpoTabela"></div>
+        </center>
     </main>
 
     <script src="/js/emBreve.js"></script>
