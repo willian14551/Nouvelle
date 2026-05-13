@@ -385,7 +385,55 @@ async def atualizar_perfil(
     nome: str = Form(...),
     email: str = Form(...),
     telefone: str = Form(...),
-    data_nasc: str = Form(...),
+    data_nasc: str = Form(...)
+):
+    cpf_logado = request.cookies.get("usuario_cpf")
+    if not cpf_logado:
+        return RedirectResponse(url="/login", status_code=303)
+    
+    conexao = obter_conexao()
+    if not conexao:
+        return RedirectResponse(url="/", status_code=303)
+    
+    try:
+        cursor = conexao.cursor(dictionary=True)
+
+        # Aqui que rola o update
+        sql_update = """
+            UPDATE Usuario
+            SET nome = %s, email = %s, telefone = %s, data_nasc = %s
+            WHERE cpf = %s
+        """
+        cursor.execute(sql_update, (nome, email, telefone, data_nasc, cpf_logado))
+        conexao.commit()
+
+        cursor.execute("SELECT cpf, nome, email, telefone, data_nasc FROM Usuario WHERE cpf = %s", (cpf_logado,))
+        usuario_atualizado = cursor.fetchone()
+
+        resposta = RedirectResponse(url="/perfil", status_code=303)
+        resposta = templates.TemplateResponse(
+            request = request,
+            name = "perfil.html",
+            context = {"request": request, "usuario": usuario_atualizado, "mensagem": "Dados atualizados com sucesso!"}
+        )
+        
+        resposta.set_cookie(key="usuario_nome", value = nome)
+
+        return resposta
+    
+    except Exception as e:
+        print(f"Erro ao atualizar: {e}")
+
+        return RedirectResponse(url="perfil", status_code=303)
+    
+    finally:
+        if conexao and conexao.is_connected():
+            cursor.close()
+            conexao.close()
+
+@app.post("/atualizar_perfil")
+async def atualizar_foto_perfil(
+    request: Request,
     excluir_foto: str = Form(None),
     foto_perfil: UploadFile = File(None)
 ):
@@ -413,30 +461,30 @@ async def atualizar_perfil(
     if excluir_foto == "true":
         caminho_foto = "assets/fotoPerfilDefault.png"
 
+
     try:
         cursor = conexao.cursor(dictionary=True)
 
         # Aqui que rola o update
         sql_update = """
             UPDATE Usuario
-            SET nome = %s, email = %s, telefone = %s, data_nasc = %s, caminho_final = %s
+            SET caminho_final = %s
             WHERE cpf = %s
         """
-        cursor.execute(sql_update, (nome, email, telefone, data_nasc, caminho_foto, cpf_logado))
+        cursor.execute(sql_update, (caminho_foto, cpf_logado))
         conexao.commit()
 
-        cursor.execute("SELECT cpf, nome, email, telefone, data_nasc FROM Usuario WHERE cpf = %s", (cpf_logado,))
+        cursor.execute("SELECT cpf FROM Usuario WHERE cpf = %s", (cpf_logado,))
         usuario_atualizado = cursor.fetchone()
 
         resposta = RedirectResponse(url="/perfil", status_code=303)
         resposta = templates.TemplateResponse(
             request = request,
             name = "perfil.html",
-            context = {"request": request, "usuario": usuario_atualizado, "mensagem": "Dados atualizados com sucesso!"}
+            context = {"request": request, "usuario": usuario_atualizado, "mensagem": "Imagem de perfil atualizada com sucesso!"}
         )
         
         resposta.set_cookie(key="usuario_caminho_final", value=caminho_foto)
-        resposta.set_cookie(key="usuario_nome", value = nome)
 
         return resposta
     
@@ -449,6 +497,8 @@ async def atualizar_perfil(
         if conexao and conexao.is_connected():
             cursor.close()
             conexao.close()
+
+
 
 @app.post("/deletar_conta")
 async def deletar_conta(request: Request):

@@ -7,6 +7,7 @@
     <title>Nouvelle - Cadastro</title>
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/cadastro.css">
+    <link rel="stylesheet" href="/css/loginCadastro.css">
 </head>
 <body>
     <nav class="menu">
@@ -43,20 +44,20 @@
         </ul>
     </nav>
 
-    <div class="divCadastro">
-        <div class="divLeft">
-            <div class="tamanho_Logo">
+    <div id="divCadastro">
+        <div id="divLeft">
+            <div class="tamanho_logo">
                 <img src="assets/logo.png" alt="Logo Nouvelle">
+            
+                {% if mensagem %}
+                    <h2 class="mensagem_erro">
+                        {{ mensagem }}
+                    </h2>
+                {% endif %}
             </div>
         </div>
-
-        {% if mensagem %}
-            <h2 class="mensagem_erro">
-                {{ mensagem }}
-            </h2>
-        {% endif %}
         
-        <div class="divRight"> 
+        <div id="divRight"> 
             <form action="/cadastrar" method="POST" id="formCadastro" enctype="multipart/form-data">
 
                 <div class="divFotoPerfil">
@@ -105,7 +106,7 @@
                 
                 <button type="submit" class="btn-login">Finalizar Cadastro</button>
 
-                <div class="utilidades_abaixo"> 
+                <div class="utilidades"> 
                     <a href="/login" class="link_login">Já tem uma conta? Faça login</a>
                 </div>
 
