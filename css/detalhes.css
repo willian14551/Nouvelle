@@ -130,7 +130,42 @@
     .poster-filme {
         margin-top: -100px;
     }
+    .tagline{
+        font-size: 25px;
+    }
+    .metadados {
+        font-size: 30px;
+    }
+
     .lista-generos {
         justify-content: center;
+        flex-wrap: wrap; /* Quebra de linha */
+        justify-content: center;
+    }
+    .sinopse-area h3, .generos-area h3 {
+        align-items: center;
+        margin: 0 auto 10px auto
+    }
+    .sinopse-area p {
+        font-size: 25px;
+        padding: 0 20px;
+        display: -webkit-box; /* Evita que títulos muito longos quebrem o layout */
+        overflow: hidden;
+    }
+    .btn-comprar {
+        display: block;
+        width: 90%;
+        margin: 0 auto;
+        box-sizing: border-box;
+        text-align: center;
+    }
+    .btn-comprar {
+        font-size: 30px;
+    }
+    .sinopse-area h3, .generos-area h3 {
+        font-size: 35px;
+    }
+    .generos-area li {
+        font-size: 20px;
     }
 }

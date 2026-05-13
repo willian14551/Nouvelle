@@ -88,3 +88,9 @@
     margin-top: 15px;
     font-size: 0.85rem;
 }
+
+@media (max-width: 768px){
+    #divLeft{
+        display: none;
+    }
+}
