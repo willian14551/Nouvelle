@@ -78,7 +78,7 @@
 
                 {% if pode_comprar %}
                     {% if request.cookies.get('usuario_cpf') %}
-                        <a href="/assentos" class="btn-comprar">Comprar Ingresso</a>
+                        <a href="/sessoes/{{ filme.id }}" class="btn-comprar">Comprar Ingresso</a>
                     {% else %}
                         <a href="/login" class="btn-comprar" style="background-color: #555;">Faça login para comprar</a>
                     {% endif %}

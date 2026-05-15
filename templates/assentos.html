@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/assentos.css">
 </head>
-<body>
+<body data-sessao-id="{{ sessao_id | default(0) }}" data-sessao-qtde-assentos="{{ sessao_info.qtde_assentos if sessao_info else 60 }}" data-sessao-filme="{{ sessao_info.filme_nome | e if sessao_info else '' }}" data-sessao-sala="{{ sessao_info.sala_id if sessao_info else 0 }}" data-sessao-horario="{{ sessao_info.horario_str | e if sessao_info else '' }}" data-sessao-data="{{ sessao_info.data_str | e if sessao_info else '' }}">
     <nav class="menu">
         <a href="/">
             <img src="/assets/logo.png" alt="Nouvelle" width="200" height="100">
@@ -47,19 +47,19 @@
             <div class="detalhes-sessao">
                 <div class="info-item">
                     <span class="label">Filme:</span>
-                    <span class="valor">Homem-Aranha: Sem Volta Para Casa</span>
+                    <span class="valor">{{ sessao_info.filme_nome if sessao_info else '—' }}</span>
                 </div>
                 <div class="info-item">
                     <span class="label">Sala:</span>
-                    <span class="valor">Sala 03</span>
+                    <span class="valor">Sala {{ sessao_info.sala_id if sessao_info else '—' }}</span>
                 </div>
                 <div class="info-item">
                     <span class="label">Horário:</span>
-                    <span class="valor">19:30</span>
+                    <span class="valor">{{ sessao_info.horario_str if sessao_info else '—' }}</span>
                 </div>
                 <div class="info-item">
                     <span class="label">Data:</span>
-                    <span class="valor">15 de Abril, 2026</span>
+                    <span class="valor">{{ sessao_info.data_str if sessao_info else '—' }}</span>
                 </div>
             </div>
         </div>
@@ -112,9 +112,9 @@
                         <span id="precoTotal">R$ 0,00</span>
                     </div>
                 </div>
-                <form action="/pagamento" method="get">
-                    <button type="submit" class="btn-comprar" id="btnComprar" disabled>Continuar para Pagamento</button>
-                </form>
+                <div>
+                    <button type="button" class="btn-comprar" id="btnComprar" disabled>Continuar para Pagamento</button>
+                </div>
             </div>
         </div>
     </main>
@@ -137,6 +137,6 @@
         </div>
     </div>
 
-    <script src="/js/assentos.js"></script>
+    <script src="/js/assentos.js?v={{ sessao_id | default(0) }}"></script>
 </body>
 </html>

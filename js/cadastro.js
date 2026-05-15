@@ -88,6 +88,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
             exibirErro(nomeInput, "O nome deve ser completo !!");
         }
+
     });
     function exibirErro(input, mensagem) {
         const erro = document.createElement('p');
