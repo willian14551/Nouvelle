@@ -127,4 +127,19 @@ document.addEventListener("DOMContentLoaded", function() {
             console.log("Nenhum arquivo selecionado."); // Teste no console
         }
     });
+            // Alternar mostrar/esconder senha
+        const senhaInput = document.getElementById('senhaCadastro');
+        const togglePassword = document.querySelector('.btn-toggle-password');
+
+        if (togglePassword && senhaInput) {
+            togglePassword.addEventListener('click', function() {
+                // Alterna o tipo do input
+                const tipo = senhaInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                senhaInput.setAttribute('type', tipo);
+                
+                // Alterna as classes do ícone
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+        }
 });

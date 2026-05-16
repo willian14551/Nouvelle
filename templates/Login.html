@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/login.css">
     <link rel="stylesheet" href="/css/loginCadastro.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <nav class="menu">
@@ -72,7 +73,8 @@
                 </div>
                 <div class="login_senha_caixas">
                     <h4>SENHA:</h4>
-                    <input type="password" name="senha" placeholder="Senha" required>
+                    <input type="password" name="senha" id="senhaLogin" placeholder="Senha" required>
+                    <i class="fa-solid fa-eye btn-toggle-password"></i>
                 </div>
 
                 <button type="submit" class="btn-login">Entrar</button>
@@ -90,4 +92,5 @@
     </div>
     
 </body>
+<script src="/js/login.js"></script>
 </html>
