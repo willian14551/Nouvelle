@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/assets/miniLogo.png" type="image/x-icon">
+    <title>Nouvelle - Sessões</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/sessoes.css">
+</head>
+<body>
+    <nav class="menu">
+        <a href="/">
+            <img src="/assets/logo.png" alt="Nouvelle" width="200" height="100">
+        </a>
+
+        <ul class="menu-links">
+            <li><a href="/">Início</a></li>
+            <li><a href="/filmesCartaz">Filmes em Cartaz</a></li>
+            <li><a href="/emBreve">Em Breve</a></li>
+        </ul>
+
+        <ul class="menu-login">
+            {% if request.cookies.get('usuario_nome') %}
+                {% if request.cookies.get('usuario_permissao') == 'ADMINISTRADOR' %}
+                    <li><a href="/admin" class="btn-admin">Painel Admin</a></li>
+                {% endif %}
+
+                <li><a id="menuPerfil" href="/perfil" >Olá, {{ request.cookies.get('usuario_nome').split()[0] }}</a></li>
+                <li><a id="menuLogout" href="/logout" class="btn-entrar">Sair</a></li>
+            {% else %}
+                <li><a id="menuLogin" href="/login" class="btn-entrar">Entrar</a></li>
+                <li><a id="menuCadastro" href="/cadastro" class="btn-cadastrar">Cadastrar</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <main class="sessoes-container">
+        <div class="filme-header">
+            <div class="filme-info">
+                <h1>{{ filme.title }}</h1>
+                <p class="filme-sinopse">{{ filme.overview }}</p>
+                <div class="filme-meta">
+                    <span class="meta-item">⭐ {{ filme.vote_average }}/10</span>
+                    <span class="meta-item">📅 {{ filme.release_date }}</span>
+                    <span class="meta-item">⏱️ {{ filme.runtime }}min</span>
+                </div>
+            </div>
+            {% if filme.poster_path %}
+            <div class="filme-poster">
+                <img src="https://image.tmdb.org/t/p/w300{{ filme.poster_path }}" alt="{{ filme.title }}">
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="sessoes-section">
+            <h2>Escolha sua Sessão</h2>
+            <div id="sessoes-list" class="sessoes-grid">
+                <!-- Sessões serão carregadas via JavaScript -->
+                <div class="loading">Carregando sessões...</div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const filmeId = {{ filme_id }};
+
+        async function carregarSessoes() {
+            try {
+                const response = await fetch(`/api/sessoes-filme/${filmeId}`);
+                const data = await response.json();
+
+                const sessoesList = document.getElementById('sessoes-list');
+
+                if (data.sessoes && data.sessoes.length > 0) {
+                    sessoesList.innerHTML = data.sessoes.map(sessao => `
+                        <div class="sessao-card">
+                            <div class="sessao-info">
+                                <div class="sessao-data">${formatarData(sessao.horario_inicio)}</div>
+                                <div class="sessao-horario">${formatarHorario(sessao.horario_inicio)}</div>
+                                <div class="sessao-sala">Sala ${sessao.sala_id}</div>
+                                <div class="sessao-tipo">${sessao.dub_leg === 'DUB' ? 'Dublado' : 'Legendado'}</div>
+                            </div>
+                            <div class="sessao-acoes">
+                                <a href="/assentos?sessao_id=${sessao.id}" class="btn-sessao">Selecionar Assentos</a>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    sessoesList.innerHTML = `
+                        <div class="sem-sessoes">
+                            <h3>Nenhuma sessão disponível</h3>
+                            <p>Não há sessões programadas para este filme no momento.</p>
+                            <a href="/" class="btn-voltar">Voltar ao Início</a>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Erro ao carregar sessões:', error);
+                document.getElementById('sessoes-list').innerHTML = `
+                    <div class="erro">
+                        <h3>Erro ao carregar sessões</h3>
+                        <p>Tente novamente mais tarde.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function formatarData(dataStr) {
+            const data = new Date(dataStr);
+            return data.toLocaleDateString('pt-BR', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        function formatarHorario(dataStr) {
+            const data = new Date(dataStr);
+            return data.toLocaleTimeString('pt-BR', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Carregar sessões quando a página carrega
+        document.addEventListener('DOMContentLoaded', carregarSessoes);
+    </script>
+</body>
+</html>

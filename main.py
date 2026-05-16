@@ -11,6 +11,8 @@ from conexao import obter_conexao
 from datetime import datetime, timedelta
 import httpx
 import bcrypt
+import json
+import re
 import shutil
 import os
 
@@ -1258,17 +1260,247 @@ async def pagamento(request: Request):
         context={"request": request}
     )
 
-@app.get("/assentos")
-async def assentos(request: Request):
-    # Verifica se o usuário tem o cookie de CPF (ou seja, se está logado)
-    usuario_logado = request.cookies.get("usuario_cpf")
-
-    if not usuario_logado:
-        # Se não estiver logado, redireciona para a página de login
+@app.post("/pagamento")
+async def processar_pagamento(
+    request: Request,
+    assentos: str = Form(None),
+    filme: str = Form(None),
+    sala: str = Form(None),
+    horario: str = Form(None),
+    data: str = Form(None),
+    sessao_id: int = Form(None),
+    metodo_pagamento: str = Form(None),
+    nomeCartao: str = Form(None),
+    numeroCartao: str = Form(None),
+    validade: str = Form(None),
+    cvv: str = Form(None),
+    pixKey: str = Form(None),
+    email: str = Form(None)
+):
+    # Verifica se o usuário está logado
+    usuario_cpf = request.cookies.get("usuario_cpf")
+    if not usuario_cpf:
         return RedirectResponse(url="/login", status_code=303)
+
+    if not assentos:
+        return JSONResponse({"success": False, "message": "Nenhum assento selecionado."}, status_code=400)
+
+    try:
+        assentos_lista = json.loads(assentos)
+    except Exception:
+        assentos_lista = []
+
+    if not assentos_lista:
+        return JSONResponse({"success": False, "message": "Nenhum assento selecionado."}, status_code=400)
+
+    if sessao_id is None:
+        return JSONResponse({"success": False, "message": "Sessão não informada."}, status_code=400)
+
+    if not metodo_pagamento:
+        return JSONResponse({"success": False, "message": "Método de pagamento não informado."}, status_code=400)
+
+    if metodo_pagamento not in ("PIX", "CARTAO_CREDITO", "CARTAO_DEBITO"):
+        return JSONResponse({"success": False, "message": "Método de pagamento inválido."}, status_code=400)
+
+    if metodo_pagamento == "PIX":
+        if not pixKey or not pixKey.strip():
+            return JSONResponse({"success": False, "message": "Chave PIX é obrigatória para PIX."}, status_code=400)
+    else:
+        if not nomeCartao or not numeroCartao or not validade or not cvv:
+            return JSONResponse({"success": False, "message": "Dados do cartão são obrigatórios para pagamentos com cartão."}, status_code=400)
+        numero_limpo = numeroCartao.replace(' ', '')
+        if not numero_limpo.isdigit() or len(numero_limpo) != 16:
+            return JSONResponse({"success": False, "message": "Número do cartão inválido."}, status_code=400)
+        if not re.match(r'^\d{2}/\d{2}$', validade):
+            return JSONResponse({"success": False, "message": "Validade deve estar no formato MM/AA."}, status_code=400)
+        if not cvv.isdigit() or len(cvv) != 3:
+            return JSONResponse({"success": False, "message": "CVV inválido."}, status_code=400)
+
+    preco_unitario = 35.00
+    quantidade = len(assentos_lista)
+    valor_total = quantidade * preco_unitario
+
+    conexao = obter_conexao()
+    if not conexao:
+        return templates.TemplateResponse(
+            request=request,
+            name="pagamento.html",
+            context={"request": request, "mensagem": "Erro de conexão com o banco."}
+        )
+
+    try:
+        cursor = conexao.cursor()
+
+        # Insere pagamento
+        sql_pagamento = """
+            INSERT INTO Pagamento (valor_total, metodo_pagamento, status, fk_Usuario_cpf)
+            VALUES (%s, %s, %s, %s)
+        """
+        valores_pagamento = (valor_total, metodo_pagamento, 'APROVADO', usuario_cpf)
+        cursor.execute(sql_pagamento, valores_pagamento)
+        pagamento_id = cursor.lastrowid
+
+        # Insere ingressos
+        for assento in assentos_lista:
+            sql_ingresso = """
+                INSERT INTO Ingresso (numero_assento, fk_Pagamento_id, fk_sessao_id)
+                VALUES (%s, %s, %s)
+            """
+            valores_ingresso = (assento, pagamento_id, sessao_id)
+            cursor.execute(sql_ingresso, valores_ingresso)
+
+        conexao.commit()
+
+        return JSONResponse({"success": True, "message": "Pagamento processado com sucesso!"}, status_code=200)
+
+    except Exception as e:
+        print(f"Erro no processamento do pagamento: {e}")
+        return JSONResponse({"success": False, "message": "Erro ao processar pagamento."}, status_code=500)
+    
+    finally:
+        if conexao and conexao.is_connected():
+            cursor.close()
+            conexao.close()
+
+@app.get("/sessoes/{filme_id}")
+async def sessoes_filme_page(request: Request, filme_id: int):
+    # Verifica se o usuário está logado
+    usuario_logado = request.cookies.get("usuario_cpf")
+    if not usuario_logado:
+        return RedirectResponse(url="/login", status_code=303)
+
+    # Buscar informações do filme na API do TMDB
+    url_filme = f"https://api.themoviedb.org/3/movie/{filme_id}?api_key={API_KEY}&language=pt-BR"
+    async with httpx.AsyncClient(verify=False) as client:
+        resposta = await client.get(url_filme)
+        filme_dados = resposta.json()
 
     return templates.TemplateResponse(
         request=request,
-        name="assentos.html",
-        context={"request": request}
+        name="sessoes.html",
+        context={"request": request, "filme": filme_dados, "filme_id": filme_id}
     )
+
+@app.get("/assentos")
+async def assentos_page(request: Request, sessao_id: int):
+    usuario_logado = request.cookies.get("usuario_cpf")
+    if not usuario_logado:
+        return RedirectResponse(url="/login", status_code=303)
+
+    conexao = obter_conexao()
+    if not conexao:
+        return templates.TemplateResponse(
+            request=request,
+            name="assentos.html",
+            context={"request": request, "sessao_id": sessao_id, "sessao_info": None}
+        )
+
+    try:
+        cursor = conexao.cursor(dictionary=True)
+        sql = """
+            SELECT s.id AS sessao_id,
+                   s.horario_inicio,
+                   s.dub_leg,
+                   sa.id AS sala_id,
+                   sa.qtde_assentos,
+                   f.nome AS filme_nome
+            FROM sessao s
+            JOIN Filme f ON s.fk_Filme_id = f.id
+            JOIN Sala sa ON s.fk_Sala_id = sa.id
+            WHERE s.id = %s
+        """
+        cursor.execute(sql, (sessao_id,))
+        sessao = cursor.fetchone()
+
+        if not sessao:
+            return RedirectResponse(url='/', status_code=303)
+
+        sessao_info = {
+            "sessao_id": sessao["sessao_id"],
+            "filme_nome": sessao["filme_nome"],
+            "sala_id": sessao["sala_id"],
+            "horario_str": sessao["horario_inicio"].strftime("%H:%M") if sessao["horario_inicio"] else "",
+            "data_str": sessao["horario_inicio"].strftime("%d/%m/%Y") if sessao["horario_inicio"] else "",
+            "tipo": "Dublado" if sessao["dub_leg"] == "DUB" else "Legendado",
+            "qtde_assentos": sessao["qtde_assentos"],
+        }
+
+        return templates.TemplateResponse(
+            request=request,
+            name="assentos.html",
+            context={"request": request, "sessao_id": sessao_id, "sessao_info": sessao_info}
+        )
+    finally:
+        if conexao.is_connected():
+            cursor.close()
+            conexao.close()
+
+@app.get("/api/assentos-ocupados/{sessao_id}")
+async def assentos_ocupados(sessao_id: int):
+    conexao = obter_conexao()
+    if not conexao:
+        return JSONResponse({"ocupados": []}, status_code=500)
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("SELECT numero_assento FROM Ingresso WHERE fk_sessao_id = %s", (sessao_id,))
+        rows = cursor.fetchall()
+        ocupados = [row[0] for row in rows]
+        return JSONResponse({"ocupados": ocupados})
+    finally:
+        if conexao.is_connected():
+            cursor.close()
+            conexao.close()
+
+@app.get("/api/sessoes-filme/{tmdb_id}")
+async def sessoes_filme(tmdb_id: int):
+    """
+    Recebe TMDB ID e retorna sessões do filme.
+    Primeiro tenta encontrar o filme no banco por tmdb_id.
+    Se não existir, cria um registro temporário.
+    """
+    conexao = obter_conexao()
+    if not conexao:
+        return JSONResponse({"erro": "Erro de conexão"}, status_code=500)
+    
+    try:
+        cursor = conexao.cursor(dictionary=True)
+        
+        # Verifica se o filme já existe no banco pelo tmdb_id
+        cursor.execute("SELECT id FROM Filme WHERE tmdb_id = %s", (tmdb_id,))
+        filme = cursor.fetchone()
+        
+        # Se não existe, cria um registro (será melhorado quando admin registrar manualmente)
+        if not filme:
+            cursor.execute(
+                "INSERT INTO Filme (tmdb_id, nome, duracao, descricao) VALUES (%s, %s, %s, %s)",
+                (tmdb_id, f"Filme {tmdb_id}", 0, "")
+            )
+            conexao.commit()
+            filme_id = cursor.lastrowid
+        else:
+            filme_id = filme['id']
+        
+        # Agora busca as sessões desse filme
+        sql = """
+            SELECT s.id, s.horario_inicio, s.dub_leg, 
+                   sa.id AS sala_id, sa.qtde_assentos,
+                   f.nome AS filme_nome
+            FROM sessao s
+            JOIN Filme f ON s.fk_Filme_id = f.id
+            JOIN Sala sa ON s.fk_Sala_id = sa.id
+            WHERE s.fk_Filme_id = %s AND s.horario_inicio > NOW()
+            ORDER BY s.horario_inicio
+        """
+        cursor.execute(sql, (filme_id,))
+        sessoes = cursor.fetchall()
+        
+        # Formatar datas
+        for sessao in sessoes:
+            if sessao.get("horario_inicio"):
+                sessao["horario_inicio"] = sessao["horario_inicio"].strftime("%Y-%m-%d %H:%M")
+        
+        return JSONResponse({"sessoes": sessoes})
+    finally:
+        if conexao.is_connected():
+            cursor.close()
+            conexao.close()

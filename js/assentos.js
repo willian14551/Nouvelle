@@ -1,22 +1,54 @@
 
 const PRECO_ASSENTO = 35.00;
-const LINHAS = 6;
 const COLUNAS = 10;
+let SESSAO_ID = window.SESSAO_ID || 0;
+let QTD_ASSENTOS = window.SESSAO_QTDE_ASSENTOS || 60;
+const SESSAO_FILME = document.body.dataset.sessaoFilme || '';
+const SESSAO_SALA = document.body.dataset.sessaoSala || '';
+const SESSAO_HORARIO = document.body.dataset.sessaoHorario || '';
+const SESSAO_DATA = document.body.dataset.sessaoData || '';
 const assentosSelecionados = new Set();
 
-// Simular assentos indisponíveis
-const indisponiveis = new Set(['A2', 'A3', 'B7', 'C4', 'C5', 'F2', 'F9']);
+// Assentos indisponíveis (serão carregados dinamicamente)
+let indisponiveis = new Set();
+
+// Função para carregar assentos ocupados da API
+async function carregarAssentosOcupados() {
+    // Usar sessao_id da variável global ou o valor armazenado em localStorage
+    const storedSessao = localStorage.getItem('sessaoSelecionada');
+    const sessaoId = SESSAO_ID || (storedSessao ? parseInt(storedSessao, 10) : 0);
+
+    if (!sessaoId) {
+        console.error('Sessão não especificada');
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/assentos-ocupados/${sessaoId}`);
+        const data = await response.json();
+        indisponiveis = new Set(data.ocupados || []);
+        gerarAssentos();
+    } catch (error) {
+        console.error('Erro ao carregar assentos ocupados:', error);
+        // Fallback: gerar assentos sem dados dinâmicos
+        gerarAssentos();
+    }
+}
 
 function gerarAssentos() {
     const container = document.getElementById('assentosGrid');
     container.innerHTML = '';
 
-    for (let i = 0; i < LINHAS; i++) {
-        const linha = String.fromCharCode(65 + i); // A, B, C, D, E, F
+    const totalAssentos = parseInt(QTD_ASSENTOS, 10) || 60;
+    const numLinhas = Math.ceil(totalAssentos / COLUNAS);
+    let assentosCriados = 0;
+
+    for (let i = 0; i < numLinhas; i++) {
+        const linha = String.fromCharCode(65 + i);
         const linhaDiv = document.createElement('div');
         linhaDiv.className = 'linha-assentos';
 
-        for (let j = 1; j <= COLUNAS; j++) {
+        for (let j = 1; j <= COLUNAS && assentosCriados < totalAssentos; j++) {
             const id = `${linha}${j}`;
             const assento = document.createElement('button');
             assento.className = 'assento';
@@ -32,6 +64,7 @@ function gerarAssentos() {
             }
 
             linhaDiv.appendChild(assento);
+            assentosCriados += 1;
         }
 
         container.appendChild(linhaDiv);
@@ -76,7 +109,7 @@ function atualizarResumo() {
 }
 
 document.getElementById('btnComprar').addEventListener('click', function(event) {
-    event.preventDefault(); // Impede a submissão padrão do formulário
+    event.preventDefault();
 
     if (assentosSelecionados.size > 0) {
         const assentos = Array.from(assentosSelecionados).sort();
@@ -99,10 +132,13 @@ document.getElementById('btnConfirmar').addEventListener('click', function() {
     // Salva dados no localStorage para a página de pagamento
     const assentos = Array.from(assentosSelecionados).sort();
     localStorage.setItem('assentosSelecionados', JSON.stringify(assentos));
-    localStorage.setItem('filmeSelecionado', 'Homem-Aranha: Sem Volta Para Casa');
-    localStorage.setItem('salaSelecionada', 'Sala 03');
-    localStorage.setItem('horarioSelecionado', '19:30');
-    localStorage.setItem('dataSelecionada', '15 de Abril, 2026');
+    if (SESSAO_ID) {
+        localStorage.setItem('sessaoSelecionada', SESSAO_ID);
+    }
+    if (SESSAO_FILME) localStorage.setItem('filmeSelecionado', SESSAO_FILME);
+    if (SESSAO_SALA) localStorage.setItem('salaSelecionada', SESSAO_SALA);
+    if (SESSAO_HORARIO) localStorage.setItem('horarioSelecionado', SESSAO_HORARIO);
+    if (SESSAO_DATA) localStorage.setItem('dataSelecionada', SESSAO_DATA);
 
     // Redireciona para a página de pagamento
     window.location.href = "/pagamento";
@@ -126,5 +162,20 @@ window.addEventListener('click', function(event) {
     }
 });
 
-// Inicializar
-gerarAssentos();
+// Inicializar após o DOM carregar
+document.addEventListener('DOMContentLoaded', function() {
+    SESSAO_ID = parseInt(document.body.dataset.sessaoId, 10) || 0;
+    QTD_ASSENTOS = parseInt(document.body.dataset.sessaoQtdeAssentos, 10) || 60;
+
+    const sessaoArmazenada = localStorage.getItem('sessaoSelecionada');
+    if (sessaoArmazenada && parseInt(sessaoArmazenada, 10) !== SESSAO_ID) {
+        localStorage.removeItem('assentosSelecionados');
+        localStorage.removeItem('filmeSelecionado');
+        localStorage.removeItem('salaSelecionada');
+        localStorage.removeItem('horarioSelecionado');
+        localStorage.removeItem('dataSelecionada');
+        localStorage.removeItem('sessaoSelecionada');
+    }
+
+    carregarAssentosOcupados();
+});

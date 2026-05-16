@@ -6,67 +6,115 @@ function carregarDadosCompra() {
     const salaArmazenada = localStorage.getItem('salaSelecionada');
     const horarioArmazenado = localStorage.getItem('horarioSelecionado');
     const dataArmazenada = localStorage.getItem('dataSelecionada');
-
+    const sessaoArmazenada = localStorage.getItem('sessaoSelecionada');
+    // Preencha os campos visíveis e hidden mesmo se os assentos não existirem
     if (assentosArmazenados) {
-        const assentos = JSON.parse(assentosArmazenados);
-        const quantidade = assentos.length;
-        const total = quantidade * 35.00;
+        try {
+            const assentos = JSON.parse(assentosArmazenados);
+            const quantidade = assentos.length;
+            const total = quantidade * 35.00;
 
-        // Atualiza a interface com dados reais
-        document.getElementById('assentosSelecionados').textContent = assentos.join(', ');
-        document.getElementById('qtdAssentosFinal').textContent = quantidade;
-        document.getElementById('totalFinal').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+            document.getElementById('assentosSelecionados').textContent = assentos.join(', ');
+            document.getElementById('qtdAssentosFinal').textContent = quantidade;
+            document.getElementById('totalFinal').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+            document.getElementById('assentosHidden').value = JSON.stringify(assentos);
+        } catch (e) {
+            console.error('Erro ao parsear assentos armazenados', e);
+        }
+    }
 
-        // Atualiza informações do filme se disponíveis
-        if (filmeArmazenado) {
-            document.querySelector('.info-item:nth-child(1) .valor').textContent = filmeArmazenado;
+    if (filmeArmazenado) {
+        document.getElementById('filmeSelecionado').textContent = filmeArmazenado;
+        document.getElementById('filmeHidden').value = filmeArmazenado;
+    }
+    if (salaArmazenada) {
+        document.getElementById('salaSelecionado').textContent = salaArmazenada;
+        document.getElementById('salaHidden').value = salaArmazenada;
+    }
+    if (horarioArmazenado) {
+        document.getElementById('horarioSelecionado').textContent = horarioArmazenado;
+        document.getElementById('horarioHidden').value = horarioArmazenado;
+    }
+    if (dataArmazenada) {
+        document.getElementById('dataSelecionado').textContent = dataArmazenada;
+        document.getElementById('dataHidden').value = dataArmazenada;
+    }
+    if (sessaoArmazenada) {
+        const sessaoElemento = document.getElementById('sessaoIdHidden');
+        if (sessaoElemento) {
+            sessaoElemento.value = String(sessaoArmazenada);
         }
-        if (salaArmazenada) {
-            document.querySelector('.info-item:nth-child(2) .valor').textContent = salaArmazenada;
-        }
-        if (horarioArmazenado) {
-            document.querySelector('.info-item:nth-child(3) .valor').textContent = horarioArmazenado;
-        }
-        if (dataArmazenada) {
-            document.querySelector('.info-item:nth-child(4) .valor').textContent = dataArmazenada;
-        }
+    }
+}
+
+function atualizarCamposMetodo() {
+    const metodo = document.querySelector('input[name="metodo_pagamento"]:checked').value;
+    const cartaoCampos = document.getElementById('cartaoCampos');
+    const pixCampo = document.getElementById('pixCampo');
+
+    if (metodo === 'PIX') {
+        cartaoCampos.style.display = 'none';
+        pixCampo.style.display = 'block';
     } else {
-        // Fallback para dados mockados se não houver dados armazenados
-        const assentosMock = ['A1', 'B3', 'C5'];
-        const quantidadeMock = assentosMock.length;
-        const totalMock = quantidadeMock * 35.00;
-
-        document.getElementById('assentosSelecionados').textContent = assentosMock.join(', ');
-        document.getElementById('qtdAssentosFinal').textContent = quantidadeMock;
-        document.getElementById('totalFinal').textContent = `R$ ${totalMock.toFixed(2).replace('.', ',')}`;
+        cartaoCampos.style.display = 'block';
+        pixCampo.style.display = 'none';
     }
 }
 
 // Validação do formulário de pagamento
 function validarFormulario() {
-    const campos = [
-        { id: 'nomeCartao', nome: 'Nome no Cartão' },
-        { id: 'numeroCartao', nome: 'Número do Cartão' },
-        { id: 'validade', nome: 'Validade' },
-        { id: 'cvv', nome: 'CVV' },
-        { id: 'email', nome: 'E-mail' }
-    ];
-
+    const metodo = document.querySelector('input[name="metodo_pagamento"]:checked').value;
     let valido = true;
     let mensagensErro = [];
 
-    campos.forEach(campo => {
-        const elemento = document.getElementById(campo.id);
-        const valor = elemento.value.trim();
+    const emailElemento = document.getElementById('email');
+    const emailValor = emailElemento.value.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-        if (!valor) {
+    if (!emailValor) {
+        valido = false;
+        mensagensErro.push('E-mail é obrigatório');
+        emailElemento.style.borderColor = '#ff4444';
+    } else if (!emailRegex.test(emailValor)) {
+        valido = false;
+        mensagensErro.push('E-mail inválido');
+        emailElemento.style.borderColor = '#ff4444';
+    } else {
+        emailElemento.style.borderColor = '#555';
+    }
+
+    if (metodo === 'PIX') {
+        const pixKey = document.getElementById('pixKey');
+        const pixValor = pixKey.value.trim();
+
+        if (!pixValor) {
             valido = false;
-            mensagensErro.push(`${campo.nome} é obrigatório`);
-            elemento.style.borderColor = '#ff4444';
+            mensagensErro.push('Chave PIX é obrigatória para PIX');
+            pixKey.style.borderColor = '#ff4444';
         } else {
+            pixKey.style.borderColor = '#555';
+        }
+    } else {
+        const camposCartao = [
+            { id: 'nomeCartao', nome: 'Nome no Cartão' },
+            { id: 'numeroCartao', nome: 'Número do Cartão' },
+            { id: 'validade', nome: 'Validade' },
+            { id: 'cvv', nome: 'CVV' }
+        ];
+
+        camposCartao.forEach(campo => {
+            const elemento = document.getElementById(campo.id);
+            const valor = elemento.value.trim();
+
+            if (!valor) {
+                valido = false;
+                mensagensErro.push(`${campo.nome} é obrigatório`);
+                elemento.style.borderColor = '#ff4444';
+                return;
+            }
+
             elemento.style.borderColor = '#555';
 
-            // Validações específicas
             if (campo.id === 'numeroCartao') {
                 const numeroLimpo = valor.replace(/\s/g, '');
                 if (!/^\d{16}$/.test(numeroLimpo)) {
@@ -91,17 +139,8 @@ function validarFormulario() {
                     elemento.style.borderColor = '#ff4444';
                 }
             }
-
-            if (campo.id === 'email') {
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(valor)) {
-                    valido = false;
-                    mensagensErro.push('E-mail inválido');
-                    elemento.style.borderColor = '#ff4444';
-                }
-            }
-        }
-    });
+        });
+    }
 
     return { valido, mensagensErro };
 }
@@ -147,32 +186,101 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('validade').addEventListener('input', formatarValidade);
     document.getElementById('cvv').addEventListener('input', limitarCVV);
 
+    document.querySelectorAll('input[name="metodo_pagamento"]').forEach(radio => {
+        radio.addEventListener('change', atualizarCamposMetodo);
+    });
+    atualizarCamposMetodo();
+    window.addEventListener('pageshow', atualizarCamposMetodo);
+    setTimeout(atualizarCamposMetodo, 0);
+
     // Submissão do formulário
-    document.getElementById('formPagamento').addEventListener('submit', function(event) {
+    document.getElementById('formPagamento').addEventListener('submit', async function(event) {
         event.preventDefault();
 
         const validacao = validarFormulario();
 
-        if (validacao.valido) {
-            // Mostra modal de sucesso
-            document.getElementById('modalTitle').textContent = 'Pagamento Confirmado';
-            document.getElementById('SmodalMessage').textContent = 'Pagamento processado com sucesso!\n\nUm comprovante foi enviado para seu e-mail.';
-            document.getElementById('btnModalAction').textContent = 'Voltar ao Início';
-            document.getElementById('modalConfirmacao').style.display = 'block';
-
-            // Limpa localStorage após confirmação
-            localStorage.removeItem('assentosSelecionados');
-            localStorage.removeItem('filmeSelecionado');
-            localStorage.removeItem('salaSelecionada');
-            localStorage.removeItem('horarioSelecionado');
-            localStorage.removeItem('dataSelecionada');
-        } else {
-            // Mostra modal de erro
+        if (!validacao.valido) {
             document.getElementById('modalTitle').textContent = 'Erro na Validação';
             document.getElementById('modalMessage').textContent = 'Por favor, corrija os seguintes erros:\n\n' + validacao.mensagensErro.join('\n');
             document.getElementById('btnModalAction').textContent = 'OK';
             document.getElementById('modalConfirmacao').style.display = 'block';
+            return;
+        }
+
+        const form = event.target;
+
+        // Ensure hidden fields are populated from localStorage before submitting
+        if (!document.getElementById('sessaoIdHidden').value) {
+            const s = localStorage.getItem('sessaoSelecionada');
+            if (s) document.getElementById('sessaoIdHidden').value = s;
+        }
+        if (!document.getElementById('filmeHidden').value) {
+            const f = localStorage.getItem('filmeSelecionado');
+            if (f) document.getElementById('filmeHidden').value = f;
+        }
+        if (!document.getElementById('salaHidden').value) {
+            const sa = localStorage.getItem('salaSelecionada');
+            if (sa) document.getElementById('salaHidden').value = sa;
+        }
+        if (!document.getElementById('horarioHidden').value) {
+            const h = localStorage.getItem('horarioSelecionado');
+            if (h) document.getElementById('horarioHidden').value = h;
+        }
+        if (!document.getElementById('dataHidden').value) {
+            const d = localStorage.getItem('dataSelecionada');
+            if (d) document.getElementById('dataHidden').value = d;
+        }
+
+        // Always ensure the hidden session id is synced with localStorage
+        const sessaoArmazenada = localStorage.getItem('sessaoSelecionada');
+        if (sessaoArmazenada) {
+            document.getElementById('sessaoIdHidden').value = sessaoArmazenada;
+        }
+
+        const formData = new FormData(form);
+
+        // Client-side check: sessao_id must be present
+        const sessaoIdValue = formData.get('sessao_id');
+        if (!sessaoIdValue) {
+            document.getElementById('modalTitle').textContent = 'Erro';
+            document.getElementById('modalMessage').textContent = 'Sessão não informada.';
+            document.getElementById('btnModalAction').textContent = 'OK';
             document.getElementById('modalConfirmacao').style.display = 'block';
+            return;
+        }
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData
+            });
+
+            const resultado = await response.json();
+
+            if (response.ok && resultado.success) {
+                document.getElementById('modalTitle').textContent = 'Pagamento Confirmado';
+                document.getElementById('modalMessage').textContent = resultado.message || 'Pagamento processado com sucesso!';
+                document.getElementById('btnModalAction').textContent = 'Voltar ao Início';
+                document.getElementById('modalConfirmacao').style.display = 'block';
+
+                // Limpa localStorage após confirmação ser exibida
+                localStorage.removeItem('assentosSelecionados');
+                localStorage.removeItem('filmeSelecionado');
+                localStorage.removeItem('salaSelecionada');
+                localStorage.removeItem('horarioSelecionado');
+                localStorage.removeItem('dataSelecionada');
+            } else {
+                document.getElementById('modalTitle').textContent = 'Erro';
+                document.getElementById('modalMessage').textContent = resultado.message || 'Não foi possível processar o pagamento.';
+                document.getElementById('btnModalAction').textContent = 'OK';
+                document.getElementById('modalConfirmacao').style.display = 'block';
+            }
+        } catch (error) {
+            document.getElementById('modalTitle').textContent = 'Erro';
+            document.getElementById('modalMessage').textContent = 'Não foi possível comunicar com o servidor. Tente novamente.';
+            document.getElementById('btnModalAction').textContent = 'OK';
+            document.getElementById('modalConfirmacao').style.display = 'block';
+            console.error('Erro no fetch de pagamento:', error);
         }
     });
 });
