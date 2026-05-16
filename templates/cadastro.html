@@ -7,6 +7,7 @@
     <title>Nouvelle - Cadastro</title>
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/cadastro.css">
+    <link rel="stylesheet" href="/css/loginCadastro.css">
 </head>
 <body>
     <nav class="menu">
@@ -26,65 +27,98 @@
             <li><a class="menuFilmesCartaz" href="/filmesCartaz">Filmes em Cartaz</a></li>      
             <li><a class="menuEmBreve" href="/emBreve">Em Breve</a></li> 
         </ul>
+        
         <ul class="menu-login">
             {% if request.cookies.get('usuario_nome') %}
-                <li><a id="menuPerfil" href="/perfil" >Olá, {{ request.cookies.get('usuario_nome').split()[0] }}</a></li>
+                {% if request.cookies.get('usuario_permissao') == 'ADMINISTRADOR' %}
+                    <li><a href="/admin" class="btn-admin">Painel Admin</a></li>
+                {% endif %}
+                
+                <li class="item-perfil-nav">
+                    <a id="menuPerfil" href="/perfil" >
+                        Olá, {{ request.cookies.get('usuario_nome').split()[0] }}
+                        <img src="/{{ request.cookies.get('usuario_caminho_final') }}" alt="Foto" class="foto-nav-mini">
+                    </a>
+                </li>
                 <li><a id="menuLogout" href="/logout" class="btn-entrar">Sair</a></li>
             {% else %}
-                <li><a id="menuLogin" href="/login" class="btn-entrar">Entrar</a></li>
-                <li><a id="menuCadastro" href="/cadastro" class="btn-cadastrar">Cadastrar</a></li>
+                <li><a href="/login" class="btn-entrar">Entrar</a></li>
+                <li><a href="/cadastro" class="btn-cadastrar">Cadastrar</a></li>
             {% endif %}
         </ul>
     </nav>
 
-
-    <main class="Local_logo"> <div class="Tamanho_Logo">
-            <img src="/assets/logo.png" alt="Logo Nouvelle">
+    <div id="divCadastro">
+        <div id="divLeft">
+            <div class="tamanho_logo">
+                <img src="assets/logo.png" alt="Logo Nouvelle">
+            
+                {% if mensagem %}
+                    <h2 class="mensagem_erro">
+                        {{ mensagem }}
+                    </h2>
+                {% endif %}
+            </div>
         </div>
+        
+        <div id="divRight"> 
+            <form action="/cadastrar" method="POST" id="formCadastro" enctype="multipart/form-data">
+                
+                <h1 class="tituloPagina">PÁGINA DE CADASTRO</h1>
 
-        <div class="Tamanho_Caixas_TXT"> 
-            <form action="/cadastrar" method="POST" id="formCadastro">
+                <div class="divFotoPerfil">
+                    <div id="container-preview">
+                        <img id="preview-img" src="/assets/fotoPerfilDefault.png" alt="Foto de Perfil">
+                    </div>
+                    <div id="container-btnImg">
+                        <h4>FOTO DE PERFIL:</h4>
+                        <p id="nomeArquivo"></p>
+                        <label for="btnAddFoto" class="botao-upload">Selecionar Imagem</label>
+                        <input type="file" name="foto_perfil" id="btnAddFoto" class="selecionarImagemPerfil" accept="image/*">
+                    </div>
+                </div>
                 
                 <div class="login_senha_caixas"> 
+                    <h4>CPF:</h4>
                     <input type="text" name="cpf" id="cpf" placeholder="CPF (000.000.000-00)" maxlength="14" required>
                     <small id="erroCpf" style="color: #F0AD12; display: none; font-weight: bold;">CPF inválido!</small>
                 </div>
                 
-                <div class="login_senha_caixas"> 
+                <div class="login_senha_caixas">
+                    <h4>NOME COMPLETO:</h4> 
                     <input type="text" name="nome" id="Nome" placeholder="Nome completo" required>
                 </div>
                 
-                <div class="login_senha_caixas"> 
+                <div class="login_senha_caixas">
+                    <h4>E-MAIL:</h4> 
                     <input type="email" name="email" placeholder="Email" required>
                 </div>
                 
-                <div class="login_senha_caixas"> 
+                <div class="login_senha_caixas">
+                    <h4>TELEFONE:</h4> 
                     <input type="text" name="telefone" id="telefone" placeholder="Telefone (DD) 90000-0000" maxlength="15" required>
                     <small id="erroTelefone" style="color: #F0AD12; display: none; font-weight: bold;">Telefone inválido!</small>
                 </div>
                 
-                <div class="login_senha_caixas"> 
+                <div class="login_senha_caixas">
+                    <h4>DATA DE NASCIMENTO:</h4> 
                     <input type="date" name="data_nasc" id="data_nasc" style="color: #999;" required>
                 </div>
-                
-                <div class="login_senha_caixas"> 
+
+                <div class="login_senha_caixas">
+                    <h4>SENHA:</h4> 
                     <input type="password" name="senha" placeholder="Senha" required>
                 </div>
                 
                 <button type="submit" class="btn-login">Finalizar Cadastro</button>
 
-                <div class="utilidades_abaixo"> 
+                <div class="utilidades"> 
                     <a href="/login" class="link_login">Já tem uma conta? Faça login</a>
                 </div>
 
-                {% if mensagem %}
-                    <h2 style="color: rgb(255, 230, 0); margin-top: 15px; text-align: center;">{{ mensagem }}</h2>
-                {% endif %}
-
             </form>
         </div>
-
-    </main>
+    </div>
 
 <script src="/js/cadastro.js"></script>
 </body>

@@ -1,7 +1,8 @@
-# Importar as ferramentas
-# FastApi cria o servidor, enquanto o request lida com os pedidos de acessar o site
-
-from fastapi import FastAPI, Request
+'''
+Importar as ferramentas
+FastApi cria o servidor, enquanto o request lida com os pedidos de acessar o site
+'''
+from fastapi import FastAPI, Request, Form, File, UploadFile
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, Request, Form
@@ -12,6 +13,8 @@ import httpx
 import bcrypt
 import json
 import re
+import shutil
+import os
 
 # Variável que instância um objeto da classe FastApi, criando o app
 app = FastAPI()
@@ -53,8 +56,20 @@ async def home(request: Request):
         context={"request": request, "filmes": filmes_recentes}
     )
 
+# INATIVIDADE DO USUÁRIO
+@app.get("/logout")
+async def logout():
+    response = RedirectResponse(url="/login", status_code=303)
+    
+    # Remove todos os cookies que foram criados no login
+    response.delete_cookie("usuario_nome")
+    response.delete_cookie("usuario_cpf")
+    response.delete_cookie("usuario_foto")
+    
+    return response
+
 # Mostra para o js como buscar somente os 5 primeiros filmes
-@app.get("/api/filmes-lista")
+@app.get("/api/filmes-em-cartaz")
 async def pegar_lista():
     async with httpx.AsyncClient(verify=False) as client:
         resposta = await client.get(url)
@@ -192,7 +207,7 @@ async def processar_cadastro(
     telefone: str = Form(...),
     data_nasc: str = Form(...),
     senha: str = Form(...),
-    num_sorte: str = Form(...)
+    foto_perfil: UploadFile = File(None)
 ):
     # Validação de Idade
     # Convertemos a data que veio do formulário (string) para um objeto de data
@@ -213,6 +228,25 @@ async def processar_cadastro(
             context={"request": request, "mensagem": "Você precisa ter pelo menos 18 anos para se cadastrar."}
         )
 
+    caminho_final = "assets/fotoPerfilDefault.png"
+
+    # Verificação e salvamento da foto de perfil, se houver
+    if foto_perfil and foto_perfil.filename:
+        pasta_destino = os.path.join("assets", "uploads")
+        os.makedirs(pasta_destino, exist_ok=True)
+        
+        extensao = os.path.splitext(foto_perfil.filename)[1]
+        nome_arquivo = f"{cpf}{extensao}"
+
+        caminho_disco = os.path.join(pasta_destino, nome_arquivo)
+        
+        # Salva o arquivo
+        with open(caminho_disco, "wb") as buffer:
+            shutil.copyfileobj(foto_perfil.file, buffer)
+        
+        # Caminho que vai para o banco de dados
+        caminho_final = f"assets/uploads/{nome_arquivo}"
+
     bytes_senha = senha.encode('utf-8')
     salt = bcrypt.gensalt()
     senha_cripto = bcrypt.hashpw(bytes_senha, salt).decode('utf-8')
@@ -227,10 +261,10 @@ async def processar_cadastro(
         cursor = conexao.cursor()
 
         sql = """
-            INSERT INTO Usuario(cpf, nome, email, telefone, data_nasc, senha, num_sorte)
+            INSERT INTO Usuario(cpf, nome, email, telefone, data_nasc, senha, caminho_final)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
-        valores = (cpf, nome, email, telefone, data_nasc, senha_cripto, num_sorte)
+        valores = (cpf, nome, email, telefone, data_nasc, senha_cripto, caminho_final)
 
         cursor.execute(sql, valores)
         conexao.commit()
@@ -277,7 +311,7 @@ async def processar_login(
     try:
         cursor = conexao.cursor(dictionary=True) # O Dictionary faz o MySql devolver os dados com os nomes das colunas
 
-        sql = "Select cpf, nome, senha, permissao FROM Usuario WHERE email = %s"
+        sql = "Select cpf, nome, senha, permissao, caminho_final FROM Usuario WHERE email = %s"
         cursor.execute(sql, (email,))
         usuario = cursor.fetchone()
 
@@ -292,7 +326,7 @@ async def processar_login(
         bytes_senha_banco = usuario['senha'].encode('utf-8')
 
         senha_valida = bcrypt.checkpw(bytes_senha_digitada, bytes_senha_banco)
-        
+
         if not senha_valida:
             return templates.TemplateResponse(
                 request=request,
@@ -305,6 +339,8 @@ async def processar_login(
         resposta.set_cookie(key="usuario_cpf", value=usuario['cpf'])
         resposta.set_cookie(key="usuario_permissao", value=usuario['permissao'])
 
+        resposta.set_cookie(key="senha_usuario", value=usuario['senha'])
+        resposta.set_cookie(key="usuario_caminho_final", value=usuario['caminho_final'])
         return resposta
     except Exception as e:
         print(f"Erro no Login: {e}")
@@ -332,7 +368,8 @@ async def logout():
 @app.get("/admin")
 async def painel_admin(request: Request):
     if not _is_admin(request):
-        return RedirectResponse(url="/", status_code=303)
+        return RedirectResponse(url="/login", status_code=303)
+
     return templates.TemplateResponse(
         request=request,
         name="admin.html",
@@ -346,7 +383,7 @@ async def painel_admin(request: Request):
 @app.get("/api/admin/salas")
 async def listar_salas(request: Request):
     if not _is_admin(request):
-        return JSONResponse({"erro": "Acesso negado"}, status_code=403)
+        return JSONResponse({"erro": "Acesso negado"}, status_code=403)    
     conexao = obter_conexao()
     if not conexao:
         return JSONResponse({"erro": "Erro de conexão"}, status_code=500)
@@ -765,8 +802,6 @@ async def listar_assentos_sessao(request: Request, sessao_id: int):
             conexao.close()
 
 
-#  CRUD de Ingressos (para o admin listar e cancelar os ingressos vendidos do cinema)
-
 # CRUD de Ingresssos - Get (para listar os ingressos vendidos, mostrando o número do assento, nome do usuário, cpf, email, nome do filme, horário da sessão, sala, se é dub ou leg, 
 # valor total pago, status do pagamento e método de pagamento)
 @app.get("/api/admin/ingressos")
@@ -1013,7 +1048,7 @@ async def carregar_perfil(request: Request):
     cpf_logado = request.cookies.get("usuario_cpf")
 
     if not cpf_logado:
-        return RedirectResponse(url="/login.html", status_code=303)
+        return RedirectResponse(url="/login", status_code=303)
     
     conexao = obter_conexao()
     if not conexao:
@@ -1023,7 +1058,7 @@ async def carregar_perfil(request: Request):
         cursor = conexao.cursor(dictionary=True)
 
         # Aqui a parte do READ do CRUD
-        sql = "SELECT cpf, nome, email, telefone, data_nasc, num_sorte FROM Usuario WHERE cpf = %s"
+        sql = "SELECT cpf, nome, email, telefone, data_nasc FROM Usuario WHERE cpf = %s"
         cursor.execute(sql, (cpf_logado,))
         usuario_dados = cursor.fetchone()
 
@@ -1051,7 +1086,6 @@ async def atualizar_perfil(
     data_nasc: str = Form(...)
 ):
     cpf_logado = request.cookies.get("usuario_cpf")
-
     if not cpf_logado:
         return RedirectResponse(url="/login", status_code=303)
     
@@ -1071,15 +1105,16 @@ async def atualizar_perfil(
         cursor.execute(sql_update, (nome, email, telefone, data_nasc, cpf_logado))
         conexao.commit()
 
-        cursor.execute("SELECT cpf, nome, email, telefone, data_nasc, num_sorte FROM Usuario WHERE cpf = %s", (cpf_logado,))
+        cursor.execute("SELECT cpf, nome, email, telefone, data_nasc FROM Usuario WHERE cpf = %s", (cpf_logado,))
         usuario_atualizado = cursor.fetchone()
 
+        resposta = RedirectResponse(url="/perfil", status_code=303)
         resposta = templates.TemplateResponse(
             request = request,
             name = "perfil.html",
             context = {"request": request, "usuario": usuario_atualizado, "mensagem": "Dados atualizados com sucesso!"}
         )
-
+        
         resposta.set_cookie(key="usuario_nome", value = nome)
 
         return resposta
@@ -1093,6 +1128,74 @@ async def atualizar_perfil(
         if conexao and conexao.is_connected():
             cursor.close()
             conexao.close()
+
+@app.post("/atualizar_foto_perfil")
+async def atualizar_foto_perfil(
+    request: Request,
+    excluir_foto: str = Form(None),
+    foto_perfil: UploadFile = File(None)
+):
+    cpf_logado = request.cookies.get("usuario_cpf")
+    if not cpf_logado:
+        return RedirectResponse(url="/login", status_code=303)
+    
+    conexao = obter_conexao()
+    if not conexao:
+        return RedirectResponse(url="/", status_code=303)
+    
+    # Caso o usuário enviou uma NOVA FOTO
+    elif foto_perfil and foto_perfil.filename:
+        os.makedirs("assets/uploads", exist_ok=True)
+        extensao = os.path.splitext(foto_perfil.filename)[1]
+        nome_arquivo = f"{cpf_logado}{extensao}"
+        caminho_disco = os.path.join("assets/uploads", nome_arquivo)
+        
+        with open(caminho_disco, "wb") as buffer:
+            shutil.copyfileobj(foto_perfil.file, buffer)
+        
+        caminho_foto = f"assets/uploads/{nome_arquivo}"
+
+    # Caso o usuário clicou em EXCLUIR
+    if excluir_foto == "true":
+        caminho_foto = "assets/fotoPerfilDefault.png"
+
+
+    try:
+        cursor = conexao.cursor(dictionary=True)
+
+        # Aqui que rola o update
+        sql_update = """
+            UPDATE Usuario
+            SET caminho_final = %s
+            WHERE cpf = %s
+        """
+        cursor.execute(sql_update, (caminho_foto, cpf_logado))
+        conexao.commit()
+
+        cursor.execute("SELECT cpf FROM Usuario WHERE cpf = %s", (cpf_logado,))
+        usuario_atualizado = cursor.fetchone()
+
+        resposta = RedirectResponse(url="/perfil", status_code=303)
+        resposta = templates.TemplateResponse(
+            request = request,
+            name = "perfil.html",
+            context = {"request": request, "usuario": usuario_atualizado, "mensagem": "Imagem de perfil atualizada com sucesso!"}
+        )
+        
+        resposta.set_cookie(key="usuario_caminho_final", value=caminho_foto)
+
+        return resposta
+    
+    except Exception as e:
+        print(f"Erro ao atualizar: {e}")
+
+        return RedirectResponse(url="perfil", status_code=303)
+    
+    finally:
+        if conexao and conexao.is_connected():
+            cursor.close()
+            conexao.close()
+
 
 # Crud de Perfil - Delete (para deletar a conta do usuário, informando o cpf)
 @app.post("/deletar_conta")
@@ -1121,7 +1224,7 @@ async def deletar_conta(request: Request):
     except Exception as e:
         print(f"Erro ao deletar conta: {e}")
 
-        cursor.execute("SELECT cpf, nome, email, telefone, data_nasc, num_sorte FROM Usuario WHERE cpf = %s", (cpf_logado,))
+        cursor.execute("SELECT cpf, nome, email, telefone, data_nasc FROM Usuario WHERE cpf = %s", (cpf_logado,))
         usuario_atualizado = cursor.fetchone()
 
         return templates.TemplateResponse(
@@ -1143,6 +1246,14 @@ async def deletar_conta(request: Request):
 # Crud de Pagamentos - Get (para mostrar a página de pagamento, onde o usuário escolhe o método de pagamento, vê o resumo da compra e confirma a compra do ingresso)
 @app.get("/pagamento")
 async def pagamento(request: Request):
+    # Verifica se o usuário tem o cookie de CPF (ou seja, se está logado)
+    usuario_logado = request.cookies.get("usuario_cpf")
+
+    if not usuario_logado:
+        # Se não estiver logado, redireciona para a página de login
+        # Você pode passar um parâmetro 'proxima' para voltar aqui depois do login
+        return RedirectResponse(url="/login", status_code=303)
+
     return templates.TemplateResponse(
         request=request,
         name="pagamento.html",

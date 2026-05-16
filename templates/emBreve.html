@@ -6,6 +6,7 @@
     <link rel="shortcut icon" href="/assets/miniLogo.png" type="image/x-icon">
     <title>Nouvelle - Em Breve</title>
     <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/filmesBreveCartaz.css">
     <link rel="stylesheet" href="/css/emBreve.css">
 </head>
 <body>
@@ -32,18 +33,31 @@
                     <li><a href="/admin" class="btn-admin">Painel Admin</a></li>
                 {% endif %}
                 
-                <li><a id="menuPerfil" href="/perfil" >Olá, {{ request.cookies.get('usuario_nome').split()[0] }}</a></li>
+                <li class="item-perfil-nav">
+                    <a id="menuPerfil" href="/perfil" >
+                        Olá, {{ request.cookies.get('usuario_nome').split()[0] }}
+                        <img src="/{{ request.cookies.get('usuario_caminho_final') }}" alt="Foto" class="foto-nav-mini">
+                    </a>
+                </li>
                 <li><a id="menuLogout" href="/logout" class="btn-entrar">Sair</a></li>
             {% else %}
-                <li><a id="menuLogin" href="/login" class="btn-entrar">Entrar</a></li>
-                <li><a id="menuCadastro" href="/cadastro" class="btn-cadastrar">Cadastrar</a></li>
+                <li><a href="/login" class="btn-entrar">Entrar</a></li>
+                <li><a href="/cadastro" class="btn-cadastrar">Cadastrar</a></li>
             {% endif %}
         </ul>
     </nav>
 
-    <main class="conteudo-principal">
-        <h2 style="color: white; text-align: center; margin-top: 30px; font-size: 2rem;">Em Breve</h2>
-        
+    <center id="corpoTabela">
+        <!-- Caixa de Pesquisa -->
+        <div class="search-box">
+            <input type="text" id="inputBuscar" placeholder="Buscar..">
+            <button id="btnBuscar">🔍︎</button><!-- LINK PARA A LUPA EM TXT => "https://www.emojiall.com/pt/code/1F50D-FE0E" -->
+        </div>
+
+        <h2 class="tituloPag">EM BREVE</h2>
+        <h1 class="msgErro"></h1>
+        <h1 class="msgErro1"></h1>
+
         <div class="gradeFilmes" id="corpoTabela">
             {% for filme in filmes %}
             <div class="cardFilme">
@@ -56,7 +70,7 @@
             </div>
             {% endfor %}
         </div>
-    </main>
+    </center>
 
     <script src="/js/emBreve.js"></script>
 </body>

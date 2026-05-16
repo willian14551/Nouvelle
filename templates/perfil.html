@@ -32,7 +32,12 @@
                     <li><a href="/admin" class="btn-admin">Painel Admin</a></li>
                 {% endif %}
                 
-                <li><a id="menuPerfil" href="/perfil" >Olá, {{ request.cookies.get('usuario_nome').split()[0] }}</a></li>
+                <li class="item-perfil-nav">
+                    <a id="menuPerfil" href="/perfil" >
+                        Olá, {{ request.cookies.get('usuario_nome').split()[0] }}
+                        <img src="/{{ request.cookies.get('usuario_caminho_final') }}" alt="Foto" class="foto-nav-mini">
+                    </a>
+                </li>
                 <li><a id="menuLogout" href="/logout" class="btn-entrar">Sair</a></li>
             {% else %}
                 <li><a id="menuLogin" href="/login" class="btn-entrar">Entrar</a></li>
@@ -41,15 +46,39 @@
         </ul>
     </nav>
 
-    <main class="Local_logo"> 
-        <div class="Tamanho_Logo">
-            <h1 style="color: #F0AD12; font-size: 40px; margin-bottom: 20px;">Meus Dados</h1>
-            <p>Aqui você pode atualizar suas informações ou excluir sua conta.</p>
-        </div>
+    <main class="main-perfil"> 
+        <div class="tamanho_logo">
+            <h1 class="tituloPerfil">Meus Dados</h1>
+            <p class="descricaoPerfil">Aqui você pode atualizar suas informações ou excluir sua conta.</p>
+
+            {% if mensagem %}
+                <p class="mensagem_erro">
+                    {{ mensagem }}
+                </p>
+            {% endif %}
+
+            <form action="/atualizar_foto_perfil" method="POST" id="formPerfil" enctype="multipart/form-data">
+                <div class="divFotoPerfil">
+                    <div id="container-preview">
+                        <img id="preview-img" src="/{{ request.cookies.get('usuario_caminho_final') }}" alt="Foto de Perfil">
+                    </div>
+
+                    <div class="botoes_nome_imagem">
+                        <label for="btnAddFoto" class="botao-upload">Alterar Imagem</label>
+                        <input type="file" name="foto_perfil" id="btnAddFoto" accept="image/*">
+                        <p id="nomeArquivo"></p>
+                    </div>
+                    
+                    {% if request.cookies.get('usuario_caminho_final') != 'assets/fotoPerfilDefault.png' %}
+                        <button type="submit" name="excluir_foto" value="true" class="btn-excluir-foto">Excluir Imagem</button>
+                    {% endif %}
+                </div>
+            </form>
+        </div> 
 
         <div class="Tamanho_Caixas_TXT"> 
-            <form action="/atualizar_perfil" method="POST" id="formPerfil">
-                
+            <form action="/atualizar_perfil" method="POST" id="formPerfil" enctype="multipart/form-data">
+
                 <div class="login_senha_caixas"> 
                     <label style="color: #F0AD12;">CPF (Não alterável):</label>
                     <input type="text" name="cpf" value="{{ usuario.cpf }}" readonly style="background-color: #222; color: #777;">
@@ -84,10 +113,9 @@
                 <button type="submit" class="btn-login" style="background-color: #8B0000; color: white;">Excluir Minha Conta</button>
             </form>
 
-            {% if mensagem %}
-                <p style="color: #F0AD12; margin-top: 15px; text-align: center;">{{ mensagem }}</p>
-            {% endif %}
+            
         </div>
     </main>
+<script src="/js/perfil.js"></script>
 </body>
 </html>

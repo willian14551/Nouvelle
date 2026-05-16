@@ -1,78 +1,57 @@
-#menuCadastro{
+/* INDICATIVO DA PÁGINA ATUAL NA BARRA DE NAVEGAÇÃO NO DESKTOP */
+.btn-cadastrar{
     text-shadow: 0 0 10px #f1c764;
 }
-.Local_logo {
-    flex: 1;
+
+/* ============================================= */
+/* IMAGEM DE PERFIL */
+.divFotoPerfil{
+    padding-bottom: 15px;
+}
+#container-preview{
+    display: block;
+    margin-top: 10px;
+    text-align: center;
+}
+#preview-img{
+    width: 150px;
+    height: 150px;
+    border-radius: 50% !important;
+    object-fit: cover;
+    border: 3px solid #F0AD12;
+}
+#nomeArquivo{
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
-    align-items: center;
-    gap: 80px;
-    padding: 40px;
-}
-
-.Tamanho_Logo {
-    flex: 0 1 450px;
-}
-
-.Tamanho_Logo img {
-    width: 100%;
-    height: auto;
-}
-
-.Tamanho_Caixas_TXT {
-    flex: 0 1 380px;
-}
-
-.login_senha_caixas {
-    margin-bottom: 15px;
-}
-
-.login_senha_caixas input {
-    width: 100%;
-    height: 50px;
-    background-color: #333;
-    border: none;
-    border-radius: 5px;
-    padding: 0 15px;
-    color: white;
-    font-size: 1rem;
-}
-
-.login_senha_caixas input:focus {
-    outline: 2px solid #F0AD12;
-}
-
-.btn-login {
-    width: 100%;
-    padding: 15px;
-    background-color: #141414;
-    color: white;
-    border: none;
-    border-radius: 5px;
+    color: #F0AD12;
     font-weight: bold;
+    text-decoration: underline;
+    margin: 10px;
+}
+
+/* BOTÃO DO ENVIO DA IMAGEM */
+.botao-upload {
+    background-color: #141414;
+    border-radius: 5px;
+    width: 100%;
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    display: inline-block;
+    padding: 15px;
     cursor: pointer;
+    box-sizing: border-box;
 }
-
-.btn-login:hover {
+.botao-upload:hover {
     background-color: #F0AD12;
-    color: #141414;
-    transition: all 0.3s ease;
+    color: #000;
+}
+#btnAddFoto{
+    display: none;
 }
 
-.utilidades_abaixo {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 15px;
-    font-size: 0.85rem;
-}
-
-.lembre_de_mim {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
+/* UTILIDADES */
 .link_login {
     color: #F0AD12;
     text-decoration: none;
@@ -80,16 +59,11 @@
     font-weight: bold;
 }
 
-main {
-    background-color: rgb(150, 28, 28);
-    padding: 40px;
-    border-radius: 10px;
-    width: 50%;
-    margin: 5% auto 0;
-}
-
+/* ============================================= */
+/* RESPONSIVIDADE PARA O CELULAR */
 @media (max-width: 768px) {
-    #menuCadastro{
+    /* INDICATIVO DA PÁGINA ATUAL NA BARRA DE NAVEGAÇÃO NO MOBILE */
+    .btn-cadastrar{
         display: block;
         max-width: 100%;
         border-bottom: 0;
@@ -98,6 +72,8 @@ main {
         background-color: rgb(114, 23, 23);
     }
 
+    /* ============================================= */
+    /* LOCAL DA LOGO */
     main {
         width: 90%;
         padding: 20px;
@@ -111,17 +87,24 @@ main {
         flex: 1 1 100%;
         width: 100%;
     }
+
+    /* ============================================= */
+    /* CAIXAS DE TEXTO (input) */
     .login_senha_caixas input {
         font-size: 30px;
         margin-bottom: 10px;
         height: 80px;
     }
+
+    /* BOTÃO DO ENVIO DA FORMULÁRIO */
     .btn-login{
         font-size: 30px;
         padding: 10px;
         margin-bottom: 20px;
     }
-    .utilidades_abaixo{
+
+    /* UTILIDADES */
+    .utilidades{
         display:grid;
         justify-content: center;
         align-items: center;

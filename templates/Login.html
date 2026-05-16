@@ -7,6 +7,7 @@
     <title>Nouvelle - Login</title>
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="/css/loginCadastro.css">
 </head>
 <body>
     <nav class="menu">
@@ -32,48 +33,60 @@
                     <li><a href="/admin" class="btn-admin">Painel Admin</a></li>
                 {% endif %}
                 
-                <li><a id="menuPerfil" href="/perfil" >Olá, {{ request.cookies.get('usuario_nome').split()[0] }}</a></li>
+                <li class="item-perfil-nav">
+                    <a id="menuPerfil" href="/perfil" >
+                        Olá, {{ request.cookies.get('usuario_nome').split()[0] }}
+                        <img src="/{{ request.cookies.get('usuario_caminho_final') }}" alt="Foto" class="foto-nav-mini">
+                    </a>
+                </li>
                 <li><a id="menuLogout" href="/logout" class="btn-entrar">Sair</a></li>
             {% else %}
-                <li><a id="menuLogin" href="/login" class="btn-entrar">Entrar</a></li>
-                <li><a id="menuCadastro" href="/cadastro" class="btn-cadastrar">Cadastrar</a></li>
+                <li><a href="/login" class="btn-entrar">Entrar</a></li>
+                <li><a href="/cadastro" class="btn-cadastrar">Cadastrar</a></li>
             {% endif %}
         </ul>
     </nav>
 
-    <div class="caixaLogin">
-        <main class="Local_logo">
-            <div class="Tamanho_Logo">
+    <div id="divLogin">
+        <div id="divLeft">
+            <div class="tamanho_logo">
                 <img src="assets/logo.png" alt="Logo Nouvelle">
-            </div>
-        </main>
-        
-        <form action="/login" method="POST" id="formLogin">
-            <div class="login_senha_caixas">
-                <input type="email" name="email" placeholder="E-mail" required>
-            </div>
-            <div class="login_senha_caixas">
-                <input type="password" name="senha" placeholder="Senha" required>
+
+                {% if mensagem %}
+                    <p class="mensagem_erro">
+                        {{ mensagem }}
+                    </p>
+                {% endif %}
             </div>
 
-            <button type="submit" class="btn-login">Entrar</button>
+        </div>
 
-            {% if mensagem %}
-                <p style="color: red; 
-                margin-top: 15px; 
-                text-align: center;">
-                {{ mensagem }}</p>
-            {% endif %}
+        <div id="divRight">
+            <form action="/login" method="POST" id="formLogin">
+                
+                <h1 class="tituloPagina">PÁGINA DE LOGIN</h1>
 
-            <div class="utilidades">
-                <div class="lembre_de_mim">
-                    <input type="checkbox" id="remember">
-                    <label for="remember">Lembre-se de mim</label>
+                <div class="login_senha_caixas">
+                    <h4>E-MAIL:</h4>
+                    <input type="email" name="email" placeholder="E-mail" required>
                 </div>
-                <a href="#" class="Qual_minha_senha">Esqueceu sua senha?</a>
-            </div>
-        </form>
-        
+                <div class="login_senha_caixas">
+                    <h4>SENHA:</h4>
+                    <input type="password" name="senha" placeholder="Senha" required>
+                </div>
+
+                <button type="submit" class="btn-login">Entrar</button>
+
+
+                <div class="utilidades">
+                    <div class="lembre_de_mim">
+                        <input type="checkbox" id="remember">
+                        <label for="remember">Lembre-se de mim</label>
+                    </div>
+                    <a href="#" class="qual_minha_senha">Esqueceu sua senha?</a>
+                </div>
+            </form> 
+        </div>
     </div>
     
 </body>

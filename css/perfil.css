@@ -1,41 +1,88 @@
-.Local_logo {
-    flex: 1;
+/* INDICATIVO DA PÁGINA ATUAL NA BARRA DE NAVEGAÇÃO NO DESKTOP */
+#menuPerfil{
+    text-shadow: 0 0 10px #f1c764;
+}
+
+/* ============================================= */
+/* MAIN DO PERFIL */
+.main-perfil {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     gap: 80px;
     padding: 40px;
 }
-
-.Tamanho_Logo {
+.tamanho_logo {
     flex: 0 1 450px;
+    position: sticky;
+    top: 180px;
+    align-self: flex-start;
+}
+.tituloPerfil{
+    color: #F0AD12;
+    font-size: 40px;
+    text-decoration: underline;
+    margin-bottom: 20px;
+}
+.descricaoPerfil {
+    color: white;
+    font-size: 18px;
+    margin-bottom: 30px;
+}
+.mensagem_erro {
+    color: red;
+    margin-top: 15px;
+    text-align: center;
+    font-size: 30px;
 }
 
+/* ============================================= */
+/* IMAGEM PERFIL */
+.divFotoPerfil{
+    display: flex;
+    align-items: center;
+}
+.divFotoPerfil label, .divFotoPerfil button {
+    flex: 1;            /* Faz os botões ocuparem o espaço restante */
+    margin-bottom: 5px; /* Espaçamento caso haja mais de um botão */
+}
+
+#preview-img{
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #F0AD12;
+}
+#nomeArquivo{
+    color: #F0AD12;
+    font-weight: bold;
+    text-decoration: underline;
+    margin-top: 20px;
+}
+
+/* BOTÕES IMAGEM */
+.botoes_nome_imagem{
+    margin-left: 50px;
+}
+
+/* ============================================= */
+/* CAIXAS DE TEXTO (input) */
+/* DIV DOS INPUTS */
 .Tamanho_Caixas_TXT {
     flex: 0 1 380px;
 }
 
-.login_senha_caixas {
-    margin-bottom: 15px;
+/* BOTÕES DA IMAGEM DE PERFIL */
+.btn-img-perfil-atualizar, .btn-img-perfil-excluir {
+    width: 60%;
+}
+#btnAddFoto{
+    display: none;
 }
 
-.login_senha_caixas input {
-    width: 100%;
-    height: 50px;
-    background-color: #333;
-    border: none;
-    border-radius: 5px;
-    padding: 0 15px;
-    color: white;
-    font-size: 1rem;
-}
-
-.login_senha_caixas input:focus {
-    outline: 2px solid #F0AD12;
-}
-
-/* --- BOTÕES --- */
-.btn-login {
+/* BOTÕES EM GERAL */
+.btn-login, .btn-img-perfil-atualizar, .btn-img-perfil-excluir, .botao-upload, .btn-excluir-foto {
     width: 100%;
     padding: 15px;
     background-color: #141414;
@@ -46,19 +93,39 @@
     cursor: pointer;
     transition: all 0.3s ease;
 }
-
-.btn-login:hover {
+.btn-login:hover, .btn-img-perfil-atualizar:hover, .btn-img-perfil-excluir:hover, .botao-upload:hover, .btn-excluir-foto:hover {
     background-color: #F0AD12;
     color: #141414;
 }
-
-/* --- ESTILOS EXCLUSIVOS DO PERFIL --- */
-.titulo-perfil {
-    color: #F0AD12;
-    font-size: 40px;
-    margin-bottom: 20px;
+.btn-atualizar {
+    margin-bottom: 15px;
+}
+.btn-excluir {
+    background-color: #8B0000;
+    color: white;
+}
+.btn-excluir:hover {
+    background-color: #ff3333;
+    color: white;
 }
 
+/* INPUT DAS INFORMAÇÕES */
+.login_senha_caixas {
+    margin-bottom: 15px;
+}
+.login_senha_caixas input {
+    width: 100%;
+    height: 50px;
+    background-color: #333;
+    border: none;
+    border-radius: 5px;
+    padding: 0 15px;
+    color: white;
+    font-size: 1rem;
+}
+.login_senha_caixas input:focus {
+    outline: 2px solid #F0AD12;
+}
 .input-bloqueado {
     background-color: #222 !important;
     color: #777 !important;
@@ -70,27 +137,11 @@
     margin: 20px 0;
 }
 
-.btn-atualizar {
-    margin-bottom: 15px;
-}
 
-.btn-excluir {
-    background-color: #8B0000;
-    color: white;
-}
-
-.btn-excluir:hover {
-    background-color: #ff3333;
-    color: white;
-}
-
-.mensagem-alerta {
-    color: #F0AD12;
-    margin-top: 15px;
-    text-align: center;
-}
-
+/* ============================================= */
+/* RESPONSIVIDADE PARA O CELULAR */
 @media (max-width: 768px) {
+    /* INDICATIVO DA PÁGINA ATUAL NA BARRA DE NAVEGAÇÃO NO MOBILE */
     #menuPerfil{
         display: block;
         max-width: 100%;
