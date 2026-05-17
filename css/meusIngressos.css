@@ -1,0 +1,80 @@
+.main-ingressos {
+    display: flex;
+    justify-content: center;
+    padding: 40px;
+}
+.conteudo-ingressos {
+    width: min(1120px, 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+.cabecalho-ingressos {
+    max-width: 760px;
+}
+.tituloPerfil {
+    color: #F0AD12;
+    font-size: 40px;
+    text-decoration: underline;
+    margin-bottom: 20px;
+}
+.descricaoPerfil {
+    color: white;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+.lista-ingressos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+}
+.btn-ingresso-item {
+    background: #111;
+    border: 1px solid #F0AD12;
+    color: #fff;
+    padding: 20px;
+    border-radius: 16px;
+    text-align: left;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+.btn-ingresso-item:hover {
+    transform: translateY(-2px);
+    background: rgba(240, 173, 18, 0.08);
+}
+.detalhes-ingresso {
+    background: #111;
+    border: 1px solid #F0AD12;
+    padding: 24px;
+    border-radius: 16px;
+    color: #fff;
+}
+.detalhes-ingresso h2 {
+    margin-top: 0;
+    margin-bottom: 16px;
+}
+.detalhes-ingresso p {
+    margin: 8px 0;
+    line-height: 1.5;
+}
+.sem-ingressos {
+    background: #111;
+    border: 1px solid #F0AD12;
+    padding: 24px;
+    border-radius: 16px;
+    color: #fff;
+    text-align: center;
+}
+.btn-voltar {
+    display: inline-block;
+    width: fit-content;
+    background-color: #333;
+}
+@media (max-width: 768px) {
+    .main-ingressos {
+        padding: 20px;
+    }
+    .lista-ingressos {
+        grid-template-columns: 1fr;
+    }
+}

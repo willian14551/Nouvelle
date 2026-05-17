@@ -1058,7 +1058,7 @@ async def carregar_perfil(request: Request):
         cursor = conexao.cursor(dictionary=True)
 
         # Aqui a parte do READ do CRUD
-        sql = "SELECT cpf, nome, email, telefone, data_nasc FROM Usuario WHERE cpf = %s"
+        sql = "SELECT cpf, nome, email, telefone, data_nasc, caminho_final FROM Usuario WHERE cpf = %s"
         cursor.execute(sql, (cpf_logado,))
         usuario_dados = cursor.fetchone()
 
@@ -1071,6 +1071,63 @@ async def carregar_perfil(request: Request):
     except Exception as e:
         print(f"Erro ao carregar perfil: {e}")
         return RedirectResponse(url="/", status_code=303)
+    finally:
+        if conexao and conexao.is_connected():
+            cursor.close()
+            conexao.close()
+
+@app.get("/meusIngressos")
+async def meus_ingressos(request: Request):
+    cpf_logado = request.cookies.get("usuario_cpf")
+    if not cpf_logado:
+        return RedirectResponse(url="/login", status_code=303)
+
+    conexao = obter_conexao()
+    if not conexao:
+        return RedirectResponse(url="/", status_code=303)
+
+    try:
+        cursor = conexao.cursor(dictionary=True)
+        sql = """
+            SELECT
+                i.id AS ingresso_id,
+                f.nome AS filme_nome,
+                se.horario_inicio,
+                se.dub_leg,
+                i.numero_assento,
+                p.valor_total,
+                p.metodo_pagamento,
+                p.status,
+                p.id AS pagamento_id,
+                sa.qtde_assentos AS sala_quantidade,
+                f.descricao AS filme_descricao
+            FROM Ingresso i
+            JOIN Pagamento p ON i.fk_Pagamento_id = p.id
+            JOIN sessao se ON i.fk_sessao_id = se.id
+            JOIN Filme f ON se.fk_Filme_id = f.id
+            JOIN Sala sa ON se.fk_Sala_id = sa.id
+            WHERE p.fk_Usuario_cpf = %s
+            ORDER BY se.horario_inicio DESC
+        """
+        cursor.execute(sql, (cpf_logado,))
+        ingressos = cursor.fetchall()
+
+        for ingresso in ingressos:
+            if ingresso.get("horario_inicio"):
+                ingresso["horario_inicio"] = ingresso["horario_inicio"].strftime("%Y-%m-%d %H:%M")
+            if ingresso.get("valor_total") is not None:
+                ingresso["valor_total"] = float(ingresso["valor_total"])
+
+        ingressos_json = json.dumps(ingressos, default=str, ensure_ascii=False)
+
+        return templates.TemplateResponse(
+            request=request,
+            name="meusIngressos.html",
+            context={"request": request, "ingressos": ingressos, "ingressos_json": ingressos_json}
+        )
+    except Exception as e:
+        print(f"Erro ao carregar meus ingressos: {e}")
+        return RedirectResponse(url="/perfil", status_code=303)
     finally:
         if conexao and conexao.is_connected():
             cursor.close()
@@ -1105,7 +1162,7 @@ async def atualizar_perfil(
         cursor.execute(sql_update, (nome, email, telefone, data_nasc, cpf_logado))
         conexao.commit()
 
-        cursor.execute("SELECT cpf, nome, email, telefone, data_nasc FROM Usuario WHERE cpf = %s", (cpf_logado,))
+        cursor.execute("SELECT cpf, nome, email, telefone, data_nasc, caminho_final FROM Usuario WHERE cpf = %s", (cpf_logado,))
         usuario_atualizado = cursor.fetchone()
 
         resposta = RedirectResponse(url="/perfil", status_code=303)
