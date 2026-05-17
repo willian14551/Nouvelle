@@ -47,7 +47,7 @@
     </ul>
   </nav>
 
-  <center id="corpoTabela">
+  <center>
     <!-- Caixa de Pesquisa -->
     <div class="search-box">
       <input type="text" id="inputBuscar" placeholder="Buscar..">
@@ -58,12 +58,12 @@
     <h1 class="msgErro"></h1>
     <h1 class="msgErro1"></h1>
 
-    <div class="gradeFilmes" id="corpoTabela">
+    <div class="gradeFilmes" id="gradeFilmes">
       {% for filme in filmes %}
       <div class="cardFilme">
         <a href="/detalhes/{{ filme.id }}">
           <img class="posterFilme" src="https://image.tmdb.org/t/p/w500{{ filme.poster_path }}" alt="{{ filme.title }}">
-          <strong id="tituloFilme">{{ filme.title }}</strong>
+          <strong class="tituloFilme">{{ filme.title }}</strong>
         </a>
       </div>
       {% endfor %}
