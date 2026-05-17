@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/assets/miniLogo.png" type="image/x-icon">
+    <title>Nouvelle - Meus Ingressos</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/perfil.css">
+    <link rel="stylesheet" href="/css/meusIngressos.css">
+</head>
+<body>
+    <nav class="menu">
+        <a href="/">
+            <img src="/assets/logo.png" alt="Nouvelle" width="200" height="100">
+        </a>
+
+        <input type="checkbox" id="menu-burguer">
+        <label for="menu-burguer" class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </label>
+
+        <ul class="menu-links">
+            <li><a href="/">Início</a></li>
+            <li><a href="/filmesCartaz">Filmes em Cartaz</a></li>
+            <li><a href="/emBreve">Em Breve</a></li>
+        </ul>
+        <ul class="menu-login">
+            {% if request.cookies.get('usuario_nome') %}
+                {% if request.cookies.get('usuario_permissao') == 'ADMINISTRADOR' %}
+                    <li><a href="/admin" class="btn-admin">Painel Admin</a></li>
+                {% endif %}
+                <li class="item-perfil-nav">
+                    <a id="menuPerfil" href="/perfil">
+                        Olá, {{ request.cookies.get('usuario_nome').split()[0] }}
+                        <img src="/{{ request.cookies.get('usuario_caminho_final') or 'assets/fotoPerfilDefault.png' }}" alt="Foto" class="foto-nav-mini">
+                    </a>
+                </li>
+                <li><a href="/logout" class="btn-entrar">Sair</a></li>
+            {% else %}
+                <li><a href="/login" class="btn-entrar">Entrar</a></li>
+                <li><a href="/cadastro" class="btn-cadastrar">Cadastrar</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <main class="main-ingressos">
+        <div class="conteudo-ingressos">
+            <div class="cabecalho-ingressos">
+                <h1 class="tituloPerfil">Meus Ingressos</h1>
+                <p class="descricaoPerfil">Selecione um ingresso para visualizar os detalhes da sua sessão.</p>
+            </div>
+
+            {% if ingressos %}
+                <div class="login_senha_caixas" style="margin-bottom: 20px;">
+                    <label style="color: #F0AD12; display: block; margin-bottom: 6px;">Escolha um ingresso:</label>
+                    <select id="ingresso-select" style="width: 100%; padding: 10px; border-radius: 8px; background: #111; color: #fff; border: 1px solid #333;">
+                        <option value="">-- Selecione um ingresso --</option>
+                        {% for ingresso in ingressos %}
+                            <option value="{{ ingresso.ingresso_id }}">Ingresso #{{ ingresso.ingresso_id }} - {{ ingresso.filme_nome }} - {{ ingresso.horario_inicio }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="lista-ingressos">
+                    {% for ingresso in ingressos %}
+                        <button type="button" class="btn-ingresso-item" data-id="{{ ingresso.ingresso_id }}">
+                            <strong>{{ ingresso.filme_nome }}</strong>
+                            <p>Ingresso #{{ ingresso.ingresso_id }}</p>
+                            <p>Assento: {{ ingresso.numero_assento or 'Não definido' }}</p>
+                            <p>Horário: {{ ingresso.horario_inicio }}</p>
+                        </button>
+                    {% endfor %}
+                </div>
+
+                <div id="detalhes-ingresso" class="detalhes-ingresso">
+                    <h2>Detalhes do ingresso</h2>
+                    <p>Selecione um ingresso para ver as informações completas.</p>
+                </div>
+
+                <script>
+                    window.meusIngressos = {{ ingressos_json | safe }};
+                </script>
+            {% else %}
+                <div class="sem-ingressos">
+                    <p>Você ainda não comprou ingressos.</p>
+                </div>
+            {% endif %}
+
+            <a href="/perfil" class="btn-login btn-voltar">Voltar ao Perfil</a>
+        </div>
+    </main>
+
+    <script src="/js/meusIngressos.js"></script>
+</body>
+</html>

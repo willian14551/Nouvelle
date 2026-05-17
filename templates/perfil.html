@@ -35,7 +35,7 @@
                 <li class="item-perfil-nav">
                     <a id="menuPerfil" href="/perfil" >
                         Olá, {{ request.cookies.get('usuario_nome').split()[0] }}
-                        <img src="/{{ request.cookies.get('usuario_caminho_final') }}" alt="Foto" class="foto-nav-mini">
+                        <img src="/{{ request.cookies.get('usuario_caminho_final') or usuario.caminho_final or 'assets/fotoPerfilDefault.png' }}" alt="Foto" class="foto-nav-mini">
                     </a>
                 </li>
                 <li><a id="menuLogout" href="/logout" class="btn-entrar">Sair</a></li>
@@ -60,7 +60,7 @@
             <form action="/atualizar_foto_perfil" method="POST" id="formPerfil" enctype="multipart/form-data">
                 <div class="divFotoPerfil">
                     <div id="container-preview">
-                        <img id="preview-img" src="/{{ request.cookies.get('usuario_caminho_final') }}" alt="Foto de Perfil">
+                        <img id="preview-img" src="/{{ request.cookies.get('usuario_caminho_final') or usuario.caminho_final or 'assets/fotoPerfilDefault.png' }}" alt="Foto de Perfil">
                     </div>
 
                     <div class="botoes_nome_imagem">
@@ -69,7 +69,7 @@
                         <p id="nomeArquivo"></p>
                     </div>
                     
-                    {% if request.cookies.get('usuario_caminho_final') != 'assets/fotoPerfilDefault.png' %}
+                    {% if (request.cookies.get('usuario_caminho_final') or usuario.caminho_final) != 'assets/fotoPerfilDefault.png' %}
                         <button type="submit" name="excluir_foto" value="true" class="btn-excluir-foto">Excluir Imagem</button>
                     {% endif %}
                 </div>
@@ -106,6 +106,8 @@
                 
                 <button type="submit" class="btn-login" style="margin-bottom: 15px;">Atualizar Dados</button>
             </form>
+
+            <a href="/meusIngressos" class="btn-login" style="display: inline-block; margin-bottom: 15px; background-color: #333;">Meus Ingressos</a>
 
             <hr style="border: 1px solid #333; margin: 20px 0;">
 
