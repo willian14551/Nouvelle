@@ -21,6 +21,9 @@ window.onload = async () => {
         });
 
         const inputBuscar = document.getElementById("inputBuscar");
+    const corpoTabela = document.getElementById("gradeFilmes");
+    const msgErro = document.querySelector('.msgErro');
+    const msgErro1 = document.querySelector('.msgErro1');
 
         function filtrarFilmes() {
             const termo = inputBuscar.value.toLowerCase();
@@ -49,8 +52,6 @@ window.onload = async () => {
                     corpoTabela.appendChild(divCard);
                 });
             } else {
-                msgErro = document.querySelector(".msgErro");
-                msgErro1 = document.querySelector(".msgErro1");
                 msgErro.textContent = "O filme '" + inputBuscar.value + "' ainda não está em exibição ou já saiu de cartaz.";
                 msgErro1.textContent = "Tente buscar outro filme.";
             }

@@ -4,7 +4,7 @@ window.onload = async () => {
     const btnBuscar = document.getElementById("btnBuscar");
     const msgErro = document.querySelector('.msgErro');
     const msgErro1 = document.querySelector('.msgErro1');
-    const corpoTabela = document.getElementById("corpoTabela");
+    const corpoTabela = document.getElementById("gradeFilmes");
 
     function renderFilmes(lista) {
         corpoTabela.innerHTML = "";

@@ -93,7 +93,7 @@
 .cardFilme a {
     text-decoration: none;
 }
-#tituloFilme {
+.tituloFilme {
     font-size: 14px;
     display: -webkit-box; /* Evita que títulos muito longos quebrem o layout */
     overflow: hidden;

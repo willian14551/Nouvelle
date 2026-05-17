@@ -47,7 +47,7 @@
         </ul>
     </nav>
 
-    <center id="corpoTabela">
+    <center>
         <!-- Caixa de Pesquisa -->
         <div class="search-box">
             <input type="text" id="inputBuscar" placeholder="Buscar..">
@@ -58,7 +58,7 @@
         <h1 class="msgErro"></h1>
         <h1 class="msgErro1"></h1>
 
-        <div class="gradeFilmes" id="corpoTabela">
+        <div class="gradeFilmes" id="gradeFilmes">
             {% for filme in filmes %}
             <div class="cardFilme">
                 <a href="/detalhes/{{ filme.id }}">
