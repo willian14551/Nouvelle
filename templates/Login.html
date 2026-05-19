@@ -9,6 +9,15 @@
     <link rel="stylesheet" href="css/login.css">
     <link rel="stylesheet" href="/css/loginCadastro.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/modal.css">
+    <style>
+        /* Asterisco vermelho nos campos obrigatórios */
+        .obrigatorio::after {
+            content: " *";
+            color: #e74c3c;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <nav class="menu">
@@ -53,13 +62,11 @@
             <div class="tamanho_logo">
                 <img src="assets/logo.png" alt="Logo Nouvelle">
 
+                <!-- Mensagem do servidor lida pelo JS e exibida via modal, sem quebrar o layout -->
                 {% if mensagem %}
-                    <p class="mensagem_erro">
-                        {{ mensagem }}
-                    </p>
+                    <span id="mensagemServidor" data-msg="{{ mensagem }}" style="display:none"></span>
                 {% endif %}
             </div>
-
         </div>
 
         <div id="divRight">
@@ -68,17 +75,16 @@
                 <h1 class="tituloPagina">PÁGINA DE LOGIN</h1>
 
                 <div class="login_senha_caixas">
-                    <h4>E-MAIL:</h4>
+                    <h4 class="obrigatorio">E-MAIL</h4>
                     <input type="email" name="email" placeholder="E-mail" required>
                 </div>
                 <div class="login_senha_caixas">
-                    <h4>SENHA:</h4>
+                    <h4 class="obrigatorio">SENHA</h4>
                     <input type="password" name="senha" id="senhaLogin" placeholder="Senha" required>
                     <i class="fa-solid fa-eye btn-toggle-password"></i>
                 </div>
 
                 <button type="submit" class="btn-login">Entrar</button>
-
 
                 <div class="utilidades">
                     <div class="lembre_de_mim">
@@ -91,6 +97,15 @@
         </div>
     </div>
     
-</body>
+<script src="/js/modal.js"></script>
 <script src="/js/login.js"></script>
+<script>
+    // Exibe a mensagem de erro do servidor via modal padronizado
+    // (o toggle de senha é tratado pelo login.js acima, sem duplicar aqui)
+    const msgEl = document.getElementById('mensagemServidor');
+    if (msgEl && msgEl.dataset.msg) {
+        mostrarAlerta('Atenção', msgEl.dataset.msg, 'erro');
+    }
+</script>
+</body>
 </html>

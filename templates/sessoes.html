@@ -7,12 +7,21 @@
     <title>Nouvelle - Sessões</title>
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/sessoes.css">
+    <link rel="stylesheet" href="/css/modal.css">
 </head>
 <body>
     <nav class="menu">
         <a href="/">
             <img src="/assets/logo.png" alt="Nouvelle" width="200" height="100">
         </a>
+
+        <!-- Checkbox e label do menu hamburguer — necessários para o CSS de responsividade do main.css -->
+        <input type="checkbox" id="menu-burguer">
+        <label for="menu-burguer" class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </label>
 
         <ul class="menu-links">
             <li><a href="/">Início</a></li>
@@ -26,7 +35,12 @@
                     <li><a href="/admin" class="btn-admin">Painel Admin</a></li>
                 {% endif %}
 
-                <li><a id="menuPerfil" href="/perfil" >Olá, {{ request.cookies.get('usuario_nome').split()[0] }}</a></li>
+                <li class="item-perfil-nav">
+                    <a id="menuPerfil" href="/perfil">
+                        Olá, {{ request.cookies.get('usuario_nome').split()[0] }}
+                        <img src="/{{ request.cookies.get('usuario_caminho_final') }}" alt="Foto" class="foto-nav-mini">
+                    </a>
+                </li>
                 <li><a id="menuLogout" href="/logout" class="btn-entrar">Sair</a></li>
             {% else %}
                 <li><a id="menuLogin" href="/login" class="btn-entrar">Entrar</a></li>
@@ -56,76 +70,65 @@
         <div class="sessoes-section">
             <h2>Escolha sua Sessão</h2>
             <div id="sessoes-list" class="sessoes-grid">
-                <!-- Sessões serão carregadas via JavaScript -->
                 <div class="loading">Carregando sessões...</div>
             </div>
         </div>
     </main>
 
-    <script>
-        const filmeId = {{ filme_id }};
+<script src="/js/modal.js"></script>
+<script>
+    const filmeId = {{ filme_id }};
 
-        async function carregarSessoes() {
-            try {
-                const response = await fetch(`/api/sessoes-filme/${filmeId}`);
-                const data = await response.json();
+    async function carregarSessoes() {
+        try {
+            const response = await fetch(`/api/sessoes-filme/${filmeId}`);
+            const data = await response.json();
+            const sessoesList = document.getElementById('sessoes-list');
 
-                const sessoesList = document.getElementById('sessoes-list');
-
-                if (data.sessoes && data.sessoes.length > 0) {
-                    sessoesList.innerHTML = data.sessoes.map(sessao => `
-                        <div class="sessao-card">
-                            <div class="sessao-info">
-                                <div class="sessao-data">${formatarData(sessao.horario_inicio)}</div>
-                                <div class="sessao-horario">${formatarHorario(sessao.horario_inicio)}</div>
-                                <div class="sessao-sala">Sala ${sessao.sala_id}</div>
-                                <div class="sessao-tipo">${sessao.dub_leg === 'DUB' ? 'Dublado' : 'Legendado'}</div>
-                            </div>
-                            <div class="sessao-acoes">
-                                <a href="/assentos?sessao_id=${sessao.id}" class="btn-sessao">Selecionar Assentos</a>
-                            </div>
+            if (data.sessoes && data.sessoes.length > 0) {
+                sessoesList.innerHTML = data.sessoes.map(sessao => `
+                    <div class="sessao-card">
+                        <div class="sessao-info">
+                            <div class="sessao-data">${formatarData(sessao.horario_inicio)}</div>
+                            <div class="sessao-horario">${formatarHorario(sessao.horario_inicio)}</div>
+                            <div class="sessao-sala">Sala ${sessao.sala_id}</div>
+                            <div class="sessao-tipo">${sessao.dub_leg === 'DUB' ? 'Dublado' : 'Legendado'}</div>
                         </div>
-                    `).join('');
-                } else {
-                    sessoesList.innerHTML = `
-                        <div class="sem-sessoes">
-                            <h3>Nenhuma sessão disponível</h3>
-                            <p>Não há sessões programadas para este filme no momento.</p>
-                            <a href="/" class="btn-voltar">Voltar ao Início</a>
+                        <div class="sessao-acoes">
+                            <a href="/assentos?sessao_id=${sessao.id}" class="btn-sessao">Selecionar Assentos</a>
                         </div>
-                    `;
-                }
-            } catch (error) {
-                console.error('Erro ao carregar sessões:', error);
-                document.getElementById('sessoes-list').innerHTML = `
-                    <div class="erro">
-                        <h3>Erro ao carregar sessões</h3>
-                        <p>Tente novamente mais tarde.</p>
+                    </div>
+                `).join('');
+            } else {
+                sessoesList.innerHTML = `
+                    <div class="sem-sessoes">
+                        <h3>Nenhuma sessão disponível</h3>
+                        <p>Não há sessões programadas para este filme no momento.</p>
+                        <a href="/" class="btn-voltar">Voltar ao Início</a>
                     </div>
                 `;
             }
+        } catch (error) {
+            console.error('Erro ao carregar sessões:', error);
+            // Usa modal para informar o erro ao usuário, seguindo o padrão da interface
+            mostrarAlerta('Erro', 'Não foi possível carregar as sessões. Tente novamente mais tarde.', 'erro');
+            document.getElementById('sessoes-list').innerHTML = '';
         }
+    }
 
-        function formatarData(dataStr) {
-            const data = new Date(dataStr);
-            return data.toLocaleDateString('pt-BR', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-        }
+    function formatarData(dataStr) {
+        const data = new Date(dataStr);
+        return data.toLocaleDateString('pt-BR', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+    }
 
-        function formatarHorario(dataStr) {
-            const data = new Date(dataStr);
-            return data.toLocaleTimeString('pt-BR', {
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }
+    function formatarHorario(dataStr) {
+        const data = new Date(dataStr);
+        return data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    }
 
-        // Carregar sessões quando a página carrega
-        document.addEventListener('DOMContentLoaded', carregarSessoes);
-    </script>
+    document.addEventListener('DOMContentLoaded', carregarSessoes);
+</script>
 </body>
 </html>

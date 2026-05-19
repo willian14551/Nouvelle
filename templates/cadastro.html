@@ -9,6 +9,23 @@
     <link rel="stylesheet" href="/css/cadastro.css">
     <link rel="stylesheet" href="/css/loginCadastro.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/modal.css">
+    <style>
+        /* Asterisco vermelho nos campos obrigatórios */
+        .obrigatorio::after {
+            content: " *";
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        /* Mensagem de erro inline abaixo do campo */
+        .msg-campo-erro {
+            color: #F0AD12;
+            font-size: 0.82rem;
+            font-weight: bold;
+            margin-top: 4px;
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <nav class="menu">
@@ -53,12 +70,16 @@
         <div id="divLeft">
             <div class="tamanho_logo">
                 <img src="assets/logo.png" alt="Logo Nouvelle">
-            
+
+                <!-- A mensagem do servidor é lida pelo cadastro.js e exibida via modal padronizado -->
                 {% if mensagem %}
-                    <h2 class="mensagem_erro">
-                        {{ mensagem }}
-                    </h2>
+                    <span id="mensagemServidor" data-msg="{{ mensagem }}" style="display:none"></span>
                 {% endif %}
+
+                <!-- Legenda explicando o asterisco de campos obrigatórios -->
+                <p style="font-size: 0.8rem; color: #aaa; margin-top: 16px;">
+                    Campos marcados com <span style="color:#e74c3c;font-weight:bold">*</span> são obrigatórios.
+                </p>
             </div>
         </div>
         
@@ -80,36 +101,48 @@
                 </div>
                 
                 <div class="login_senha_caixas"> 
-                    <h4>CPF:</h4>
-                    <input type="text" name="cpf" id="cpf" placeholder="CPF (000.000.000-00)" maxlength="14" required>
-                    <small id="erroCpf" style="color: #F0AD12; display: none; font-weight: bold;">CPF inválido!</small>
+                    <h4 class="obrigatorio">CPF</h4>
+                    <input type="text" name="cpf" id="cpf" placeholder="000.000.000-00" maxlength="14" required>
+                    <small id="erroCpf" class="msg-campo-erro">CPF inválido!</small>
                 </div>
                 
                 <div class="login_senha_caixas">
-                    <h4>NOME COMPLETO:</h4> 
+                    <h4 class="obrigatorio">NOME COMPLETO</h4>
                     <input type="text" name="nome" id="Nome" placeholder="Nome completo" required>
                 </div>
                 
                 <div class="login_senha_caixas">
-                    <h4>E-MAIL:</h4> 
-                    <input type="email" name="email" placeholder="Email" required>
+                    <h4 class="obrigatorio">E-MAIL</h4>
+                    <input type="email" name="email" placeholder="email@exemplo.com" required>
                 </div>
                 
                 <div class="login_senha_caixas">
-                    <h4>TELEFONE:</h4> 
-                    <input type="text" name="telefone" id="telefone" placeholder="Telefone (DD) 90000-0000" maxlength="15" required>
-                    <small id="erroTelefone" style="color: #F0AD12; display: none; font-weight: bold;">Telefone inválido!</small>
+                    <h4 class="obrigatorio">TELEFONE</h4>
+                    <input type="text" name="telefone" id="telefone" placeholder="(DD) 90000-0000" maxlength="15" required>
+                    <small id="erroTelefone" class="msg-campo-erro">Telefone inválido!</small>
                 </div>
                 
                 <div class="login_senha_caixas">
-                    <h4>DATA DE NASCIMENTO:</h4> 
+                    <h4 class="obrigatorio">DATA DE NASCIMENTO</h4>
                     <input type="date" name="data_nasc" id="data_nasc" style="color: #999;" required>
                 </div>
 
                 <div class="login_senha_caixas">
-                    <h4>SENHA:</h4> 
-                    <input type="password" name="senha" id="senhaCadastro" placeholder="Senha" required>
+                    <h4 class="obrigatorio">SENHA</h4>
+                    <input type="password" name="senha" id="senhaCadastro" placeholder="Mín. 8 chars, maiúscula, número e especial" required>
                     <i class="fa-solid fa-eye btn-toggle-password"></i>
+                    <!-- Dica de força de senha exibida enquanto o usuário digita -->
+                    <small id="erroSenha" class="msg-campo-erro">
+                        Senha fraca: use ao menos 8 caracteres, letras maiúsculas, minúsculas, um número e um caractere especial.
+                    </small>
+                </div>
+
+                <!-- Campo de confirmação de senha para evitar erros de digitação -->
+                <div class="login_senha_caixas">
+                    <h4 class="obrigatorio">CONFIRMAR SENHA</h4>
+                    <input type="password" id="senhaConfirmar" placeholder="Repita a senha" required>
+                    <i class="fa-solid fa-eye btn-toggle-password"></i>
+                    <small id="erroConfirmar" class="msg-campo-erro">As senhas não coincidem.</small>
                 </div>
                 
                 <button type="submit" class="btn-login">Finalizar Cadastro</button>
@@ -122,6 +155,7 @@
         </div>
     </div>
 
+<script src="/js/modal.js"></script>
 <script src="/js/cadastro.js"></script>
 </body>
 </html>

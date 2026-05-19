@@ -40,11 +40,12 @@
 /* IMAGEM PERFIL */
 .divFotoPerfil{
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 24px;
 }
 .divFotoPerfil label, .divFotoPerfil button {
-    flex: 1;            /* Faz os botões ocuparem o espaço restante */
-    margin-bottom: 5px; /* Espaçamento caso haja mais de um botão */
+    margin-bottom: 8px;
 }
 
 #preview-img{
@@ -63,7 +64,12 @@
 
 /* BOTÕES IMAGEM */
 .botoes_nome_imagem{
-    margin-left: 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 220px;       /* largura fixa para todos os botões ficarem idênticos */
+    flex-shrink: 0;
+    align-self: center; /* centraliza verticalmente em relação à foto */
 }
 
 /* ============================================= */
@@ -92,6 +98,10 @@
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
+    box-sizing: border-box;
+    display: block;         /* garante que o <label> se comporte como bloco igual ao <button> */
+    text-align: center;     /* centraliza o texto no <label> */
+    line-height: normal;    /* evita altura diferente entre label e button */
 }
 .btn-login:hover, .btn-img-perfil-atualizar:hover, .btn-img-perfil-excluir:hover, .botao-upload:hover, .btn-excluir-foto:hover {
     background-color: #F0AD12;

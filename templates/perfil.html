@@ -4,9 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="/assets/miniLogo.png" type="image/x-icon">
-    <title>Nouvelle - Pagamento</title>
+    <title>Nouvelle - Perfil</title>
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/perfil.css">
+    <link rel="stylesheet" href="/css/modal.css">
+    <style>
+        /* Asterisco vermelho nos campos obrigatórios */
+        .obrigatorio::after {
+            content: " *";
+            color: #e74c3c;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <nav class="menu">
@@ -35,7 +44,7 @@
                 <li class="item-perfil-nav">
                     <a id="menuPerfil" href="/perfil" >
                         Olá, {{ request.cookies.get('usuario_nome').split()[0] }}
-                        <img src="/{{ request.cookies.get('usuario_caminho_final') or usuario.caminho_final or 'assets/fotoPerfilDefault.png' }}" alt="Foto" class="foto-nav-mini">
+                        <img src="/{{ usuario.caminho_final or request.cookies.get('usuario_caminho_final') or 'assets/fotoPerfilDefault.png' }}" alt="Foto" class="foto-nav-mini">
                     </a>
                 </li>
                 <li><a id="menuLogout" href="/logout" class="btn-entrar">Sair</a></li>
@@ -51,27 +60,28 @@
             <h1 class="tituloPerfil">Meus Dados</h1>
             <p class="descricaoPerfil">Aqui você pode atualizar suas informações ou excluir sua conta.</p>
 
+            <!-- Mensagem de retorno do servidor exibida via modal padronizado -->
             {% if mensagem %}
-                <p class="mensagem_erro">
-                    {{ mensagem }}
-                </p>
+                <span id="mensagemServidor" data-msg="{{ mensagem }}" style="display:none"></span>
             {% endif %}
 
-            <form action="/atualizar_foto_perfil" method="POST" id="formPerfil" enctype="multipart/form-data">
+            <form action="/atualizar_foto_perfil" method="POST" id="formFoto" enctype="multipart/form-data">
                 <div class="divFotoPerfil">
                     <div id="container-preview">
-                        <img id="preview-img" src="/{{ request.cookies.get('usuario_caminho_final') or usuario.caminho_final or 'assets/fotoPerfilDefault.png' }}" alt="Foto de Perfil">
+                        <img id="preview-img" src="/{{ usuario.caminho_final or request.cookies.get('usuario_caminho_final') or 'assets/fotoPerfilDefault.png' }}" alt="Foto de Perfil">
                     </div>
 
                     <div class="botoes_nome_imagem">
                         <label for="btnAddFoto" class="botao-upload">Alterar Imagem</label>
                         <input type="file" name="foto_perfil" id="btnAddFoto" accept="image/*">
                         <p id="nomeArquivo"></p>
+                        <!-- Botão salvar foto: aparece ao selecionar arquivo -->
+                        <button type="submit" id="btnSalvarFoto" class="btn-login" style="display:none;">Salvar Foto</button>
+                        <!-- Botão excluir: só exibido quando há foto personalizada -->
+                        {% if usuario.caminho_final != 'assets/fotoPerfilDefault.png' %}
+                            <button type="submit" name="excluir_foto" value="true" class="btn-excluir-foto">Excluir Imagem</button>
+                        {% endif %}
                     </div>
-                    
-                    {% if (request.cookies.get('usuario_caminho_final') or usuario.caminho_final) != 'assets/fotoPerfilDefault.png' %}
-                        <button type="submit" name="excluir_foto" value="true" class="btn-excluir-foto">Excluir Imagem</button>
-                    {% endif %}
                 </div>
             </form>
         </div> 
@@ -85,23 +95,23 @@
                 </div>
                 
                 <div class="login_senha_caixas"> 
-                    <label style="color: #F0AD12;">Nome completo:</label>
+                    <label class="obrigatorio" style="color: #F0AD12;">Nome completo</label>
                     <input type="text" name="nome" value="{{ usuario.nome }}" required>
                 </div>
                 
                 <div class="login_senha_caixas"> 
-                    <label style="color: #F0AD12;">Email:</label>
+                    <label class="obrigatorio" style="color: #F0AD12;">Email</label>
                     <input type="email" name="email" value="{{ usuario.email }}" required>
                 </div>
                 
                 <div class="login_senha_caixas"> 
-                    <label style="color: #F0AD12;">Telefone:</label>
+                    <label class="obrigatorio" style="color: #F0AD12;">Telefone</label>
                     <input type="text" name="telefone" value="{{ usuario.telefone }}" required>
                 </div>
                 
                 <div class="login_senha_caixas"> 
-                    <label style="color: #F0AD12;">Data de Nascimento:</label>
-                    <input type="date" name="data_nasc" value="{{ usuario.data_nasc }}" required>
+                    <label class="obrigatorio" style="color: #F0AD12;">Data de Nascimento</label>
+                    <input type="date" id="data_nasc" name="data_nasc" value="{{ usuario.data_nasc }}" required>
                 </div>
                 
                 <button type="submit" class="btn-login" style="margin-bottom: 15px;">Atualizar Dados</button>
@@ -111,13 +121,35 @@
 
             <hr style="border: 1px solid #333; margin: 20px 0;">
 
-            <form action="/deletar_conta" method="POST" onsubmit="return confirm('Tem certeza absoluta que deseja EXCLUIR sua conta? Esta ação não pode ser desfeita.');">
-                <button type="submit" class="btn-login" style="background-color: #8B0000; color: white;">Excluir Minha Conta</button>
+            <!-- O onsubmit nativo foi substituído por modal padronizado via JS abaixo -->
+            <form action="/deletar_conta" method="POST" id="formDeletar">
+                <button type="button" id="btnDeletar" class="btn-login" style="background-color: #8B0000; color: white;">
+                    Excluir Minha Conta
+                </button>
             </form>
-
-            
         </div>
     </main>
+
+<script src="/js/modal.js"></script>
 <script src="/js/perfil.js"></script>
+
+<script>
+    // Substitui o confirm() nativo pelo modal padronizado para excluir conta
+    document.getElementById('btnDeletar').addEventListener('click', function () {
+        mostrarConfirmacao(
+            'Excluir conta',
+            'Tem certeza absoluta que deseja EXCLUIR sua conta? Esta ação não pode ser desfeita.',
+            function () {
+                document.getElementById('formDeletar').submit();
+            }
+        );
+    });
+
+    // Exibe mensagem de retorno do servidor via modal
+    const msgEl = document.getElementById('mensagemServidor');
+    if (msgEl && msgEl.dataset.msg) {
+        mostrarAlerta('Aviso', msgEl.dataset.msg, 'aviso');
+    }
+</script>
 </body>
 </html>

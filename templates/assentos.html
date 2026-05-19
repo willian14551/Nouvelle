@@ -7,6 +7,7 @@
     <title>Nouvelle - Assentos</title>
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/assentos.css">
+    <link rel="stylesheet" href="/css/modal.css">
 </head>
 <body data-sessao-id="{{ sessao_id | default(0) }}" data-sessao-qtde-assentos="{{ sessao_info.qtde_assentos if sessao_info else 60 }}" data-sessao-filme="{{ sessao_info.filme_nome | e if sessao_info else '' }}" data-sessao-sala="{{ sessao_info.sala_id if sessao_info else 0 }}" data-sessao-horario="{{ sessao_info.horario_str | e if sessao_info else '' }}" data-sessao-data="{{ sessao_info.data_str | e if sessao_info else '' }}">
     <nav class="menu">
@@ -125,25 +126,11 @@
             </div>
         </div>
     </main>
-
-    <div id="modalConfirmacao" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Confirmar Compra</h2>
-                <span class="modal-close">&times;</span>
-            </div>
-            <div class="modal-body">
-                <p><strong>Assentos Selecionados:</strong> <span id="modalAssentos"></span></p>
-                <p><strong>Total:</strong> <span id="modalTotal"></span></p>
-                <p>Deseja continuar para o pagamento?</p>
-            </div>
-            <div class="modal-footer">
-                <button id="btnCancelar" class="btn-modal btn-cancelar">Cancelar</button>
-                <button id="btnConfirmar" class="btn-modal btn-confirmar">Confirmar</button>
-            </div>
-        </div>
     </div>
 
+    <!-- modal.js deve vir antes de assentos.js para que mostrarConfirmacao esteja disponível -->
+    <script src="/js/modal.js"></script>
     <script src="/js/assentos.js?v={{ sessao_id | default(0) }}"></script>
+    <script src="/js/session-timeout.js"></script>
 </body>
 </html>

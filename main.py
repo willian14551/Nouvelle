@@ -56,18 +56,6 @@ async def home(request: Request):
         context={"request": request, "filmes": filmes_recentes}
     )
 
-# INATIVIDADE DO USUÁRIO
-@app.get("/logout")
-async def logout():
-    response = RedirectResponse(url="/login", status_code=303)
-    
-    # Remove todos os cookies que foram criados no login
-    response.delete_cookie("usuario_nome")
-    response.delete_cookie("usuario_cpf")
-    response.delete_cookie("usuario_foto")
-    
-    return response
-
 # Mostra para o js como buscar somente os 5 primeiros filmes
 @app.get("/api/filmes-em-cartaz")
 async def pegar_lista():
@@ -76,11 +64,13 @@ async def pegar_lista():
         dados = resposta.json()
         return dados.get("results", [])[:5]
 
+# API de Detalhes - Get (retorna status e assentos disponíveis de um filme específico)
 @app.get("/api/detalhes/{filme_id}")
 async def pegar_detalhes(filme_id: int):
     # Imagine que você busca os detalhes de um filme específico aqui
     return {"id": filme_id, "status": "Disponível", "assentos": [1, 5, 8]}
 
+# Mostra a página de detalhes de um filme, com informações completas e opção de compra
 @app.get("/detalhes/{filme_id}")
 async def detalhes_pagina(request: Request, filme_id: int):
     url_detalhes = f"https://api.themoviedb.org/3/movie/{filme_id}?api_key={API_KEY}&language=pt-BR"
@@ -133,6 +123,7 @@ async def detalhes_pagina(request: Request, filme_id: int):
         }
     )
 
+# API Em Breve - Get (retorna os próximos 18 filmes com data de lançamento futura)
 @app.get("/api/filmes-em-breve")
 async def api_em_breve():
     hoje = datetime.now().strftime("%Y-%m-%d")
@@ -165,6 +156,7 @@ async def filmesCartaz(request: Request):
         context={"request": request, "filmes": filmesCartaz}
     )
 
+# Mostra a página de filmes em breve, filtrando apenas os que ainda não estrearam
 @app.get("/emBreve")
 async def emBreve(request: Request):
     hoje = datetime.now().strftime("%Y-%m-%d")
@@ -190,6 +182,7 @@ async def emBreve(request: Request):
     )
 
 
+# Exibe a página de cadastro de novo usuário
 @app.get("/cadastro")
 async def cadastro_pagina (request: Request):
     return templates.TemplateResponse(
@@ -198,6 +191,7 @@ async def cadastro_pagina (request: Request):
         context={"request": request}
     )
 
+# Processa o formulário de cadastro: valida idade, senha, salva foto e insere o usuário no banco
 @app.post("/cadastrar")
 async def processar_cadastro(
     request: Request,
@@ -215,9 +209,9 @@ async def processar_cadastro(
     hoje = datetime.now()
 
     # Aqui ocorre o cálculo de idade
-    # 1. Subtraímos os anos.
-    # 2. Verificamos se o dia/mês atual já passou do dia/mês de nascimento.
-    # Se não passou, subtraímos 1 da idade.
+    # Subtraímos os anos
+    # Verificamos se o dia/mês atual já passou do dia/mês de nascimento
+    # Se não passou, subtraímos 1 da idade
     idade = hoje.year - data_nascimento.year - ((hoje.month, hoje.day) < (data_nascimento.month, data_nascimento.day))
 
     # Se a idade for menor que 18 (inclui datas futuras que geram idade negativa) vai ser barrado aqui
@@ -226,6 +220,15 @@ async def processar_cadastro(
             request=request, 
             name="cadastro.html", 
             context={"request": request, "mensagem": "Você precisa ter pelo menos 18 anos para se cadastrar."}
+        )
+
+    # Valida força da senha: mínimo 8 caracteres, maiúscula, minúscula, número e caractere especial
+    padrao_senha = re.compile(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+\[\]{};\':"\\|,.<>/?]).{8,}$')
+    if not padrao_senha.match(senha):
+        return templates.TemplateResponse(
+            request=request,
+            name="cadastro.html",
+            context={"request": request, "mensagem": "Senha fraca: use ao menos 8 caracteres, letras maiúsculas, minúsculas, um número e um caractere especial."}
         )
 
     caminho_final = "assets/fotoPerfilDefault.png"
@@ -286,6 +289,7 @@ async def processar_cadastro(
             cursor.close()
             conexao.close()
 
+# Exibe a página de login
 @app.get("/login")
 async def login_pagina(request: Request):
     return templates.TemplateResponse(
@@ -294,6 +298,7 @@ async def login_pagina(request: Request):
         context={"request": request}
     )
 
+# Processa o formulário de login: valida e-mail, compara senha com hash e define os cookies de sessão
 @app.post("/login")
 async def processar_login(
     request: Request,
@@ -335,12 +340,14 @@ async def processar_login(
             )
         
         resposta = RedirectResponse(url="/", status_code=303)
-        resposta.set_cookie(key="usuario_nome", value=usuario['nome'])
-        resposta.set_cookie(key="usuario_cpf", value=usuario['cpf'])
-        resposta.set_cookie(key="usuario_permissao", value=usuario['permissao'])
+        # max_age=3600 define 1 hora de validade; o JS de inatividade (session-timeout.js)
+        # desconecta antes disso após 15 minutos sem uso
+        resposta.set_cookie(key="usuario_nome", value=usuario['nome'], max_age=3600)
+        resposta.set_cookie(key="usuario_cpf", value=usuario['cpf'], max_age=3600)
+        resposta.set_cookie(key="usuario_permissao", value=usuario['permissao'], max_age=3600)
 
-        resposta.set_cookie(key="senha_usuario", value=usuario['senha'])
-        resposta.set_cookie(key="usuario_caminho_final", value=usuario['caminho_final'])
+        resposta.set_cookie(key="senha_usuario", value=usuario['senha'], max_age=3600)
+        resposta.set_cookie(key="usuario_caminho_final", value=usuario['caminho_final'], max_age=3600)
         return resposta
     except Exception as e:
         print(f"Erro no Login: {e}")
@@ -355,12 +362,16 @@ async def processar_login(
             conexao.close()
 
 
+# Encerra a sessão do usuário removendo todos os cookies e redirecionando para o login
 @app.get("/logout")
 async def logout():
-    resposta = RedirectResponse(url="/", status_code=303)
+    resposta = RedirectResponse(url="/login", status_code=303)
+    # Remove todos os cookies criados no login
     resposta.delete_cookie("usuario_nome")
     resposta.delete_cookie("usuario_cpf")
-    resposta.delete_cookie("usuario_permissao")  # cookie de permissão também precisa ser removido
+    resposta.delete_cookie("usuario_permissao")
+    resposta.delete_cookie("usuario_caminho_final")
+    resposta.delete_cookie("senha_usuario")
     return resposta
 
 
@@ -854,12 +865,9 @@ async def listar_ingressos(request: Request):
             conexao.close()
 
 
+# CRUD de Ingressos - Delete (cancela um ingresso e marca o pagamento como ESTORNADO)
 @app.delete("/api/admin/ingressos/{ingresso_id}")
 async def cancelar_ingresso(request: Request, ingresso_id: int):
-    """
-    Cancela (deleta) um ingresso e marca o pagamento como ESTORNADO.
-    Só cancela se o pagamento não for RECUSADO.
-    """
     if not _is_admin(request):
         return JSONResponse({"erro": "Acesso negado"}, status_code=403)
     conexao = obter_conexao()
@@ -1076,6 +1084,7 @@ async def carregar_perfil(request: Request):
             cursor.close()
             conexao.close()
 
+# Exibe os ingressos comprados pelo usuário logado, com detalhes do filme, sessão e pagamento
 @app.get("/meusIngressos")
 async def meus_ingressos(request: Request):
     cpf_logado = request.cookies.get("usuario_cpf")
@@ -1165,14 +1174,15 @@ async def atualizar_perfil(
         cursor.execute("SELECT cpf, nome, email, telefone, data_nasc, caminho_final FROM Usuario WHERE cpf = %s", (cpf_logado,))
         usuario_atualizado = cursor.fetchone()
 
-        resposta = RedirectResponse(url="/perfil", status_code=303)
         resposta = templates.TemplateResponse(
-            request = request,
-            name = "perfil.html",
-            context = {"request": request, "usuario": usuario_atualizado, "mensagem": "Dados atualizados com sucesso!"}
+            request=request,
+            name="perfil.html",
+            context={"request": request, "usuario": usuario_atualizado, "mensagem": "Dados atualizados com sucesso!"}
         )
-        
-        resposta.set_cookie(key="usuario_nome", value = nome)
+        resposta.set_cookie(key="usuario_nome", value=nome)
+        # Garante que o cookie de foto também esteja atualizado caso tenha mudado
+        if usuario_atualizado:
+            resposta.set_cookie(key="usuario_caminho_final", value=usuario_atualizado["caminho_final"])
 
         return resposta
     
@@ -1186,6 +1196,7 @@ async def atualizar_perfil(
             cursor.close()
             conexao.close()
 
+# Crud de Perfil - Update (atualiza ou exclui a foto de perfil do usuário, limpando o arquivo antigo do disco)
 @app.post("/atualizar_foto_perfil")
 async def atualizar_foto_perfil(
     request: Request,
@@ -1200,27 +1211,49 @@ async def atualizar_foto_perfil(
     if not conexao:
         return RedirectResponse(url="/", status_code=303)
     
-    # Caso o usuário enviou uma NOVA FOTO
-    elif foto_perfil and foto_perfil.filename:
-        os.makedirs("assets/uploads", exist_ok=True)
-        extensao = os.path.splitext(foto_perfil.filename)[1]
-        nome_arquivo = f"{cpf_logado}{extensao}"
-        caminho_disco = os.path.join("assets/uploads", nome_arquivo)
-        
-        with open(caminho_disco, "wb") as buffer:
-            shutil.copyfileobj(foto_perfil.file, buffer)
-        
-        caminho_foto = f"assets/uploads/{nome_arquivo}"
+    # Define o caminho padrão caso nenhuma ação seja realizada
+    caminho_foto = None
 
     # Caso o usuário clicou em EXCLUIR
     if excluir_foto == "true":
         caminho_foto = "assets/fotoPerfilDefault.png"
 
+    # Caso o usuário enviou uma NOVA FOTO
+    elif foto_perfil and foto_perfil.filename:
+        os.makedirs("assets/uploads", exist_ok=True)
+
+        # Remove a foto antiga do disco para não acumular arquivos
+        try:
+            cursor_limpeza = conexao.cursor()
+            cursor_limpeza.execute("SELECT caminho_final FROM Usuario WHERE cpf = %s", (cpf_logado,))
+            row = cursor_limpeza.fetchone()
+            cursor_limpeza.close()
+            if row:
+                caminho_antigo = row[0]
+                if caminho_antigo and caminho_antigo != "assets/fotoPerfilDefault.png":
+                    if os.path.exists(caminho_antigo):
+                        os.remove(caminho_antigo)
+        except Exception as e:
+            print(f"Aviso: não foi possível remover a foto antiga: {e}")
+
+        # Timestamp no nome para forçar o navegador a buscar o arquivo novo (evita cache 304)
+        ts = datetime.now().strftime("%Y%m%d%H%M%S")
+        extensao = os.path.splitext(foto_perfil.filename)[1]
+        nome_arquivo = f"{cpf_logado}_{ts}{extensao}"
+        caminho_disco = os.path.join("assets/uploads", nome_arquivo)
+
+        with open(caminho_disco, "wb") as buffer:
+            shutil.copyfileobj(foto_perfil.file, buffer)
+
+        caminho_foto = f"assets/uploads/{nome_arquivo}"
+
+    # Se nenhuma das duas ações foi detectada, volta sem fazer nada
+    if caminho_foto is None:
+        return RedirectResponse(url="/perfil", status_code=303)
 
     try:
         cursor = conexao.cursor(dictionary=True)
 
-        # Aqui que rola o update
         sql_update = """
             UPDATE Usuario
             SET caminho_final = %s
@@ -1229,24 +1262,23 @@ async def atualizar_foto_perfil(
         cursor.execute(sql_update, (caminho_foto, cpf_logado))
         conexao.commit()
 
-        cursor.execute("SELECT cpf FROM Usuario WHERE cpf = %s", (cpf_logado,))
+        # Busca todos os campos necessários para renderizar o template corretamente
+        cursor.execute("SELECT cpf, nome, email, telefone, data_nasc, caminho_final FROM Usuario WHERE cpf = %s", (cpf_logado,))
         usuario_atualizado = cursor.fetchone()
 
-        resposta = RedirectResponse(url="/perfil", status_code=303)
         resposta = templates.TemplateResponse(
-            request = request,
-            name = "perfil.html",
-            context = {"request": request, "usuario": usuario_atualizado, "mensagem": "Imagem de perfil atualizada com sucesso!"}
+            request=request,
+            name="perfil.html",
+            context={"request": request, "usuario": usuario_atualizado, "mensagem": "Imagem de perfil atualizada com sucesso!"}
         )
-        
+
         resposta.set_cookie(key="usuario_caminho_final", value=caminho_foto)
 
         return resposta
-    
-    except Exception as e:
-        print(f"Erro ao atualizar: {e}")
 
-        return RedirectResponse(url="perfil", status_code=303)
+    except Exception as e:
+        print(f"Erro ao atualizar foto: {e}")
+        return RedirectResponse(url="/perfil", status_code=303)
     
     finally:
         if conexao and conexao.is_connected():
@@ -1317,6 +1349,7 @@ async def pagamento(request: Request):
         context={"request": request}
     )
 
+# Crud de Pagamentos - Post (valida os dados de pagamento, registra o pagamento e cria os ingressos no banco)
 @app.post("/pagamento")
 async def processar_pagamento(
     request: Request,
@@ -1419,6 +1452,7 @@ async def processar_pagamento(
             cursor.close()
             conexao.close()
 
+# Exibe a página de sessões disponíveis para um filme específico
 @app.get("/sessoes/{filme_id}")
 async def sessoes_filme_page(request: Request, filme_id: int):
     # Verifica se o usuário está logado
@@ -1438,6 +1472,7 @@ async def sessoes_filme_page(request: Request, filme_id: int):
         context={"request": request, "filme": filme_dados, "filme_id": filme_id}
     )
 
+# Exibe a página de seleção de assentos para uma sessão, buscando as informações dela no banco
 @app.get("/assentos")
 async def assentos_page(request: Request, sessao_id: int):
     usuario_logado = request.cookies.get("usuario_cpf")
@@ -1492,6 +1527,7 @@ async def assentos_page(request: Request, sessao_id: int):
             cursor.close()
             conexao.close()
 
+# API Assentos - Get (retorna a lista de assentos já ocupados em uma sessão, para o JS bloquear no mapa)
 @app.get("/api/assentos-ocupados/{sessao_id}")
 async def assentos_ocupados(sessao_id: int):
     conexao = obter_conexao()
@@ -1508,13 +1544,9 @@ async def assentos_ocupados(sessao_id: int):
             cursor.close()
             conexao.close()
 
+# API Sessões - Get (busca as sessões futuras de um filme pelo tmdb_id, criando o registro no banco se necessário)
 @app.get("/api/sessoes-filme/{tmdb_id}")
 async def sessoes_filme(tmdb_id: int):
-    """
-    Recebe TMDB ID e retorna sessões do filme.
-    Primeiro tenta encontrar o filme no banco por tmdb_id.
-    Se não existir, cria um registro temporário.
-    """
     conexao = obter_conexao()
     if not conexao:
         return JSONResponse({"erro": "Erro de conexão"}, status_code=500)

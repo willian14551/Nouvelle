@@ -14,6 +14,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (botaoUpload) botaoUpload.innerText = "Alterar Imagem";
             if (paragNomeArquivo) paragNomeArquivo.innerText = nomeArquivo;
 
+            const btnSalvar = document.getElementById('btnSalvarFoto');
+
             if (arquivo) { 
                 const leitor = new FileReader();
 
@@ -23,8 +25,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 leitor.readAsDataURL(arquivo);
+                // Só mostra o botão de salvar quando o usuário seleciona um arquivo
+                if (btnSalvar) btnSalvar.style.display = 'block';
             } else {
                 if (containerPreview) containerPreview.style.display = 'none';
+                if (btnSalvar) btnSalvar.style.display = 'none';
             }
         });
     }

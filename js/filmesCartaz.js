@@ -1,64 +1,77 @@
+/**
+ * filmesCartaz.js — Busca e exibe filmes em cartaz com pesquisa local.
+ * Correções aplicadas: variável corpoTabela apontava para id errado dentro de filtrarFilmes(),
+ * variável "erro" indefinida no catch, e typo ".textContentL" no catch.
+ */
+
 window.onload = async () => {
+    const inputBuscar = document.getElementById("inputBuscar");
+    const btnBuscar   = document.getElementById("btnBuscar");
+    const gradeFilmes = document.getElementById("gradeFilmes");
+    const msgErro     = document.querySelector('.msgErro');
+    const msgErro1    = document.querySelector('.msgErro1');
+
+    let filmesEmCartaz = [];
+
+    function renderFilmes(lista) {
+        gradeFilmes.innerHTML = '';
+        if (!lista || lista.length === 0) {
+            if (msgErro)  msgErro.textContent  = `O filme '${inputBuscar.value}' ainda não está em exibição ou já saiu de cartaz.`;
+            if (msgErro1) msgErro1.textContent = 'Tente buscar outro filme.';
+            return;
+        }
+        // Limpa mensagens anteriores ao exibir resultados
+        if (msgErro)  msgErro.textContent  = '';
+        if (msgErro1) msgErro1.textContent = '';
+
+        lista.forEach(filme => {
+            const divCard = document.createElement("div");
+            divCard.className = "cardFilme";
+
+            const posterUrl = filme.poster_path
+                ? `https://image.tmdb.org/t/p/w500${filme.poster_path}`
+                : "/assets/sem-foto.jpg";
+
+            divCard.innerHTML = `
+                <a href="/detalhes/${filme.id}">
+                    <img class="posterFilme" src="${posterUrl}" alt="${filme.title}">
+                    <strong class="tituloFilme">${filme.title}</strong>
+                </a>
+            `;
+            gradeFilmes.appendChild(divCard);
+        });
+    }
+
+    function filtrarFilmes() {
+        const termo = (inputBuscar ? inputBuscar.value : '').trim().toLowerCase();
+        if (!termo) {
+            renderFilmes(filmesEmCartaz);
+            return;
+        }
+        const filtrados = filmesEmCartaz.filter(f => (f.title || '').toLowerCase().includes(termo));
+        renderFilmes(filtrados);
+    }
+
     try {
         const resposta = await fetch("/api/filmes-em-cartaz");
-        const filmesEmCartaz = await resposta.json();
-        console.log("Filmes carregados para busca local:", filmesEmCartaz);
+        filmesEmCartaz = await resposta.json();
 
-        if (filmesEmCartaz.length === 0) {
-            msgErro.textContent = "Nenhum filme em cartaz no momento.";
+        if (!filmesEmCartaz || filmesEmCartaz.length === 0) {
+            if (msgErro) msgErro.textContent = "Nenhum filme em cartaz no momento.";
             return;
         }
 
-        // Barra de pesquisa
-        const btnBuscar = document.getElementById("btnBuscar");
-        btnBuscar.addEventListener("click", () => {
-            filtrarFilmes();
-        });
-        window.addEventListener("keydown", function(event){
-            if (event.key == "Enter"){
+        if (btnBuscar) btnBuscar.addEventListener("click", filtrarFilmes);
+        window.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
                 filtrarFilmes();
             }
         });
 
-        const inputBuscar = document.getElementById("inputBuscar");
-    const corpoTabela = document.getElementById("gradeFilmes");
-    const msgErro = document.querySelector('.msgErro');
-    const msgErro1 = document.querySelector('.msgErro1');
-
-        function filtrarFilmes() {
-            const termo = inputBuscar.value.toLowerCase();
-            const corpoTabela = document.getElementById("corpoTabela");
-            corpoTabela.innerHTML = "";
-
-            // FILTRAGEM LOCAL: Olhamos apenas para os filmes que já temos
-            const resultados = filmesEmCartaz.filter(filme => 
-                filme.title.toLowerCase().includes(termo)
-            );
-
-            if (resultados.length > 0) {
-                resultados.forEach(filme => {
-                    const divCard = document.createElement("div");
-                    divCard.className = "cardFilme";
-                    
-                    // Montando a URL da imagem do TMDb
-                    const posterUrl = filme.poster_path 
-                        ? "https://image.tmdb.org/t/p/w500" + filme.poster_path 
-                        : "caminho/para/imagem-padrao.jpg";
-
-                    divCard.innerHTML = `
-                        <img class="posterFilme" src="${posterUrl}">
-                        <strong class="tituloFilme">${filme.title}</strong>
-                    `;
-                    corpoTabela.appendChild(divCard);
-                });
-            } else {
-                msgErro.textContent = "O filme '" + inputBuscar.value + "' ainda não está em exibição ou já saiu de cartaz.";
-                msgErro1.textContent = "Tente buscar outro filme.";
-            }
-        }
-
+        renderFilmes(filmesEmCartaz);
     } catch (error) {
-        console.error("Erro ao carregar API:", erro);
-        msgErro.textContentL = "Erro ao conectar com o servidor.";
+        console.error("Erro ao carregar API:", error);
+        if (gradeFilmes) gradeFilmes.innerHTML = "<p style='color:white;'>Erro ao conectar com o servidor.</p>";
     }
 };
