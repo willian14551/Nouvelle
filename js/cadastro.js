@@ -55,10 +55,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const campoPerfil    = document.getElementById('btnAddFoto');
     const previewImg     = document.getElementById('preview-img');
     const nomeArquivo    = document.getElementById('nomeArquivo');
+    const campoNome      = document.getElementById('Nome');
     const campoTelefone  = document.getElementById('telefone');
     const campoSenha     = document.getElementById('senhaCadastro');
     const campoConfirmar = document.getElementById('senhaConfirmar');
     const erroCPF        = document.getElementById('erroCpf');
+    const erroNome       = document.getElementById('erroNome');
     const erroTelefone   = document.getElementById('erroTelefone');
     const erroSenha      = document.getElementById('erroSenha');
     const erroConfirmar  = document.getElementById('erroConfirmar');
@@ -74,6 +76,15 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 erroCPF.style.display = 'none';
             }
+        });
+    }
+
+    // Valida o nome em tempo real
+    if (campoNome && erroNome) {
+        campoNome.addEventListener('input', () => {
+            const letras = campoNome.value.match(/[A-Za-zÀ-ÖØ-öø-ÿ]/g);
+            const totalLetras = letras ? letras.length : 0;
+            erroNome.style.display = (campoNome.value.length > 0 && totalLetras < 5) ? 'block' : 'none';
         });
     }
 
@@ -136,6 +147,16 @@ document.addEventListener('DOMContentLoaded', function () {
     // Validação completa antes de enviar o formulário ao servidor
     if (form) {
         form.addEventListener('submit', function (e) {
+            if (campoNome && erroNome) {
+                const letras = campoNome.value.match(/[A-Za-zÀ-ÖØ-öø-ÿ]/g);
+                const totalLetras = letras ? letras.length : 0;
+                if (totalLetras < 5) {
+                    e.preventDefault();
+                    erroNome.style.display = 'block';
+                    mostrarAlerta('Nome inválido', 'O nome deve ser nome completo.', 'erro');
+                    return;
+                }
+            }
             if (campoCPF && !validarCPF(campoCPF.value)) {
                 e.preventDefault();
                 mostrarAlerta('CPF inválido', 'Verifique o CPF digitado antes de continuar.', 'erro');
