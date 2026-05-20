@@ -32,3 +32,13 @@ pip install fastapi uvicorn pydantic pydantic-core mysql-connector-python bcrypt
 uvicorn main:app --reload
 
 ```
+### 2. Usuário Default ADMIN
+
+```
+E-mail: admin@nouvelle.com
+Senha: Admin@admin123
+```
+
+### Engenharia Reversa do Banco de Dados
+<img width="568" height="781" alt="image" src="https://github.com/user-attachments/assets/bae0a12b-0c8d-4628-b383-38d41d4c18ae" />
+
