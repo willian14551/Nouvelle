@@ -618,13 +618,14 @@
             }
         }
 
-        async function deletarFilme(id) {
+        function deletarFilme(id) {
             /* DELETE /api/admin/filmes/{id} */
             /* Remove o filme. O banco impedirá exclusão se houver sessões vinculadas (Foreign Key) */
-            if (!confirm('Excluir este filme? Isso só funciona se não houver sessões vinculadas.')) return;
-            const res = await fetch(`/api/admin/filmes/${id}`, { method: 'DELETE' });
-            if (res.ok) { toast('Filme excluído.'); carregarFilmes(); }
-            else { toast('Não é possível excluir: existem sessões vinculadas.', 'err'); }
+            mostrarConfirmacao('Excluir Filme', 'Isso só funciona se não houver sessões vinculadas. Deseja continuar?', async () => {
+                const res = await fetch(`/api/admin/filmes/${id}`, { method: 'DELETE' });
+                if (res.ok) { toast('Filme excluído.'); carregarFilmes(); }
+                else { toast('Não é possível excluir: existem sessões vinculadas.', 'err'); }
+            });
         }
 
         //  SALAS
@@ -693,12 +694,13 @@
             abrirModal('modal-sala');
         }
 
-        async function deletarSala(id) {
+        function deletarSala(id) {
             /* DELETE /api/admin/salas/{id} */
-            if (!confirm('Excluir esta sala?')) return;
-            const res = await fetch(`/api/admin/salas/${id}`, { method: 'DELETE' });
-            if (res.ok) { toast('Sala excluída.'); carregarSalas(); }
-            else { toast('Não é possível excluir: existem sessões nessa sala.', 'err'); }
+            mostrarConfirmacao('Excluir Sala', 'Deseja excluir esta sala permanentemente?', async () => {
+                const res = await fetch(`/api/admin/salas/${id}`, { method: 'DELETE' });
+                if (res.ok) { toast('Sala excluída.'); carregarSalas(); }
+                else { toast('Não é possível excluir: existem sessões nessa sala.', 'err'); }
+            });
         }
 
         // SESSÕES
@@ -838,12 +840,13 @@
             }
         }
 
-        async function deletarSessao(id) {
+        function deletarSessao(id) {
             /* DELETE /api/admin/sessoes/{id} */
-            if (!confirm('Excluir esta sessão?')) return;
-            const res = await fetch(`/api/admin/sessoes/${id}`, { method: 'DELETE' });
-            if (res.ok) { toast('Sessão excluída.'); carregarSessoes(); }
-            else { toast('Não é possível excluir: existem ingressos vinculados.', 'err'); }
+            mostrarConfirmacao('Excluir Sessão', 'Deseja excluir esta sessão permanentemente?', async () => {
+                const res = await fetch(`/api/admin/sessoes/${id}`, { method: 'DELETE' });
+                if (res.ok) { toast('Sessão excluída.'); carregarSessoes(); }
+                else { toast('Não é possível excluir: existem ingressos vinculados.', 'err'); }
+            });
         }
 
         //  USUÁRIOS
@@ -897,36 +900,37 @@
             renderizarUsuarios(filtrados);
         }
 
-        async function alternarPermissao(cpf, permissaoAtual) {
+        function alternarPermissao(cpf, permissaoAtual) {
             const nova = permissaoAtual === 'ADMINISTRADOR' ? 'CLIENTE' : 'ADMINISTRADOR';
-            if (!confirm(`Alterar permissão para ${nova}?`)) return;
+            mostrarConfirmacao('Alterar Permissão', `Deseja alterar a permissão deste usuário para ${nova}?`, async () => {
+                const res = await fetch(`/api/admin/usuarios/${cpf}/permissao`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ permissao: nova })
+                });
 
-            const res = await fetch(`/api/admin/usuarios/${cpf}/permissao`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ permissao: nova })
+                if (res.ok) {
+                    toast('Permissão atualizada!');
+                    carregarUsuarios();
+                } else {
+                    // Ele vai pegar a mensagem de erro enviada pelo BACKEND se houver uma se não conseguir atualizar
+                    const erroData = await res.json();
+                    toast(erroData.erro || 'Erro ao alterar permissão.', 'err');
+                }
             });
-
-            if (res.ok) {
-                toast('Permissão atualizada!');
-                carregarUsuarios();
-            } else {
-                // Ele vai pegar a mensagem de erro enviada pelo BACKEND se houver uma se não conseguir atualizar
-                const erroData = await res.json();
-                toast(erroData.erro || 'Erro ao alterar permissão.', 'err');
-            }
         }
 
-        async function deletarUsuario(cpf) {
+        function deletarUsuario(cpf) {
             /* DELETE /api/admin/usuarios/{cpf} */
-            if (!confirm('Excluir este usuário? Isso removerá todos os dados vinculados.')) return;
-            const res = await fetch(`/api/admin/usuarios/${cpf}`, { method: 'DELETE' });
-            if (res.ok) { toast('Usuário excluído.'); carregarUsuarios(); }
-            else {
-                // Ele vai pegar a mensagem de erro enviada pelo BACKEND se houver uma se não conseguir excluir
-                const erroData = await res.json();
-                toast(erroData.erro || 'Erro ao alterar permissão.', 'err');
-            }
+            mostrarConfirmacao('Excluir Usuário', 'Isso removerá todos os dados vinculados. Deseja continuar?', async () => {
+                const res = await fetch(`/api/admin/usuarios/${cpf}`, { method: 'DELETE' });
+                if (res.ok) { toast('Usuário excluído.'); carregarUsuarios(); }
+                else {
+                    // Ele vai pegar a mensagem de erro enviada pelo BACKEND se houver uma se não conseguir excluir
+                    const erroData = await res.json();
+                    toast(erroData.erro || 'Erro ao alterar permissão.', 'err');
+                }
+            });
         }
 
         // INGRESSOS
@@ -1020,12 +1024,13 @@
             }
         }
 
-        async function deletarIngresso(id) {
+        function deletarIngresso(id) {
             /* DELETE /api/admin/ingressos/{id} */
-            if (!confirm('Excluir este ingresso permanentemente?')) return;
-            const res = await fetch(`/api/admin/ingressos/${id}`, { method: 'DELETE' });
-            if (res.ok) { toast('Ingresso excluído.'); carregarIngressos(); }
-            else { toast('Erro ao excluir ingresso.', 'err'); }
+            mostrarConfirmacao('Excluir Ingresso', 'Deseja excluir este ingresso permanentemente?', async () => {
+                const res = await fetch(`/api/admin/ingressos/${id}`, { method: 'DELETE' });
+                if (res.ok) { toast('Ingresso excluído.'); carregarIngressos(); }
+                else { toast('Erro ao excluir ingresso.', 'err'); }
+            });
         }
 
         // ASSENTOS
@@ -1121,6 +1126,7 @@
         carregarFilmes();
     </script>
     <script src="/js/session-timeout.js"></script>
+    <script src="/js/modal.js"></script>
 </body>
 
 </html>

@@ -363,3 +363,69 @@ tbody td {
     thead th,
     tbody td { padding: 8px 10px; }
 }
+
+
+/*modal.js - estilos das classes de alerta/confirmação */
+
+#_modal-alerta-global {
+    display: flex;
+}
+
+.modal-caixa {
+    background: var(--bg-card);
+    border: 1px solid var(--red-brand);
+    border-radius: 8px;
+    padding: 28px;
+    width: 100%;
+    max-width: 480px;
+}
+
+.modal-titulo {
+    color: var(--gold);
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.modal-mensagem {
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.modal-botoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.modal-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 13px;
+    transition: all 0.3s ease;
+}
+
+.modal-btn--ok,
+.modal-btn--confirmar {
+    background: var(--gold);
+    color: #111;
+}
+
+.modal-btn--ok:hover,
+.modal-btn--confirmar:hover {
+    background: var(--gold-dark);
+}
+
+.modal-btn--cancelar {
+    background: var(--red-brand);
+    color: white;
+}
+
+.modal-btn--cancelar:hover {
+    background: var(--gold);
+    color: #141414;
+}
