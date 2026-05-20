@@ -79,3 +79,16 @@ ALTER TABLE sessao ADD CONSTRAINT FK_sessao_Filme
     FOREIGN KEY (fk_Filme_id)
     REFERENCES Filme (id)
     ON DELETE RESTRICT;
+
+INSERT INTO Usuario (cpf, nome, email, senha, telefone, data_nasc, estudante, pcd, permissao) 
+VALUES (
+    '000.000.000-00', 
+    'Administrador Nouvelle', 
+    'admin@nouvelle.com', 
+    '$2y$12$IWn35gNc8rLNyH6Nb0Mh9uEpatiJO/AazvXp72T.2cPjMoW.YeN1.', 
+    '(41) 90000-0000', 
+    '2000-01-01', 
+    FALSE, 
+    FALSE, 
+    'ADMINISTRADOR'
+);
