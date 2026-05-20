@@ -147,6 +147,21 @@
     margin: 20px 0;
 }
 
+/* Asterisco vermelho nos campos obrigatórios */
+.obrigatorio::after {
+            content: " *";
+            color: #e74c3c;
+            font-weight: bold;
+}
+
+/* MENSAGEM DE ERRO INLINE */
+.msg-campo-erro {
+            color: #F0AD12;
+            font-size: 0.82rem;
+            font-weight: bold;
+            margin-top: 4px;
+            display: none;
+}
 
 /* ============================================= */
 /* RESPONSIVIDADE PARA O CELULAR */

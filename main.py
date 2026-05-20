@@ -204,8 +204,17 @@ async def processar_cadastro(
     foto_perfil: UploadFile = File(None)
 ):
     # Validação de Idade
-    # Convertemos a data que veio do formulário (string) para um objeto de data
-    data_nascimento = datetime.strptime(data_nasc, "%Y-%m-%d")
+    # Converte a data que veio do formulário (string) para um objeto de data.
+    # O try/except impede que anos com mais de 4 dígitos quebrem o strptime
+    try:
+        data_nascimento = datetime.strptime(data_nasc, "%Y-%m-%d")
+    except ValueError:
+        return templates.TemplateResponse(
+            request=request, 
+            name="cadastro.html", 
+            context={"request": request, "mensagem": "Data de nascimento inválida."}
+        )
+
     hoje = datetime.now()
 
     # Aqui ocorre o cálculo de idade
@@ -215,11 +224,12 @@ async def processar_cadastro(
     idade = hoje.year - data_nascimento.year - ((hoje.month, hoje.day) < (data_nascimento.month, data_nascimento.day))
 
     # Se a idade for menor que 18 (inclui datas futuras que geram idade negativa) vai ser barrado aqui
-    if idade < 18:
+    # Também bloqueia idades absurdidas, como 150 anos
+    if idade < 18 or idade > 120: 
         return templates.TemplateResponse(
             request=request, 
             name="cadastro.html", 
-            context={"request": request, "mensagem": "Você precisa ter pelo menos 18 anos para se cadastrar."}
+            context={"request": request, "mensagem": "Idade Inválida: Você precisa ter entre 18 e 120 anos para se cadastrar."}
         )
 
     # Valida força da senha: mínimo 8 caracteres, maiúscula, minúscula, número e caractere especial
@@ -1142,14 +1152,16 @@ async def meus_ingressos(request: Request):
             cursor.close()
             conexao.close()
 
-# Crud de Perfil - Update (para atualizar os dados do usuário, informando nome, email, telefone e data de nascimento)
+# Crud de Perfil - Update (para atualizar os dados do usuário, informando nome, email, telefone e data de nascimento, e senha caso preenchida)
 @app.post("/atualizar_perfil")
 async def atualizar_perfil(
     request: Request,
     nome: str = Form(...),
     email: str = Form(...),
     telefone: str = Form(...),
-    data_nasc: str = Form(...)
+    data_nasc: str = Form(...),
+    nova_senha: str = Form(None),
+    confirmar_senha: str = Form(None)
 ):
     cpf_logado = request.cookies.get("usuario_cpf")
     if not cpf_logado:
@@ -1162,15 +1174,52 @@ async def atualizar_perfil(
     try:
         cursor = conexao.cursor(dictionary=True)
 
-        # Aqui que rola o update
-        sql_update = """
-            UPDATE Usuario
-            SET nome = %s, email = %s, telefone = %s, data_nasc = %s
-            WHERE cpf = %s
-        """
-        cursor.execute(sql_update, (nome, email, telefone, data_nasc, cpf_logado))
+        # Validação adicional no backend da nova senha (se fornecida)
+        senha_cripto = None
+        if nova_senha:
+            if nova_senha != confirmar_senha:
+                # Recarrega os dados do usuário para devolver a página de perfil com o aviso
+                cursor.execute("SELECT cpf, nome, email, telefone, data_nasc, caminho_final FROM Usuario WHERE cpf = %s", (cpf_logado,))
+                usuario_dados = cursor.fetchone()
+                return templates.TemplateResponse(
+                    request=request, name="perfil.html",
+                    context={"request": request, "usuario": usuario_dados, "mensagem": "As senhas não coincidem."}
+                )
+            
+            # Valida força da senha no backend por segurança
+            padrao_senha = re.compile(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+\[\]{};\':"\\|,.<>/?]).{8,}$')
+            if not padrao_senha.match(nova_senha):
+                cursor.execute("SELECT cpf, nome, email, telefone, data_nasc, caminho_final FROM Usuario WHERE cpf = %s", (cpf_logado,))
+                usuario_dados = cursor.fetchone()
+                return templates.TemplateResponse(
+                    request=request, name="perfil.html",
+                    context={"request": request, "usuario": usuario_dados, "mensagem": "A nova senha não atende aos requisitos de segurança."}
+                )
+            
+            # Gera o hash criptografado da nova senha
+            bytes_senha = nova_senha.encode('utf-8')
+            salt = bcrypt.gensalt()
+            senha_cripto = bcrypt.hashpw(bytes_senha, salt).decode('utf-8')
+
+        # Aqui que rola o update (com ou sem a senha, dependendo do input)
+        if senha_cripto:
+            sql_update = """
+                UPDATE Usuario
+                SET nome = %s, email = %s, telefone = %s, data_nasc = %s, senha = %s
+                WHERE cpf = %s
+            """
+            cursor.execute(sql_update, (nome, email, telefone, data_nasc, senha_cripto, cpf_logado))
+        else:
+            sql_update = """
+                UPDATE Usuario
+                SET nome = %s, email = %s, telefone = %s, data_nasc = %s
+                WHERE cpf = %s
+            """
+            cursor.execute(sql_update, (nome, email, telefone, data_nasc, cpf_logado))
+
         conexao.commit()
 
+        # Busca os dados recém-salvos para renderizar a página
         cursor.execute("SELECT cpf, nome, email, telefone, data_nasc, caminho_final FROM Usuario WHERE cpf = %s", (cpf_logado,))
         usuario_atualizado = cursor.fetchone()
 
@@ -1180,6 +1229,7 @@ async def atualizar_perfil(
             context={"request": request, "usuario": usuario_atualizado, "mensagem": "Dados atualizados com sucesso!"}
         )
         resposta.set_cookie(key="usuario_nome", value=nome)
+        
         # Garante que o cookie de foto também esteja atualizado caso tenha mudado
         if usuario_atualizado:
             resposta.set_cookie(key="usuario_caminho_final", value=usuario_atualizado["caminho_final"])
@@ -1188,8 +1238,7 @@ async def atualizar_perfil(
     
     except Exception as e:
         print(f"Erro ao atualizar: {e}")
-
-        return RedirectResponse(url="perfil", status_code=303)
+        return RedirectResponse(url="/perfil", status_code=303)
     
     finally:
         if conexao and conexao.is_connected():

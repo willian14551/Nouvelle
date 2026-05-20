@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,6 +20,7 @@
         }
     </style>
 </head>
+
 <body>
     <nav class="menu">
         <a href="/">
@@ -34,25 +36,25 @@
 
         <ul class="menu-links">
             <li><a class="menuInicio" href="/">Início</a></li>
-            <li><a class="menuFilmesCartaz" href="/filmesCartaz">Filmes em Cartaz</a></li>      
-            <li><a class="menuEmBreve" href="/emBreve">Em Breve</a></li> 
+            <li><a class="menuFilmesCartaz" href="/filmesCartaz">Filmes em Cartaz</a></li>
+            <li><a class="menuEmBreve" href="/emBreve">Em Breve</a></li>
         </ul>
         <ul class="menu-login">
             {% if request.cookies.get('usuario_nome') %}
-                {% if request.cookies.get('usuario_permissao') == 'ADMINISTRADOR' %}
-                    <li><a href="/admin" class="btn-admin">Painel Admin</a></li>
-                {% endif %}
-                
-                <li class="item-perfil-nav">
-                    <a id="menuPerfil" href="/perfil" >
-                        Olá, {{ request.cookies.get('usuario_nome').split()[0] }}
-                        <img src="/{{ request.cookies.get('usuario_caminho_final') }}" alt="Foto" class="foto-nav-mini">
-                    </a>
-                </li>
-                <li><a id="menuLogout" href="/logout" class="btn-entrar">Sair</a></li>
+            {% if request.cookies.get('usuario_permissao') == 'ADMINISTRADOR' %}
+            <li><a href="/admin" class="btn-admin">Painel Admin</a></li>
+            {% endif %}
+
+            <li class="item-perfil-nav">
+                <a id="menuPerfil" href="/perfil">
+                    Olá, {{ request.cookies.get('usuario_nome').split()[0] }}
+                    <img src="/{{ request.cookies.get('usuario_caminho_final') }}" alt="Foto" class="foto-nav-mini">
+                </a>
+            </li>
+            <li><a id="menuLogout" href="/logout" class="btn-entrar">Sair</a></li>
             {% else %}
-                <li><a href="/login" class="btn-entrar">Entrar</a></li>
-                <li><a href="/cadastro" class="btn-cadastrar">Cadastrar</a></li>
+            <li><a href="/login" class="btn-entrar">Entrar</a></li>
+            <li><a href="/cadastro" class="btn-cadastrar">Cadastrar</a></li>
             {% endif %}
         </ul>
     </nav>
@@ -64,14 +66,14 @@
 
                 <!-- Mensagem do servidor lida pelo JS e exibida via modal, sem quebrar o layout -->
                 {% if mensagem %}
-                    <span id="mensagemServidor" data-msg="{{ mensagem }}" style="display:none"></span>
+                <span id="mensagemServidor" data-msg="{{ mensagem }}" style="display:none"></span>
                 {% endif %}
             </div>
         </div>
 
         <div id="divRight">
             <form action="/login" method="POST" id="formLogin">
-                
+
                 <h1 class="tituloPagina">PÁGINA DE LOGIN</h1>
 
                 <div class="login_senha_caixas">
@@ -93,19 +95,22 @@
                     </div>
                     <a href="#" class="qual_minha_senha">Esqueceu sua senha?</a>
                 </div>
-            </form> 
+            </form>
         </div>
     </div>
-    
-<script src="/js/modal.js"></script>
-<script src="/js/login.js"></script>
-<script>
-    // Exibe a mensagem de erro do servidor via modal padronizado
-    // (o toggle de senha é tratado pelo login.js acima, sem duplicar aqui)
-    const msgEl = document.getElementById('mensagemServidor');
-    if (msgEl && msgEl.dataset.msg) {
-        mostrarAlerta('Atenção', msgEl.dataset.msg, 'erro');
-    }
-</script>
+
+    <script src="/js/modal.js"></script>
+    <script src="/js/login.js"></script>
+    <script>
+        // Exibe a mensagem de erro do servidor via modal padronizado
+        // (o toggle de senha é tratado pelo login.js acima, sem duplicar aqui)
+        const msgEl = document.getElementById('mensagemServidor');
+        if (msgEl && msgEl.dataset.msg) {
+            mostrarAlerta('Atenção', msgEl.dataset.msg, 'erro');
+        }
+    </script>
+    <script src="/js/session-timeout.js"></script>
+
 </body>
+
 </html>

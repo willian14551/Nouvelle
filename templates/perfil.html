@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,6 +18,7 @@
         }
     </style>
 </head>
+
 <body>
     <nav class="menu">
         <a href="/">
@@ -32,43 +34,46 @@
 
         <ul class="menu-links">
             <li><a href="/">Início</a></li>
-            <li><a href="/filmesCartaz">Filmes em Cartaz</a></li>      
-            <li><a href="/emBreve">Em Breve</a></li> 
+            <li><a href="/filmesCartaz">Filmes em Cartaz</a></li>
+            <li><a href="/emBreve">Em Breve</a></li>
         </ul>
         <ul class="menu-login">
             {% if request.cookies.get('usuario_nome') %}
-                {% if request.cookies.get('usuario_permissao') == 'ADMINISTRADOR' %}
-                    <li><a href="/admin" class="btn-admin">Painel Admin</a></li>
-                {% endif %}
-                
-                <li class="item-perfil-nav">
-                    <a id="menuPerfil" href="/perfil" >
-                        Olá, {{ request.cookies.get('usuario_nome').split()[0] }}
-                        <img src="/{{ usuario.caminho_final or request.cookies.get('usuario_caminho_final') or 'assets/fotoPerfilDefault.png' }}" alt="Foto" class="foto-nav-mini">
-                    </a>
-                </li>
-                <li><a id="menuLogout" href="/logout" class="btn-entrar">Sair</a></li>
+            {% if request.cookies.get('usuario_permissao') == 'ADMINISTRADOR' %}
+            <li><a href="/admin" class="btn-admin">Painel Admin</a></li>
+            {% endif %}
+
+            <li class="item-perfil-nav">
+                <a id="menuPerfil" href="/perfil">
+                    Olá, {{ request.cookies.get('usuario_nome').split()[0] }}
+                    <img src="/{{ usuario.caminho_final or request.cookies.get('usuario_caminho_final') or 'assets/fotoPerfilDefault.png' }}"
+                        alt="Foto" class="foto-nav-mini">
+                </a>
+            </li>
+            <li><a id="menuLogout" href="/logout" class="btn-entrar">Sair</a></li>
             {% else %}
-                <li><a id="menuLogin" href="/login" class="btn-entrar">Entrar</a></li>
-                <li><a id="menuCadastro" href="/cadastro" class="btn-cadastrar">Cadastrar</a></li>
+            <li><a id="menuLogin" href="/login" class="btn-entrar">Entrar</a></li>
+            <li><a id="menuCadastro" href="/cadastro" class="btn-cadastrar">Cadastrar</a></li>
             {% endif %}
         </ul>
     </nav>
 
-    <main class="main-perfil"> 
+    <main class="main-perfil">
         <div class="tamanho_logo">
             <h1 class="tituloPerfil">Meus Dados</h1>
             <p class="descricaoPerfil">Aqui você pode atualizar suas informações ou excluir sua conta.</p>
 
             <!-- Mensagem de retorno do servidor exibida via modal padronizado -->
             {% if mensagem %}
-                <span id="mensagemServidor" data-msg="{{ mensagem }}" style="display:none"></span>
+            <span id="mensagemServidor" data-msg="{{ mensagem }}" style="display:none"></span>
             {% endif %}
 
             <form action="/atualizar_foto_perfil" method="POST" id="formFoto" enctype="multipart/form-data">
                 <div class="divFotoPerfil">
                     <div id="container-preview">
-                        <img id="preview-img" src="/{{ usuario.caminho_final or request.cookies.get('usuario_caminho_final') or 'assets/fotoPerfilDefault.png' }}" alt="Foto de Perfil">
+                        <img id="preview-img"
+                            src="/{{ usuario.caminho_final or request.cookies.get('usuario_caminho_final') or 'assets/fotoPerfilDefault.png' }}"
+                            alt="Foto de Perfil">
                     </div>
 
                     <div class="botoes_nome_imagem">
@@ -76,80 +81,120 @@
                         <input type="file" name="foto_perfil" id="btnAddFoto" accept="image/*">
                         <p id="nomeArquivo"></p>
                         <!-- Botão salvar foto: aparece ao selecionar arquivo -->
-                        <button type="submit" id="btnSalvarFoto" class="btn-login" style="display:none;">Salvar Foto</button>
+                        <button type="submit" id="btnSalvarFoto" class="btn-login" style="display:none;">Salvar
+                            Foto</button>
                         <!-- Botão excluir: só exibido quando há foto personalizada -->
                         {% if usuario.caminho_final != 'assets/fotoPerfilDefault.png' %}
-                            <button type="submit" name="excluir_foto" value="true" class="btn-excluir-foto">Excluir Imagem</button>
+                        <button type="submit" name="excluir_foto" value="true" class="btn-excluir-foto">Excluir
+                            Imagem</button>
                         {% endif %}
                     </div>
                 </div>
             </form>
-        </div> 
+        </div>
 
-        <div class="Tamanho_Caixas_TXT"> 
+        <div class="Tamanho_Caixas_TXT">
             <form action="/atualizar_perfil" method="POST" id="formPerfil" enctype="multipart/form-data">
 
-                <div class="login_senha_caixas"> 
+                <div class="login_senha_caixas">
                     <label style="color: #F0AD12;">CPF (Não alterável):</label>
-                    <input type="text" name="cpf" value="{{ usuario.cpf }}" readonly style="background-color: #222; color: #777;">
+                    <input type="text" name="cpf" value="{{ usuario.cpf }}" readonly
+                        style="background-color: #222; color: #777;">
                 </div>
-                
-                <div class="login_senha_caixas"> 
+
+                <div class="login_senha_caixas">
                     <label class="obrigatorio" style="color: #F0AD12;">Nome completo</label>
                     <input type="text" name="nome" value="{{ usuario.nome }}" required>
                 </div>
-                
-                <div class="login_senha_caixas"> 
+
+                <div class="login_senha_caixas">
                     <label class="obrigatorio" style="color: #F0AD12;">Email</label>
                     <input type="email" name="email" value="{{ usuario.email }}" required>
                 </div>
-                
-                <div class="login_senha_caixas"> 
+
+                <div class="login_senha_caixas">
                     <label class="obrigatorio" style="color: #F0AD12;">Telefone</label>
                     <input type="text" name="telefone" value="{{ usuario.telefone }}" required>
                 </div>
-                
-                <div class="login_senha_caixas"> 
+
+                <div class="login_senha_caixas">
                     <label class="obrigatorio" style="color: #F0AD12;">Data de Nascimento</label>
                     <input type="date" id="data_nasc" name="data_nasc" value="{{ usuario.data_nasc }}" required>
                 </div>
-                
+
+                <hr style="border: 1px solid #333; margin: 25px 0 15px;">
+                <h3 style="color: white; margin-bottom: 5px; font-size: 1.1rem;">Alterar Senha (Opcional)</h3>
+                <p style="color: #aaa; font-size: 0.85rem; margin-bottom: 20px;">
+                    Deixe em branco se não quiser alterar sua senha atual.
+                </p>
+
+                <div class="login_senha_caixas">
+                    <label style="color: #F0AD12;">Nova Senha</label>
+                    <div style="position: relative;">
+                        <input type="password" name="nova_senha" id="nova_senha"
+                            placeholder="Mín. 8 chars, maiúscula, número e especial" style="padding-right: 40px;">
+                        <i class="fa-solid fa-eye btn-toggle-password"
+                            style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #ccc;"></i>
+                    </div>
+                    <small id="erroNovaSenha" class="msg-campo-erro" style="display: none;">
+                        Senha fraca: use ao menos 8 caracteres, letras maiúsculas, minúsculas, um número e um caractere
+                        especial.
+                    </small>
+                </div>
+
+                <div class="login_senha_caixas">
+                    <label style="color: #F0AD12;">Confirmar Nova Senha</label>
+                    <div style="position: relative;">
+                        <input type="password" name="confirmar_senha" id="confirmar_senha"
+                            placeholder="Repita a nova senha" style="padding-right: 40px;">
+                        <i class="fa-solid fa-eye btn-toggle-password"
+                            style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #ccc;"></i>
+                    </div>
+                    <small id="erroConfirmarSenha" class="msg-campo-erro" style="display: none;">As senhas não
+                        coincidem.</small>
+                </div>
+
                 <button type="submit" class="btn-login" style="margin-bottom: 15px;">Atualizar Dados</button>
-            </form>
 
-            <a href="/meusIngressos" class="btn-login" style="display: inline-block; margin-bottom: 15px; background-color: #333;">Meus Ingressos</a>
+                <a href="/meusIngressos" class="btn-login"
+                    style="display: inline-block; margin-bottom: 15px; background-color: #333;">Meus Ingressos</a>
 
-            <hr style="border: 1px solid #333; margin: 20px 0;">
+                <hr style="border: 1px solid #333; margin: 20px 0;">
 
-            <!-- O onsubmit nativo foi substituído por modal padronizado via JS abaixo -->
-            <form action="/deletar_conta" method="POST" id="formDeletar">
-                <button type="button" id="btnDeletar" class="btn-login" style="background-color: #8B0000; color: white;">
-                    Excluir Minha Conta
-                </button>
-            </form>
+                <!-- O onsubmit nativo foi substituído por modal padronizado via JS abaixo -->
+                <form action="/deletar_conta" method="POST" id="formDeletar">
+                    <button type="button" id="btnDeletar" class="btn-login"
+                        style="background-color: #8B0000; color: white;">
+                        Excluir Minha Conta
+                    </button>
+                </form>
         </div>
     </main>
 
-<script src="/js/modal.js"></script>
-<script src="/js/perfil.js"></script>
+    <script src="/js/modal.js"></script>
+    <script src="/js/perfil.js"></script>
 
-<script>
-    // Substitui o confirm() nativo pelo modal padronizado para excluir conta
-    document.getElementById('btnDeletar').addEventListener('click', function () {
-        mostrarConfirmacao(
-            'Excluir conta',
-            'Tem certeza absoluta que deseja EXCLUIR sua conta? Esta ação não pode ser desfeita.',
-            function () {
-                document.getElementById('formDeletar').submit();
-            }
-        );
-    });
+    <script>
+        // Substitui o confirm() nativo pelo modal padronizado para excluir conta
+        document.getElementById('btnDeletar').addEventListener('click', function () {
+            mostrarConfirmacao(
+                'Excluir conta',
+                'Tem certeza absoluta que deseja EXCLUIR sua conta? Esta ação não pode ser desfeita.',
+                function () {
+                    document.getElementById('formDeletar').submit();
+                }
+            );
+        });
 
-    // Exibe mensagem de retorno do servidor via modal
-    const msgEl = document.getElementById('mensagemServidor');
-    if (msgEl && msgEl.dataset.msg) {
-        mostrarAlerta('Aviso', msgEl.dataset.msg, 'aviso');
-    }
-</script>
+        // Exibe mensagem de retorno do servidor via modal
+        const msgEl = document.getElementById('mensagemServidor');
+        if (msgEl && msgEl.dataset.msg) {
+            mostrarAlerta('Aviso', msgEl.dataset.msg, 'aviso');
+        }
+    </script>
+
+    <script src="/js/session-timeout.js"></script>
+
 </body>
+
 </html>

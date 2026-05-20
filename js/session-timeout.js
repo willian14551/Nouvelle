@@ -1,10 +1,8 @@
-/**
- * session-timeout.js — Expira a sessão do usuário após 15 minutos de inatividade
- * Obs: Depende de modal.js para exibir o aviso antes de deslogar
- */
+ // session-timeout.js — Expira a sessão do usuário após 15 minutos de inatividade
+ // Obs: Depende de modal.js para exibir o aviso antes de deslogar
 
 (function () {
-    const TIMEOUT_MIN   = 15;                      // minutos até o logout automático
+    const TIMEOUT_MIN   = 2;                      // minutos até o logout automático
     const AVISO_MIN     = TIMEOUT_MIN - 1;          // avisa 1 minuto antes
     const TIMEOUT_MS    = TIMEOUT_MIN * 60 * 1000;
     const AVISO_MS      = AVISO_MIN  * 60 * 1000;

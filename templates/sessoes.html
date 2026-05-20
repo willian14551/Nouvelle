@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <link rel="stylesheet" href="/css/sessoes.css">
     <link rel="stylesheet" href="/css/modal.css">
 </head>
+
 <body>
     <nav class="menu">
         <a href="/">
@@ -31,20 +33,20 @@
 
         <ul class="menu-login">
             {% if request.cookies.get('usuario_nome') %}
-                {% if request.cookies.get('usuario_permissao') == 'ADMINISTRADOR' %}
-                    <li><a href="/admin" class="btn-admin">Painel Admin</a></li>
-                {% endif %}
+            {% if request.cookies.get('usuario_permissao') == 'ADMINISTRADOR' %}
+            <li><a href="/admin" class="btn-admin">Painel Admin</a></li>
+            {% endif %}
 
-                <li class="item-perfil-nav">
-                    <a id="menuPerfil" href="/perfil">
-                        Olá, {{ request.cookies.get('usuario_nome').split()[0] }}
-                        <img src="/{{ request.cookies.get('usuario_caminho_final') }}" alt="Foto" class="foto-nav-mini">
-                    </a>
-                </li>
-                <li><a id="menuLogout" href="/logout" class="btn-entrar">Sair</a></li>
+            <li class="item-perfil-nav">
+                <a id="menuPerfil" href="/perfil">
+                    Olá, {{ request.cookies.get('usuario_nome').split()[0] }}
+                    <img src="/{{ request.cookies.get('usuario_caminho_final') }}" alt="Foto" class="foto-nav-mini">
+                </a>
+            </li>
+            <li><a id="menuLogout" href="/logout" class="btn-entrar">Sair</a></li>
             {% else %}
-                <li><a id="menuLogin" href="/login" class="btn-entrar">Entrar</a></li>
-                <li><a id="menuCadastro" href="/cadastro" class="btn-cadastrar">Cadastrar</a></li>
+            <li><a id="menuLogin" href="/login" class="btn-entrar">Entrar</a></li>
+            <li><a id="menuCadastro" href="/cadastro" class="btn-cadastrar">Cadastrar</a></li>
             {% endif %}
         </ul>
     </nav>
@@ -75,18 +77,18 @@
         </div>
     </main>
 
-<script src="/js/modal.js"></script>
-<script>
-    const filmeId = {{ filme_id }};
+    <script src="/js/modal.js"></script>
+    <script>
+        const filmeId = {{ filme_id }};
 
-    async function carregarSessoes() {
-        try {
-            const response = await fetch(`/api/sessoes-filme/${filmeId}`);
-            const data = await response.json();
-            const sessoesList = document.getElementById('sessoes-list');
+        async function carregarSessoes() {
+            try {
+                const response = await fetch(`/api/sessoes-filme/${filmeId}`);
+                const data = await response.json();
+                const sessoesList = document.getElementById('sessoes-list');
 
-            if (data.sessoes && data.sessoes.length > 0) {
-                sessoesList.innerHTML = data.sessoes.map(sessao => `
+                if (data.sessoes && data.sessoes.length > 0) {
+                    sessoesList.innerHTML = data.sessoes.map(sessao => `
                     <div class="sessao-card">
                         <div class="sessao-info">
                             <div class="sessao-data">${formatarData(sessao.horario_inicio)}</div>
@@ -99,36 +101,38 @@
                         </div>
                     </div>
                 `).join('');
-            } else {
-                sessoesList.innerHTML = `
+                } else {
+                    sessoesList.innerHTML = `
                     <div class="sem-sessoes">
                         <h3>Nenhuma sessão disponível</h3>
                         <p>Não há sessões programadas para este filme no momento.</p>
                         <a href="/" class="btn-voltar">Voltar ao Início</a>
                     </div>
                 `;
+                }
+            } catch (error) {
+                console.error('Erro ao carregar sessões:', error);
+                // Usa modal para informar o erro ao usuário, seguindo o padrão da interface
+                mostrarAlerta('Erro', 'Não foi possível carregar as sessões. Tente novamente mais tarde.', 'erro');
+                document.getElementById('sessoes-list').innerHTML = '';
             }
-        } catch (error) {
-            console.error('Erro ao carregar sessões:', error);
-            // Usa modal para informar o erro ao usuário, seguindo o padrão da interface
-            mostrarAlerta('Erro', 'Não foi possível carregar as sessões. Tente novamente mais tarde.', 'erro');
-            document.getElementById('sessoes-list').innerHTML = '';
         }
-    }
 
-    function formatarData(dataStr) {
-        const data = new Date(dataStr);
-        return data.toLocaleDateString('pt-BR', {
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-        });
-    }
+        function formatarData(dataStr) {
+            const data = new Date(dataStr);
+            return data.toLocaleDateString('pt-BR', {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+            });
+        }
 
-    function formatarHorario(dataStr) {
-        const data = new Date(dataStr);
-        return data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    }
+        function formatarHorario(dataStr) {
+            const data = new Date(dataStr);
+            return data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        }
 
-    document.addEventListener('DOMContentLoaded', carregarSessoes);
-</script>
+        document.addEventListener('DOMContentLoaded', carregarSessoes);
+    </script>
+    <script src="/js/session-timeout.js"></script>
 </body>
+
 </html>
