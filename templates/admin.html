@@ -90,6 +90,23 @@
             <h2>Sessões Programadas</h2>
             <button class="btn btn-gold" onclick="abrirModal('modal-sessao')">+ Nova Sessão</button>
         </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 12px; margin-bottom: 20px; align-items: flex-end;">
+            <div class="campo" style="margin-bottom: 0;">
+                <label>Filme</label>
+                <input type="text" id="filtro-sessao-filme" placeholder="Nome do filme" onkeyup="filtrarSessoes()">
+            </div>
+            <div class="campo" style="margin-bottom: 0;">
+                <label>Data</label>
+                <input type="date" id="filtro-sessao-data" onchange="filtrarSessoes()">
+            </div>
+            <div class="campo" style="margin-bottom: 0;">
+                <label>Sala (Local)</label>
+                <input type="text" id="filtro-sessao-sala" placeholder="ID da sala" onkeyup="filtrarSessoes()">
+            </div>
+            <button class="btn btn-blue" onclick="limparFiltrosSessoes()" style="height: 38px;">Limpar</button>
+        </div>
+
         <div class="tabela-wrapper">
             <table>
                 <thead>
@@ -107,6 +124,14 @@
         <div class="secao-header">
             <h2>Usuários Cadastrados</h2>
         </div>
+
+        <div style="display: flex; gap: 12px; margin-bottom: 20px; align-items: flex-end;">
+            <div class="campo" style="margin-bottom: 0; flex: 1;">
+                <label>Buscar por Nome ou CPF</label>
+                <input type="text" id="filtro-usuario-termo" placeholder="Ex: Willian ou 123.456.789-00" onkeyup="filtrarUsuarios()">
+            </div>
+        </div>
+
         <div class="tabela-wrapper">
             <table>
                 <thead>
@@ -340,7 +365,11 @@
 
 <script>
     //  UTILITÁRIOS
-
+    
+    // VARIÁVEIS GLOBAIS PARA FILTROS
+    let dadosSessoesGlobais = [];
+    let dadosUsuariosGlobais = [];
+    
     function trocarAba(nome) {
         document.querySelectorAll('.aba-painel').forEach(p => p.classList.remove('ativa'));
         document.querySelectorAll('.aba-btn').forEach(b => b.classList.remove('ativa'));
@@ -627,15 +656,22 @@
         const tbody = document.getElementById('tabela-sessoes');
         tbody.innerHTML = '<tr><td colspan="6" class="carregando">Carregando...</td></tr>';
 
-        const res     = await fetch('/api/admin/sessoes');
-        const sessoes = await res.json();
+        const res = await fetch('/api/admin/sessoes');
+        dadosSessoesGlobais = await res.json();
+        
+        renderizarSessoes(dadosSessoesGlobais);
+    }
 
-        if (!sessoes.length) {
-            tbody.innerHTML = '<tr><td colspan="6" class="carregando">Nenhuma sessão cadastrada.</td></tr>';
+    function renderizarSessoes(lista) {
+        /* Renderiza a tabela de sessões com base no array fornecido */
+        const tbody = document.getElementById('tabela-sessoes');
+        
+        if (!lista.length) {
+            tbody.innerHTML = '<tr><td colspan="6" class="carregando">Nenhuma sessão encontrada.</td></tr>';
             return;
         }
 
-        tbody.innerHTML = sessoes.map((s, i) => `
+        tbody.innerHTML = lista.map((s, i) => `
             <tr>
                 <td>${i + 1}</td>
                 <td>${s.filme_nome}</td>
@@ -648,6 +684,37 @@
                 </td>
             </tr>
         `).join('');
+    }
+
+    function filtrarSessoes() {
+        /* Filtra as sessões localmente baseado nos inputs (Filme, Data, Sala) */
+        const termoFilme = document.getElementById('filtro-sessao-filme').value.toLowerCase();
+        const termoData  = document.getElementById('filtro-sessao-data').value;
+        const termoSala  = document.getElementById('filtro-sessao-sala').value.toLowerCase();
+
+        const filtrados = dadosSessoesGlobais.filter(s => {
+            const matchFilme = s.filme_nome.toLowerCase().includes(termoFilme);
+            const matchSala  = s.sala_id.toString().includes(termoSala);
+            
+            let matchData = true;
+            if (termoData) {
+                // Extrai apenas a parte da data (YYYY-MM-DD) do horario_inicio
+                const dataSessao = s.horario_inicio.split('T')[0];
+                matchData = (dataSessao === termoData);
+            }
+
+            return matchFilme && matchSala && matchData;
+        });
+
+        renderizarSessoes(filtrados);
+    }
+
+    function limparFiltrosSessoes() {
+        /* Restaura os filtros de sessões para o estado inicial */
+        document.getElementById('filtro-sessao-filme').value = '';
+        document.getElementById('filtro-sessao-data').value = '';
+        document.getElementById('filtro-sessao-sala').value = '';
+        renderizarSessoes(dadosSessoesGlobais);
     }
 
     async function preencherSelectFilmes() {
@@ -728,15 +795,28 @@
     }
 
     //  USUÁRIOS
+
     async function carregarUsuarios() {
         /* GET /api/admin/usuarios */
         const tbody = document.getElementById('tabela-usuarios');
         tbody.innerHTML = '<tr><td colspan="6" class="carregando">Carregando...</td></tr>';
 
-        const res      = await fetch('/api/admin/usuarios');
-        const usuarios = await res.json();
+        const res = await fetch('/api/admin/usuarios');
+        dadosUsuariosGlobais = await res.json();
+        
+        renderizarUsuarios(dadosUsuariosGlobais);
+    }
 
-        tbody.innerHTML = usuarios.map(u => `
+    function renderizarUsuarios(lista) {
+        /* Renderiza a tabela de usuários com base no array fornecido */
+        const tbody = document.getElementById('tabela-usuarios');
+
+        if (!lista.length) {
+            tbody.innerHTML = '<tr><td colspan="6" class="carregando">Nenhum usuário encontrado.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = lista.map(u => `
             <tr>
                 <td><code>${u.cpf}</code></td>
                 <td>${u.nome}</td>
@@ -751,6 +831,18 @@
                 </td>
             </tr>
         `).join('');
+    }
+
+    function filtrarUsuarios() {
+        /* Filtra os usuários localmente pelo Nome ou CPF */
+        const termo = document.getElementById('filtro-usuario-termo').value.toLowerCase();
+        
+        const filtrados = dadosUsuariosGlobais.filter(u => 
+            u.nome.toLowerCase().includes(termo) || 
+            u.cpf.toLowerCase().includes(termo)
+        );
+
+        renderizarUsuarios(filtrados);
     }
 
     async function alternarPermissao(cpf, permissaoAtual) {

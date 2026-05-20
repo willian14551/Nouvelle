@@ -56,13 +56,13 @@ async def home(request: Request):
         context={"request": request, "filmes": filmes_recentes}
     )
 
-# Mostra para o js como buscar somente os 5 primeiros filmes
+# Mostra para o js como buscar somente os 18 primeiros filmes
 @app.get("/api/filmes-em-cartaz")
 async def pegar_lista():
     async with httpx.AsyncClient(verify=False) as client:
         resposta = await client.get(url)
         dados = resposta.json()
-        return dados.get("results", [])[:5]
+        return dados.get("results", [])[:18]
 
 # API de Detalhes - Get (retorna status e assentos disponíveis de um filme específico)
 @app.get("/api/detalhes/{filme_id}")

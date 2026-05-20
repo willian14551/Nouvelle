@@ -1,6 +1,6 @@
 
  // modal.js — Sistema de alertas padronizado da Nouvelle
- //Disponibiliza duas funções globais: mostrarAlerta() e mostrarConfirmacao()
+ //Disponibiliza duas funções globais: o mostrarAlerta() e mostrarConfirmacao()
 
 // Cor principal de cada tipo, usada na borda da caixa e no botão OK via variável CSS
 const _CORES = {
