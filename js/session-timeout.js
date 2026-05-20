@@ -1,7 +1,6 @@
 /**
- * session-timeout.js — Expira a sessão do usuário após 15 minutos de inatividade.
- * Inclua este script apenas em páginas acessadas por usuários logados.
- * Depende de modal.js para exibir o aviso antes de deslogar.
+ * session-timeout.js — Expira a sessão do usuário após 15 minutos de inatividade
+ * Obs: Depende de modal.js para exibir o aviso antes de deslogar
  */
 
 (function () {
