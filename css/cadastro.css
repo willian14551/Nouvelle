@@ -30,6 +30,16 @@
     margin: 10px;
 }
 
+/* ÍCONE DO CALENDÁRIO */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(60%);
+    cursor: pointer;
+    transition: filter 0.2s ease; /* Transição suave igual à do olho */
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    filter: invert(71%) sepia(85%) saturate(1005%) hue-rotate(355deg) brightness(97%) contrast(94%);
+}
+
 /* BOTÃO DO ENVIO DA IMAGEM */
 .botao-upload {
     background-color: #141414;
@@ -89,11 +99,39 @@
     }
 
     /* ============================================= */
+    /* FOTO DE PERFIL */
+    .divFotoPerfil h4{
+        font-size: 25px;
+    }
+    #preview-img{
+        width: 250px;
+        height: 250px;
+        border: 5px solid #F0AD12;
+    }
+    #nomeArquivo{    
+        flex-wrap: wrap;
+        font-size: 25px;
+    }
+    .botao-upload, .btn-login {
+        font-size: 25px;
+        padding: 20px !important;
+    }
+
+    /* ============================================= */
     /* CAIXAS DE TEXTO (input) */
     .login_senha_caixas input {
         font-size: 30px;
         margin-bottom: 10px;
         height: 80px;
+    }
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        width: 30px;
+        height: 30px;
+    }
+
+
+    #erroSenha{
+        font-size: 20px;
     }
 
     /* UTILIDADES */
