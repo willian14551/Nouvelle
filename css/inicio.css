@@ -107,6 +107,7 @@
     /* CARROSSEL DE FILMES */
     .banner-carrossel {
         min-height: 400px;
+        height: 110vh !important;
     }
     
     /* SETAS DE NAVEGAÇÃO */
@@ -133,12 +134,13 @@
         inset: auto; /* Atalho moderno para as quatro direções ao mesmo tempo, evita o top:auto, bottom:auto, etc. */
         transform: none;
         width: 100%;
-        padding: 20px;
+        padding: 25px;
+        margin-bottom: 20px !important;
     }
     .info-filme h3 {
-        font-size: 50px !important;
+        font-size: 250% !important;
     }
     .info-filme p {
-        font-size: 30px;
+        font-size: 200%;
     }
 }
