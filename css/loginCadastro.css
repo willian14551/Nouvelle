@@ -89,12 +89,6 @@
     font-size: 0.85rem;
 }
 
-@media (max-width: 768px){
-    #divLeft{
-        display: none;
-    }
-}
-
 /* Torna o container o ponto de referência posicional */
 .login_senha_caixas {
     position: relative;
@@ -119,4 +113,57 @@
 
 .btn-toggle-password:hover {
     color: #F0AD12;
+}
+
+/* ============================================= */
+/* RESPONSIVIDADE PARA O CELULAR */
+@media (max-width: 768px) {
+    #divLogin, #divCadastro {
+        flex-direction: column;
+        align-items: center;
+        width: 80%;
+        margin: 40px auto;
+    }
+    #divLeft {
+        display: none;
+    }
+    #divRight {
+        flex: 1;
+        width: 100%;
+    }
+    
+    .tituloPagina {
+        text-align: center;
+        font-size: 35px;
+    }
+    
+    .login_senha_caixas h4 {
+        font-size: 25px;
+    }
+    .login_senha_caixas input {
+        height: 80px;
+        font-size: 25px;
+    }
+    .login_senha_caixas, .btn-login {
+        width: 100%;
+    }
+    .btn-login {
+        font-size: 30px;
+        padding: 10px;
+        margin-bottom: 20px;
+    }
+    
+    /* Reposiciona o olhinho da senha para não ficar flutuando */
+    .btn-toggle-password {
+        height: (100% - 30px); /* Ajusta a altura para o tamanho do input */
+    }
+
+    /* UTILIDADES */
+    .utilidades{
+        flex-wrap: wrap;
+        flex-direction: column;
+        display:flex;
+        justify-content: center;
+        align-items: center;
+    }
 }

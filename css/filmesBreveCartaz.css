@@ -113,23 +113,43 @@
     /* BARRA DE PESQUISA */
     /* Retira a borda redonda da barra de pesquisa e a deixa no tamanho da tela */
     .search-box{
-        top: 120px; /* Deixa a barra de pesquisa subir até esta posição (no caso fica "colado" com o menu)*/
+        top: 123px; /* Deixa a barra de pesquisa subir até esta posição (no caso fica "colado" com o menu)*/
         margin: 0; 
         border-radius: 0;
     }
     #inputBuscar {
         width: calc(100% - 40px); 
     }
+    input:-ms-input-placeholder{
+        font-size: 30px;
+    }
     .menu{
         border: 0; /* Remove a borda preta do menu no mobile */
+    }
+    .tituloPag{
+        margin-top: 25px;
+        font-size: 40px;
     }
 
     /* ============================================= */
     /* CONTAINER DOS FILMES */
+    .gradeFilmes {
+        padding: 0;
+        gap: 20px;
+        margin: 20px;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+    }
     .cardFilme {
         width: calc(50% - 20px); /* Deixa 2 filmes por linha no celular */
         min-width: 140px;
-    }   
+    }
+    .tituloFilme{
+        font-size: 25px;
+    }
+    .posterFilme {
+        width: 100%;
+        height: 300px; 
+    }
 }
 
 /* ============================================= */

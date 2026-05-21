@@ -51,15 +51,8 @@
     }
 
     /* UTILIDADES */
-    .utilidades{
-        flex-wrap: wrap;
-        display:grid;
-        justify-content: center;
-        align-items: center;
-    }
-    .lembre_de_mim, .Qual_minha_senha{
+    .lembre_de_mim, .qual_minha_senha{
         font-size: 25px;
-        margin-bottom: 30px;
+        margin-top: 15px;
     }
-
 }

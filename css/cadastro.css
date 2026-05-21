@@ -96,20 +96,9 @@
         height: 80px;
     }
 
-    /* BOTÃO DO ENVIO DA FORMULÁRIO */
-    .btn-login{
-        font-size: 30px;
-        padding: 10px;
-        margin-bottom: 20px;
-    }
-
     /* UTILIDADES */
-    .utilidades{
-        display:grid;
-        justify-content: center;
-        align-items: center;
-    }
     .link_login {
+        text-align: center;
         font-size: 25px;
         margin-bottom: 30px;
     }
