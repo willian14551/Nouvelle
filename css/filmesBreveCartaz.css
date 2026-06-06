@@ -1,18 +1,17 @@
 /* BARRA DE PESQUISA */
 /* Div da barra de pesquisa */
 .search-box {
-    position: sticky; /* Faz o menu grudar no topo ao rolar a página */
-    top: 150px; /* Deixa a barra de pesquisa subir até esta posição (no caso fica "colado" com o menu)*/
-    z-index: 1001; /* Garante que o menu fique sobre os outros elementos */
-    margin: 20px;
+    position: sticky;
+    top: 150px;
+    z-index: 999;
     display: flex;
     width: 100%;
     max-width: 1090px;
     background-color: #2f3640;
     border-radius: 8px;
-    overflow: hidden; /* Garante que o botão não saia da borda arredondada */
-    height: 50px; /* Altura da barra de pesquisa */
-    margin: -90px auto 40px auto; /* O -90px puxa a barra PARA CIMA, entrando na área da borda preta. O 'auto' centraliza nas laterais. O '40px' dá um respiro embaixo dela. */
+    overflow: hidden;
+    height: 50px;
+    margin: -90px auto 40px auto;
 }
 .search-box input {
     flex: 1; /* Faz o input ocupar todo o espaço restante */
@@ -110,11 +109,11 @@
 }
 
 @media (max-width: 768px) {
-    /* BARRA DE PESQUISA */
-    /* Retira a borda redonda da barra de pesquisa e a deixa no tamanho da tela */
-    .search-box{
-        top: 123px; /* Deixa a barra de pesquisa subir até esta posição (no caso fica "colado" com o menu)*/
-        margin: 0; 
+    .search-box {
+        position: relative;
+        top: auto;
+        z-index: auto;
+        margin: 0;
         border-radius: 0;
     }
     #inputBuscar {
