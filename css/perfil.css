@@ -163,10 +163,7 @@
             display: none;
 }
 
-/* ============================================= */
-/* RESPONSIVIDADE PARA O CELULAR */
 @media (max-width: 768px) {
-    /* INDICATIVO DA PÁGINA ATUAL NA BARRA DE NAVEGAÇÃO NO MOBILE */
     #menuPerfil{
         display: block;
         max-width: 100%;
@@ -174,5 +171,34 @@
         border-radius: 0;
         text-shadow: none !important;
         background-color: rgb(114, 23, 23);
+    }
+
+    .main-perfil {
+        flex-direction: column;
+        align-items: center;
+        gap: 40px;
+        padding: 20px;
+    }
+
+    .tamanho_logo {
+        position: static;
+        flex: 1 1 auto;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .divFotoPerfil {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .Tamanho_Caixas_TXT {
+        flex: 1 1 auto;
+        width: 100%;
     }
 }
