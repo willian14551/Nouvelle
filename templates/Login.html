@@ -82,8 +82,10 @@
                 </div>
                 <div class="login_senha_caixas">
                     <h4 class="obrigatorio">SENHA</h4>
-                    <input type="password" name="senha" id="senhaLogin" placeholder="Senha" required>
-                    <i class="fa-solid fa-eye btn-toggle-password"></i>
+                    <div class="input-wrapper">
+                        <input type="password" name="senha" id="senhaLogin" placeholder="Senha" required>
+                        <i class="fa-solid fa-eye btn-toggle-password"></i>
+                    </div>
                 </div>
 
                 <button type="submit" class="btn-login">Entrar</button>
@@ -103,7 +105,6 @@
     <script src="/js/login.js"></script>
     <script>
         // Exibe a mensagem de erro do servidor via modal padronizado
-        // (o toggle de senha é tratado pelo login.js acima, sem duplicar aqui)
         const msgEl = document.getElementById('mensagemServidor');
         if (msgEl && msgEl.dataset.msg) {
             mostrarAlerta('Atenção', msgEl.dataset.msg, 'erro');

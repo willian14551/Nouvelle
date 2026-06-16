@@ -134,20 +134,21 @@
 
                 <div class="login_senha_caixas">
                     <h4 class="obrigatorio">SENHA</h4>
-                    <input type="password" name="senha" id="senhaCadastro" placeholder="Digite sua senha" required>
-                    <i class="fa-solid fa-eye btn-toggle-password"></i>
-                    <!-- Dica de força de senha exibida enquanto o usuário digita -->
+                    <div class="input-wrapper">
+                        <input type="password" name="senha" id="senhaCadastro" placeholder="Digite sua senha" required>
+                        <i class="fa-solid fa-eye btn-toggle-password"></i>
+                    </div>
                     <small id="erroSenha" class="msg-campo-erro">
-                        Senha fraca: use ao menos 8 caracteres, letras maiúsculas, minúsculas, um número e um caractere
-                        especial.
+                        Senha fraca: use ao menos 8 caracteres, letras maiúsculas, minúsculas, um número e um caractere especial.
                     </small>
                 </div>
 
-                <!-- Campo de confirmação de senha para evitar erros de digitação -->
                 <div class="login_senha_caixas">
                     <h4 class="obrigatorio">CONFIRMAR SENHA</h4>
-                    <input type="password" id="senhaConfirmar" placeholder="Repita a senha" required>
-                    <i class="fa-solid fa-eye btn-toggle-password"></i>
+                    <div class="input-wrapper">
+                        <input type="password" id="senhaConfirmar" placeholder="Repita a senha" required>
+                        <i class="fa-solid fa-eye btn-toggle-password"></i>
+                    </div>
                     <small id="erroConfirmar" class="msg-campo-erro">As senhas não coincidem.</small>
                 </div>
 

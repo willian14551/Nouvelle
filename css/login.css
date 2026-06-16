@@ -39,7 +39,6 @@
     /* CAIXAS DE TEXTO (input) */
     .login_senha_caixas input{
         font-size: 30px;
-        margin-bottom: 10px;
         height: 80px;
     }
 

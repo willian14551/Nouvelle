@@ -89,12 +89,12 @@
     font-size: 0.85rem;
 }
 
-/* Torna o container o ponto de referência posicional */
-.login_senha_caixas {
+/* Container que isola o input e o ícone */
+.input-wrapper {
     position: relative;
+    width: 100%;
 }
 
-/* Garante que o texto digitado não fique por baixo do olho */
 .login_senha_caixas input[type="password"],
 .login_senha_caixas input[type="text"] {
     padding-right: 45px; 
@@ -103,7 +103,8 @@
 .btn-toggle-password {
     position: absolute;
     right: 15px;
-    bottom: 15px; 
+    top: 50%;
+    transform: translateY(-50%);
     cursor: pointer;
     color: #999;
     font-size: 1.2rem;
@@ -115,7 +116,6 @@
     color: #F0AD12;
 }
 
-/* ============================================= */
 /* RESPONSIVIDADE PARA O CELULAR */
 @media (max-width: 768px) {
     #divLogin, #divCadastro {
@@ -151,11 +151,6 @@
         font-size: 30px;
         padding: 10px;
         margin-bottom: 20px;
-    }
-    
-    /* Reposiciona o olhinho da senha para não ficar flutuando */
-    .btn-toggle-password {
-        height: (100% - 30px); /* Ajusta a altura para o tamanho do input */
     }
 
     /* UTILIDADES */
