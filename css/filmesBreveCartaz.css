@@ -3,7 +3,7 @@
 .search-box {
     position: sticky;
     top: 150px;
-    z-index: 999;
+    z-index: 9999;
     display: flex;
     width: 100%;
     max-width: 1090px;
@@ -110,9 +110,9 @@
 
 @media (max-width: 768px) {
     .search-box {
-        position: relative;
-        top: auto;
-        z-index: auto;
+        position: sticky;
+        top: 124px;
+        z-index: 999;
         margin: 0;
         border-radius: 0;
     }
