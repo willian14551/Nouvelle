@@ -36,7 +36,7 @@ uvicorn main:app --reload
 
 ```
 E-mail: admin@nouvelle.com
-Senha: Admin@admin123
+Senha: Admin@123
 ```
 
 ### Engenharia Reversa do Banco de Dados
